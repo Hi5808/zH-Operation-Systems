@@ -181,6 +181,18 @@ The `i915` driver is included regardless, so GUI can be added later without a ke
 
 ---
 
+## Boot Sequence
+
+Full detail in [boot_sequence.md](boot_sequence.md).
+
+```
+Power On → UEFI → GRUB → Kernel → initramfs → systemd → Plymouth (logo) → Services → Login → zsh + tmux
+```
+
+Target cold boot: **~16 seconds**
+
+---
+
 ## Status
 
 `Planning` — Base OS locked (Debian minimal). Kernel config and package list drafted.

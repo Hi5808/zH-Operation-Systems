@@ -3,6 +3,25 @@
   "version": "0.1.0",
   "status": "planning",
   "created": "2026-08-06",
+  "boot_sequence": {
+    "document": "os/smbrix/boot_sequence.md",
+    "stages": [
+      "MrChromebox UEFI — POST, EFI scan",
+      "GRUB — loads kernel + initramfs, 1s timeout",
+      "Linux kernel — Haswell CPU, eMMC, i915, iwlwifi init",
+      "initramfs — mounts real root partition",
+      "systemd (PID 1) — mounts filesystems, starts services",
+      "Plymouth — SMBrix boot logo displayed",
+      "Core services — NetworkManager, tailscaled, ufw, thermald",
+      "Plymouth exits — TTY ready",
+      "Getty — login prompt on TTY1",
+      "zsh + tmux — user shell environment"
+    ],
+    "target_boot_time_seconds": 16,
+    "kernel_params": "root=/dev/mmcblk0p3 quiet splash i915.enable_psr=0 nmi_watchdog=0",
+    "bootloader": "GRUB",
+    "bootloader_timeout_seconds": 1
+  },
   "branding": {
     "boot_logo": "os/smbrix/boot_logo.png",
     "boot_logo_description": "Circuit board leaf inside a glowing teal ring — transparent background, 972x972px PNG",
