@@ -59,7 +59,45 @@ tmux gives you:
 - Session persistence — detach and reattach without losing your session
 - Works over SSH, works headless, zero display dependency
 
-Shell: **bash** (default, reconsidering zsh/fish later)
+### Shell — zsh
+
+Matches Kali's default (switched from bash in 2020). Familiar from the existing setup on the device.
+
+Plugins:
+- `oh-my-zsh` — plugin/theme framework
+- `zsh-autosuggestions` — fish-style inline suggestions
+- `zsh-syntax-highlighting` — colors commands as you type
+
+### Emoji Support 🎨
+
+Emoji work natively in zsh scripts, the prompt, and the tmux status bar.
+
+Requirements:
+- Locale set to `en_US.UTF-8`
+- **JetBrainsMono Nerd Font** — covers full emoji + powerline icons
+- tmux: `set -g utf8 on`
+
+Use emoji directly in scripts:
+```zsh
+echo "🔒 VPN connected"
+echo "📡 WiFi: $(iwconfig 2>/dev/null | grep ESSID)"
+echo "🔋 Battery: $(cat /sys/class/power_supply/BAT0/capacity)%"
+```
+
+### Color Schemes
+
+Six schemes included — switch between them per session or set a default:
+
+| Scheme | Style | Best For |
+|--------|-------|----------|
+| **Dracula** ⭐ default | Dark purple/pink, high contrast | Low-light use |
+| **Nord** | Cool blue-grey, muted | Long sessions, easy on eyes |
+| **Gruvbox Dark** | Warm amber/green retro | High readability |
+| **Catppuccin Mocha** | Soft pastel dark | Modern aesthetic |
+| **Tokyo Night** | Deep blue/purple, vibrant | Visual pop |
+| **Solarized Dark** | Classic, precision contrast | Scientifically tuned |
+
+Schemes applied across: **tmux** · **vim** · **zsh prompt**
 
 ---
 

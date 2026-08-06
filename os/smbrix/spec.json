@@ -80,8 +80,47 @@
     "terminal": {
       "multiplexer": "tmux",
       "multiplexer_notes": "Split panes, multiple windows, session persistence — no GUI required. Replaces Terminator for CLI-first workflow.",
-      "shell": "bash",
-      "shell_candidates": ["bash", "zsh", "fish"]
+      "shell": "zsh",
+      "shell_notes": "zsh is Kali's default since 2020 — matches existing workflow on the device.",
+      "shell_plugins": ["oh-my-zsh", "zsh-autosuggestions", "zsh-syntax-highlighting"],
+      "emoji_support": {
+        "enabled": true,
+        "locale": "en_US.UTF-8",
+        "font": "JetBrainsMono Nerd Font",
+        "font_notes": "Nerd Font required for full emoji + icon rendering in terminal scripts and prompt",
+        "tmux_setting": "set -g utf8 on",
+        "notes": "Emoji usable directly in zsh scripts, prompt, and tmux status bar"
+      },
+      "color_schemes": {
+        "default": "Dracula",
+        "available": [
+          {
+            "name": "Dracula",
+            "style": "Dark purple/pink — high contrast, easy on eyes in low light"
+          },
+          {
+            "name": "Nord",
+            "style": "Cool blue-grey — muted, professional, great for long sessions"
+          },
+          {
+            "name": "Gruvbox Dark",
+            "style": "Warm retro amber/green — earthy, high readability"
+          },
+          {
+            "name": "Catppuccin Mocha",
+            "style": "Pastel dark — soft, modern, popular in the Linux community"
+          },
+          {
+            "name": "Tokyo Night",
+            "style": "Deep blue/purple — inspired by Tokyo at night, vibrant accents"
+          },
+          {
+            "name": "Solarized Dark",
+            "style": "Classic — precision contrast ratios, scientifically designed"
+          }
+        ],
+        "applied_to": ["tmux", "vim", "zsh prompt (oh-my-zsh theme)"]
+      }
     },
     "vpn_support": {
       "method": "CLI only",
