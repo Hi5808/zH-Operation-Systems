@@ -1,0 +1,87 @@
+{
+  "name": "SMBrix",
+  "version": "0.1.0",
+  "status": "planning",
+  "created": "2026-08-06",
+  "target_hardware": {
+    "device": "HP Chromebook 14-SMB",
+    "cpu": {
+      "model": "Intel Celeron 2955U",
+      "architecture": "x86_64",
+      "microarchitecture": "Haswell",
+      "cores": 2,
+      "threads": 2,
+      "base_clock_ghz": 1.4,
+      "cache_l3_mb": 2,
+      "tdp_w": 15
+    },
+    "gpu": {
+      "model": "Intel HD Graphics (Haswell)",
+      "type": "integrated",
+      "driver_target": "i915"
+    },
+    "ram": {
+      "size_gb": 4,
+      "type": "DDR3L",
+      "channels": 1
+    },
+    "storage": {
+      "internal": {
+        "type": "eMMC",
+        "size_gb": 16
+      },
+      "expansion": ["SD card"]
+    },
+    "display": {
+      "size_in": 14,
+      "resolution": "1366x768",
+      "type": "TN LCD"
+    },
+    "connectivity": {
+      "wifi": "Intel Dual Band Wireless-AC 7260",
+      "bluetooth": "4.0",
+      "usb": ["2x USB 2.0", "1x USB 3.0"],
+      "video_out": ["HDMI"],
+      "audio": "Intel HD Audio",
+      "sd_card": true,
+      "ethernet": false
+    },
+    "firmware": {
+      "type": "UEFI",
+      "provider": "MrChromebox",
+      "secure_boot": false
+    },
+    "battery": {
+      "estimated_life_hrs": 8
+    }
+  },
+  "os": {
+    "base": "TBD",
+    "base_candidates": ["Debian minimal", "Ubuntu Server", "Kali (stripped)"],
+    "kernel": "linux",
+    "kernel_notes": "Custom config targeting Haswell hardware, eMMC storage, i915 GPU",
+    "gui": {
+      "include": "undecided",
+      "candidates": ["none (CLI only)", "LXQt", "Openbox + tint2"]
+    },
+    "init_system": "systemd",
+    "package_manager": "apt",
+    "primary_interface": "CLI",
+    "vpn_support": {
+      "method": "CLI",
+      "clients": ["WireGuard", "OpenVPN", "nmcli"]
+    },
+    "goals": [
+      "Hardware-optimized for HP Chromebook 14-SMB",
+      "Minimal footprint to respect 16GB eMMC storage",
+      "Full UEFI boot via MrChromebox",
+      "Responsive CLI as primary interface",
+      "VPN support without GUI dependency",
+      "i915 GPU driver support for optional GUI"
+    ],
+    "non_goals": [
+      "General-purpose multi-hardware support",
+      "Heavy desktop environment"
+    ]
+  }
+}

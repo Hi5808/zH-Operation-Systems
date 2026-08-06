@@ -1,0 +1,14 @@
+{
+  "last_updated": "2026-08-06",
+  "os_count": 1,
+  "entries": [
+    {
+      "name": "SMBrix",
+      "slug": "smbrix",
+      "status": "planning",
+      "target_device": "HP Chromebook 14-SMB",
+      "architecture": "x86_64",
+      "path": "os/smbrix"
+    }
+  ]
+}
