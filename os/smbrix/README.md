@@ -91,7 +91,7 @@ Custom kernel config targeting this hardware specifically:
 `sudo` · `ufw` · `logrotate` · `cron` · `rsync`
 
 **VPN**
-`wireguard-tools` · `openvpn`
+`tailscale` · `wireguard-tools` · `openvpn`
 
 **Hardware**
 `firmware-iwlwifi` · `intel-microcode` · `thermald`
@@ -102,11 +102,14 @@ Custom kernel config targeting this hardware specifically:
 
 No GUI required for VPN:
 
-| Method | Command |
-|--------|---------|
-| WireGuard | `wg-quick up wg0` |
-| OpenVPN | `openvpn --config file.ovpn` |
-| NetworkManager | `nmcli vpn connect <name>` |
+| Method | Command | Notes |
+|--------|---------|-------|
+| **Tailscale** | `tailscale up` / `tailscale down` | Preferred — mesh VPN, zero-config, WireGuard under the hood |
+| WireGuard | `wg-quick up wg0` | Manual tunnel config |
+| OpenVPN | `openvpn --config file.ovpn` | Traditional VPN, wide server support |
+| NetworkManager | `nmcli vpn connect <name>` | Any configured VPN connection |
+
+**Tailscale** runs as a background daemon (`tailscaled`) and handles routing automatically. Best option for remote access to the Chromebook — `tailscale ssh` lets you reach the machine from anywhere without port forwarding.
 
 ---
 

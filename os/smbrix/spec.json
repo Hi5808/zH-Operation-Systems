@@ -85,13 +85,19 @@
     },
     "vpn_support": {
       "method": "CLI only",
-      "clients": ["WireGuard (wg-quick)", "OpenVPN", "nmcli"]
+      "clients": [
+        "Tailscale — mesh VPN, zero-config peer-to-peer, CLI via tailscale up/down/status",
+        "WireGuard (wg-quick) — manual config, raw tunnels",
+        "OpenVPN — traditional VPN, wide server compatibility",
+        "nmcli — NetworkManager CLI for any configured VPN"
+      ],
+      "tailscale_notes": "Preferred VPN for remote access. Runs as a daemon (tailscaled), WireGuard-based under the hood. Install via official apt repo."
     },
     "core_packages": {
       "networking": ["NetworkManager", "iwd", "nmap", "curl", "wget"],
       "terminal": ["tmux", "vim", "htop", "tree", "bat", "fzf"],
       "system": ["sudo", "ufw", "logrotate", "cron", "rsync"],
-      "vpn": ["wireguard-tools", "openvpn"],
+      "vpn": ["tailscale", "wireguard-tools", "openvpn"],
       "hardware": ["firmware-iwlwifi", "intel-microcode", "thermald"]
     },
     "storage_budget": {
