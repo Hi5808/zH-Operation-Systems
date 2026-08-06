@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "status": "planning",
   "created": "2026-08-06",
+  "branding": {
+    "boot_logo": "os/smbrix/boot_logo.png",
+    "boot_logo_description": "Circuit board leaf inside a glowing teal ring — transparent background, 972x972px PNG",
+    "boot_logo_format": "PNG with transparency",
+    "boot_splash": "Plymouth splash screen using boot_logo.png centered on dark background"
+  },
   "target_hardware": {
     "device": "HP Chromebook 14-SMB",
     "cpu": {

@@ -2,6 +2,14 @@
 
 > A hardware-first custom OS built specifically for the HP Chromebook 14-SMB.
 
+## Boot Logo
+
+![SMBrix Boot Logo](boot_logo.png)
+
+Circuit board leaf inside a glowing teal ring — displayed via Plymouth boot splash on startup.
+
+---
+
 ## Concept
 
 SMBrix is purpose-built for one machine. Every decision — kernel config, drivers, storage layout, interface — is made with the Chromebook 14-SMB's exact hardware in mind. It runs on a fully unlocked UEFI layer via MrChromebox, with Debian minimal as its base.
