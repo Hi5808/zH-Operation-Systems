@@ -56,32 +56,67 @@
     }
   },
   "os": {
-    "base": "TBD",
+    "base": "Debian minimal",
     "base_candidates": ["Debian minimal", "Ubuntu Server", "Kali (stripped)"],
     "kernel": "linux",
-    "kernel_notes": "Custom config targeting Haswell hardware, eMMC storage, i915 GPU",
+    "kernel_notes": "Custom config targeting Haswell microarchitecture, eMMC storage, i915 GPU, iwlwifi for Intel 7260",
+    "kernel_optimizations": [
+      "CONFIG_MHASWELL — Haswell CPU tuning",
+      "Enable eMMC (CONFIG_MMC, CONFIG_MMC_SDHCI)",
+      "i915 Intel GPU driver (CONFIG_DRM_I915)",
+      "iwlwifi for Intel 7260 WiFi (CONFIG_IWLWIFI)",
+      "Disable unused drivers (SCSI tape, floppy, parallel port, etc.)",
+      "Enable WireGuard (CONFIG_WIREGUARD)",
+      "Enable cgroups + namespaces for containerization"
+    ],
     "gui": {
       "include": "undecided",
-      "candidates": ["none (CLI only)", "LXQt", "Openbox + tint2"]
+      "candidates": ["none (CLI only)", "Openbox + tint2", "LXQt"],
+      "note": "Decision deferred until base footprint is measured against 16GB eMMC budget"
     },
     "init_system": "systemd",
     "package_manager": "apt",
     "primary_interface": "CLI",
+    "terminal": {
+      "multiplexer": "tmux",
+      "multiplexer_notes": "Split panes, multiple windows, session persistence — no GUI required. Replaces Terminator for CLI-first workflow.",
+      "shell": "bash",
+      "shell_candidates": ["bash", "zsh", "fish"]
+    },
     "vpn_support": {
-      "method": "CLI",
-      "clients": ["WireGuard", "OpenVPN", "nmcli"]
+      "method": "CLI only",
+      "clients": ["WireGuard (wg-quick)", "OpenVPN", "nmcli"]
+    },
+    "core_packages": {
+      "networking": ["NetworkManager", "iwd", "nmap", "curl", "wget"],
+      "terminal": ["tmux", "vim", "htop", "tree", "bat", "fzf"],
+      "system": ["sudo", "ufw", "logrotate", "cron", "rsync"],
+      "vpn": ["wireguard-tools", "openvpn"],
+      "hardware": ["firmware-iwlwifi", "intel-microcode", "thermald"]
+    },
+    "storage_budget": {
+      "total_gb": 16,
+      "partitions": {
+        "efi_mb": 512,
+        "swap_gb": 2,
+        "root_gb": 10,
+        "home_gb": 3.5
+      },
+      "notes": "Tight budget — no large desktop environments, careful package selection required"
     },
     "goals": [
-      "Hardware-optimized for HP Chromebook 14-SMB",
-      "Minimal footprint to respect 16GB eMMC storage",
+      "Hardware-optimized kernel for HP Chromebook 14-SMB",
+      "Minimal footprint within 16GB eMMC",
       "Full UEFI boot via MrChromebox",
-      "Responsive CLI as primary interface",
-      "VPN support without GUI dependency",
-      "i915 GPU driver support for optional GUI"
+      "tmux as multi-terminal interface — no GUI dependency",
+      "VPN support entirely from CLI",
+      "i915 driver retained for optional GUI path",
+      "Debian minimal as clean, proven base"
     ],
     "non_goals": [
       "General-purpose multi-hardware support",
-      "Heavy desktop environment"
+      "Heavy desktop environment",
+      "Snap or Flatpak packages"
     ]
   }
 }

@@ -4,9 +4,11 @@
 
 ## Concept
 
-SMBrix is purpose-built for one machine. Rather than adapting a general distro and hoping for the best, every decision — kernel config, drivers, storage layout, interface — is made with the Chromebook 14-SMB's exact hardware in mind.
+SMBrix is purpose-built for one machine. Every decision — kernel config, drivers, storage layout, interface — is made with the Chromebook 14-SMB's exact hardware in mind. It runs on a fully unlocked UEFI layer via MrChromebox, with Debian minimal as its base.
 
-The name comes directly from the machine: **14-SMB** (Small & Medium Business model). It runs on a fully unlocked UEFI layer via MrChromebox, freeing it entirely from ChromeOS constraints.
+The name comes directly from the machine: **14-SMB** (Small & Medium Business model).
+
+---
 
 ## Target Hardware
 
@@ -14,51 +16,122 @@ The name comes directly from the machine: **14-SMB** (Small & Medium Business mo
 |-----------|------|
 | Device | HP Chromebook 14-SMB |
 | CPU | Intel Celeron 2955U (Haswell, 2c/2t @ 1.4GHz) |
-| GPU | Intel HD Graphics (i915 driver) |
+| GPU | Intel HD Graphics — `i915` driver |
 | RAM | 4GB DDR3L |
 | Storage | 16GB eMMC |
 | Display | 14" 1366x768 |
-| WiFi | Intel 7260 AC |
+| WiFi | Intel Dual Band Wireless-AC 7260 (`iwlwifi`) |
 | Bluetooth | 4.0 |
 | Firmware | MrChromebox UEFI |
 
-## Design Decisions
+---
 
-### Hardware-first kernel
-The kernel will be configured specifically for Haswell microarchitecture, eMMC storage, and the i915 integrated GPU — no bloat for hardware that isn't in this machine.
+## Base OS
 
-### CLI as primary interface
-The primary interaction layer is the terminal. Every core function (VPN, networking, system management) works headlessly from the command line.
+**Debian minimal** — chosen because:
+- Smallest possible footprint for a 16GB eMMC
+- Kali (currently on the machine) already validates Debian hardware compatibility
+- Full control over every installed package
+- `firmware-iwlwifi` and `intel-microcode` available in non-free repos — one-step fix
 
-### VPN without a GUI
-VPN is handled entirely via CLI tools — no NetworkManager GUI required:
-- WireGuard via `wg-quick`
-- OpenVPN via `openvpn`
-- NetworkManager via `nmcli`
+---
 
-### GUI — undecided
-The 16GB eMMC and 4GB RAM make a lightweight GUI possible but not guaranteed. Candidates if included:
+## Storage Budget
+
+| Partition | Size |
+|-----------|------|
+| EFI | 512MB |
+| Swap | 2GB |
+| Root `/` | 10GB |
+| Home `/home` | 3.5GB |
+
+16GB total. Tight — no bloat allowed.
+
+---
+
+## Terminal Setup
+
+**tmux** is the multi-terminal solution — not Terminator (which requires a GUI).
+
+tmux gives you:
+- Split panes horizontally and vertically within a single terminal
+- Multiple named windows (like tabs)
+- Session persistence — detach and reattach without losing your session
+- Works over SSH, works headless, zero display dependency
+
+Shell: **bash** (default, reconsidering zsh/fish later)
+
+---
+
+## Kernel Configuration
+
+Custom kernel config targeting this hardware specifically:
+
+| Config | Purpose |
+|--------|---------|
+| `CONFIG_MHASWELL` | Haswell CPU optimizations |
+| `CONFIG_MMC`, `CONFIG_MMC_SDHCI` | eMMC storage support |
+| `CONFIG_DRM_I915` | Intel integrated GPU |
+| `CONFIG_IWLWIFI` | Intel 7260 WiFi |
+| `CONFIG_WIREGUARD` | Built-in WireGuard support |
+| Disable floppy, parallel port, SCSI tape, etc. | Remove unused driver overhead |
+| cgroups + namespaces | Container support |
+
+---
+
+## Core Packages
+
+**Networking**
+`NetworkManager` · `iwd` · `nmap` · `curl` · `wget`
+
+**Terminal**
+`tmux` · `vim` · `htop` · `tree` · `bat` · `fzf`
+
+**System**
+`sudo` · `ufw` · `logrotate` · `cron` · `rsync`
+
+**VPN**
+`wireguard-tools` · `openvpn`
+
+**Hardware**
+`firmware-iwlwifi` · `intel-microcode` · `thermald`
+
+---
+
+## VPN — CLI Only
+
+No GUI required for VPN:
+
+| Method | Command |
+|--------|---------|
+| WireGuard | `wg-quick up wg0` |
+| OpenVPN | `openvpn --config file.ovpn` |
+| NetworkManager | `nmcli vpn connect <name>` |
+
+---
+
+## GUI
+
+**Undecided.** Decision deferred until the base Debian install + kernel footprint is measured against the 16GB eMMC budget.
+
+Candidates if included:
 - **None** — pure CLI, maximum headroom
-- **Openbox + tint2** — minimal window manager, ~150MB overhead
-- **LXQt** — lightest full desktop, ~300MB overhead
+- **Openbox + tint2** — bare window manager, ~150MB
+- **LXQt** — lightest full desktop, ~300MB
 
-Decision deferred until base OS and kernel footprint are measured.
+The `i915` driver is included regardless, so GUI can be added later without a kernel rebuild.
 
-### Base OS candidates
-| Candidate | Pros | Cons |
-|-----------|------|------|
-| Debian minimal | Smallest base, rock-solid | Manual setup |
-| Ubuntu Server | Great hardware support, familiar | Slightly heavier |
-| Kali (stripped) | Already installed, keep tools | Larger base, security-tool overhead |
+---
 
 ## Status
 
-`Planning` — Hardware profile documented. Base OS and kernel config TBD.
+`Planning` — Base OS locked (Debian minimal). Kernel config and package list drafted.
 
 ## Next Steps
 
-- [ ] Choose base OS
-- [ ] Measure eMMC partition budget
-- [ ] Draft kernel config (Haswell + i915 + eMMC optimizations)
+- [ ] Choose shell (bash / zsh / fish)
+- [ ] Finalize kernel config
+- [ ] Measure base install footprint vs. 16GB budget
 - [ ] Decide GUI inclusion
-- [ ] Document package list
+- [ ] Document boot sequence (UEFI → GRUB → SMBrix)
+- [ ] Draft tmux default config
