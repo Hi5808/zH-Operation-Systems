@@ -6,7 +6,16 @@
 
 ![SMBrix Boot Logo](boot_logo.png)
 
-Circuit board leaf inside a glowing teal ring — displayed via Plymouth boot splash on startup.
+Circuit board leaf inside a glowing teal ring.
+
+### Usage
+
+| Context | Behavior |
+|---------|----------|
+| **Startup** | Displayed via Plymouth splash screen on every boot, before login prompt |
+| **Default app icon** | Any application or script without its own logo falls back to `boot_logo.png` |
+
+The boot logo is the system-wide identity — it appears at startup and acts as the fallback for anything unbranded. No application ships without a logo in SMBrix.
 
 ---
 
