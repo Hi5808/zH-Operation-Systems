@@ -82,6 +82,44 @@ None of this requires bypassing DRM, defeating a security boundary you
 don't have the right to cross, or touching hardware you don't own — see
 the legal scope below for exactly where this guide's methodology stops.
 
+## A note on ownership and credit
+
+By the end of a successful port, the running system on your device is
+yours — you did the dumping, the reverse engineering, the kernel work,
+the testing, the flashing. Nobody disputes that the finished result
+belongs to the person who did the work to get there.
+
+But "the final product is mine" and "I built this from nothing" are two
+different claims, and this guide is only honest if it keeps them
+separate. Almost nothing here is done from a blank slate:
+
+- The kernel you port from is someone else's source tree, published
+  under GPL specifically so you could do this.
+- The shim layer that lets Android HALs run under Linux (`libhybris`)
+  is Halium/UBports' engineering, not yours.
+- The device-porting conventions and tooling (`proprietary-blobs.txt`,
+  the per-device repo layout, `pmbootstrap`) came from postmarketOS and
+  Halium's accumulated work across hundreds of devices.
+- A specific chip family's bring-up — like GammaOS's work on the
+  UNISOC T618 handhelds (§9.4, `devices/anbernic-rg405m/profile.md`) —
+  is often the single thing that makes an otherwise "from scratch"
+  device tractable at all.
+
+Relying on that work isn't a shortcut you should feel is diminishing the
+result, and it isn't something to paper over either. It's how this
+entire ecosystem functions — every finished port is itself prior art for
+the next person, the same way GammaOS or Halium's device trees were
+prior art for you. The obligation that comes with using it is small and
+specific: name the project, link the source, don't present someone
+else's engineering as if it were a from-scratch result. That's not a
+legal formality — it's the actual mechanism by which this community
+keeps working for the next device and the next person after you.
+
+So the end-state view this guide wants you to walk away with is: the
+device is yours, the result is yours, and it was only possible because
+of named, credited work that came before it — all three of those are
+true at once, not in tension with each other.
+
 ## Legal / scope notes (read first)
 
 - Work only on hardware you own or are explicitly authorized to modify.
