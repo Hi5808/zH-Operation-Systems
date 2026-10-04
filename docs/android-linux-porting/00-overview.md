@@ -99,9 +99,13 @@ Stock Android firmware (OTA zip / dump from device)
 2. Jump to [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) and
    find your device's SoC vendor (or the closest match) to learn its
    boot-ROM recovery mode, dump/flash tooling, and mainline maturity.
-3. Copy [10-device-profile-template.md](10-device-profile-template.md)
-   into `devices/<codename>/profile.md` and fill it in as you work through
-   §1-§6 for your specific device.
+3. Run `./scripts/new-device.sh <codename> "<Display Name>" [vendor] [model]`
+   (see [10-device-profile-template.md](10-device-profile-template.md) and
+   [scripts/README.md](scripts/README.md)) to scaffold
+   `devices/<codename>/profile.md`, and fill it in as you work through
+   §1-§6 for your specific device. `./scripts/check-tools.sh` and the
+   other scripts in [scripts/](scripts/) automate the mechanical parts of
+   §1.
 4. Keep [11-troubleshooting-and-debugging.md](11-troubleshooting-and-debugging.md)
    open while bringing the device up — most first-boot issues map
    directly to one of its entries.

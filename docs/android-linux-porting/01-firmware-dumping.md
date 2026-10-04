@@ -4,6 +4,14 @@ Goal: get every partition that matters off the device (or out of an OTA
 package) as a plain file you can inspect, and recover the kernel/DTB/modules
 in a form a disassembler or kernel build can consume.
 
+The mechanical parts of §1.3-§1.5 below are automated by
+[scripts/unpack-boot.sh](scripts/unpack-boot.sh),
+[scripts/extract-kernel-config.sh](scripts/extract-kernel-config.sh), and
+[scripts/dump-vendor-partition.sh](scripts/dump-vendor-partition.sh) — see
+[scripts/README.md](scripts/README.md). The manual commands are still
+given below since the scripts are thin wrappers around exactly these
+steps, not a black box.
+
 ## 1.1 Sources of firmware
 
 - **OTA / full-firmware ZIP** from the vendor (easiest, most complete,

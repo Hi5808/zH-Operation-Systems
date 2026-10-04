@@ -1,5 +1,9 @@
 # 7. Tool Reference
 
+Run [scripts/check-tools.sh](scripts/check-tools.sh) to see which of the
+tools below are already installed on this machine, with install hints
+for anything missing.
+
 ## Dumping & unpacking (§1)
 | Tool | Purpose | Source |
 |---|---|---|
