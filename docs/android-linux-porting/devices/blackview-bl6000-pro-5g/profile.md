@@ -132,6 +132,13 @@ as components are RE'd per [02-reverse-engineering-ghidra.md](../../02-reverse-e
   learn whether `mtkclient` actually has write access on this unit.
 
 ## Next steps (in order)
+
+**If a dump already exists locally** (e.g. on a laptop with physical
+device access), skip straight to
+[../../HANDOFF.md](../../HANDOFF.md)'s Blackview checklist instead of
+re-deriving these steps — it's the concrete, ready-to-run version of the
+list below.
+
 1. Obtain a firmware dump — either the stock SP-Flash-Tool package (fast
    path, confirm checksum/provenance) or a direct `mtkclient` BROM dump
    from the physical device. The BROM dump is more authoritative (ground

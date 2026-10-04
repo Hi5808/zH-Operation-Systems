@@ -119,5 +119,10 @@ deferred to §9.
 
 | Device | SoC vendor / chip | Status |
 |---|---|---|
-| [Blackview BL6000 Pro 5G](devices/blackview-bl6000-pro-5g/profile.md) | MediaTek Dimensity 800 (MT6873) | Profile created, firmware not yet dumped |
-| [Anbernic RG405M](devices/anbernic-rg405m/profile.md) | UNISOC Tiger T618 | Profile created, firmware not yet dumped — existing GammaOS/LineageOS prior art identified |
+| [Blackview BL6000 Pro 5G](devices/blackview-bl6000-pro-5g/profile.md) | MediaTek Dimensity 800 (MT6873) | Profile created; dump files exist locally, not yet cataloged into this repo — see [HANDOFF.md](HANDOFF.md) |
+| [Anbernic RG405M](devices/anbernic-rg405m/profile.md) | UNISOC Tiger T618 | Profile created; dump files exist locally, not yet cataloged into this repo — see [HANDOFF.md](HANDOFF.md). Existing GammaOS/LineageOS prior art identified |
+
+**[HANDOFF.md](HANDOFF.md)** is the concrete, per-device checklist for
+whoever has physical access to these devices (a local agent, or you) —
+exact scripts to run, in order, and what to bring back into this repo
+vs. what must never be committed.

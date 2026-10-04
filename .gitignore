@@ -1,0 +1,15 @@
+# Vendor firmware dumps and derived binaries never belong in this repo --
+# only the text notes/manifests derived from them. See
+# docs/android-linux-porting/HANDOFF.md and 12-oem-restore.md.
+
+docs/android-linux-porting/devices/*/backups/*.img
+docs/android-linux-porting/devices/*/backups/*.bin
+docs/android-linux-porting/devices/*/boot_out/kernel
+docs/android-linux-porting/devices/*/boot_out/ramdisk
+docs/android-linux-porting/devices/*/boot_out/dtb
+docs/android-linux-porting/devices/*/boot_out/*.dtb
+docs/android-linux-porting/devices/*/vendor_mnt/
+
+# device.dts (text), kernel.config (text), manifest.tsv (checksums/paths
+# only, no binary content), profile.md, and re-notes.md are all fine to
+# commit and are NOT ignored by the above.

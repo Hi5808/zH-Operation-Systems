@@ -152,6 +152,13 @@ against stock firmware rather than reconstructing from zero — see
   for this.
 
 ## Next steps (in order)
+
+**If a dump already exists locally** (e.g. on a laptop with physical
+device access), skip straight to
+[../../HANDOFF.md](../../HANDOFF.md)'s Anbernic checklist instead of
+re-deriving these steps — it's the concrete, ready-to-run version of the
+list below.
+
 1. Clone and read `github.com/TheGammaSqueeze/GammaOS`'s kernel/device
    tree — this is almost certainly the fastest path to a complete,
    working DT + defconfig for this exact board, skipping most of §1/§4's
