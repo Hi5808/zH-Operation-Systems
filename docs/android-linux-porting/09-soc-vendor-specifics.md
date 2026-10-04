@@ -48,10 +48,24 @@ methodology and expect to do more from-scratch RE.
 - **Unbrick/full-dump mode**: **BROM mode** — hold a specific button
   combo while connecting USB, before the Preloader even runs; BootROM
   exposes a USB download protocol. Tool: **`mtkclient`**
-  (bkerler/mtkclient) — the MediaTek equivalent of EDL/qdl, dumps/flashes
-  any partition, including on devices with no unlocked bootloader (BROM
-  mode is a hardware-level boot stage, independent of bootloader lock
-  state, though "preloader auth" on some newer chips restricts it further).
+  (bkerler/mtkclient) — the MediaTek equivalent of EDL/qdl.
+  **What BROM actually lets you do is set by the chip's SLA/DAA (Secure
+  Login Authentication / Download Agent Authentication) fusing, which is
+  independent of the Android-level "OEM unlock" toggle — the two don't
+  track each other:**
+  - **DAA not enforced** (common on older/budget SoCs) — BROM gives full
+    read *and* write access to any partition, regardless of whether the
+    Android bootloader is unlocked.
+  - **DAA/SLA enforced** (more common on newer/flagship MTK chips) — BROM
+    requires an authentication handshake first. Some configurations allow
+    an unauthenticated **read-only** dump but block writes; others block
+    both. `mtkclient` implements known per-chip-generation bypasses
+    (e.g. "kamakiri", "hashimoto") for *some* SoCs, but this is a
+    chip-specific exploit, not a general guarantee — check
+    `mtkclient`'s own device-support notes for your exact chip before
+    assuming either read or write access, and never assume BROM alone
+    gives you a flashing/unbrick path until you've confirmed write access
+    works on this specific device.
 - **Partition naming**: GPT, similar `by-name` scheme; also has an older
   non-GPT "pmt"/legacy partition scheme on very old devices.
 - **Clock/pinctrl in DT**: `mediatek,mt<chip>-pericfg`/`topckgen` (clock),
@@ -112,16 +126,28 @@ methodology and expect to do more from-scratch RE.
 
 - **Boot chain**: BootROM → **FDL1/FDL2** (Flash Download agents,
   loaded over USB, analogous to Qualcomm's Firehose) → bootloader → kernel.
-- **Unbrick/full-dump**: UNISOC's SPRD download-mode protocol. Tools:
-  community reverse-engineered implementations exist (search
-  `sprd_dump`/`unisoc` tooling on GitHub; this ecosystem is far less
-  mature/standardized than Qualcomm/MediaTek's, so expect more manual
-  protocol work).
+- **Unbrick/full-dump**: UNISOC's SPRD download-mode protocol. Tooling
+  is fragmented and vendor/device-specific rather than one universal
+  client: community reverse-engineered implementations exist (search
+  `sprd_dump`/`unisoc` tooling on GitHub), and for Anbernic's T618/T820
+  handheld line specifically, the `unisoc-unlock` Python package
+  (`pip install unisoc-unlock`) and the GammaOS project's own flasher
+  implement a working unlock/flash flow (confirmed via GammaOS's install
+  docs — see `devices/anbernic-rg405m/profile.md` for the device-specific
+  detail). Notably, this flow does **not** use the standard Android
+  Developer-Options "OEM unlocking" toggle or AOSP `fastboot flashing
+  unlock` — UNISOC bootloaders on these devices report their own native
+  lock state (a boot-time "LOCK FLAG" message) and are unlocked through a
+  vendor-specific USB protocol instead. Treat any given UNISOC device's
+  actual unlock/dump tooling as something to search for by exact chip +
+  device family, not assumed from this general entry.
 - **Mainline/community status**: minimal — UNISOC chips (common in
   budget devices) have very little mainline Linux or Halium community
   support. A UNISOC device port is one of the more "from scratch" cases
   this guide's methodology is designed for; lean harder on §2 Ghidra RE
-  since there's less prior art to diff against.
+  since there's less prior art to diff against. The Anbernic/GammaOS
+  T618 line is a notable exception with real, working community tooling
+  — check for a similar project before assuming "from scratch" applies.
 
 ## 9.5 HiSilicon (Kirin) — legacy Huawei devices
 
@@ -165,6 +191,33 @@ probably already upstream.
 | Allwinner | FEL/boot0 | `sunxi-tools` | Panfrost/Lima (good) | Excellent |
 | Rockchip | Maskrom | `rkdeveloptool` | Panfrost (good) | Excellent |
 | NVIDIA Tegra | APX/RCM | `nvflash`/`tegrarcm` | Nouveau (partial) | Good |
+
+**None of these BootROM-level recovery modes are a guaranteed universal
+read/write bypass** — each vendor gates the mode behind its own
+authentication scheme, independent of the Android-level bootloader-unlock
+toggle:
+
+- **Qualcomm EDL**: the Sahara protocol that EDL speaks first needs a
+  signed Firehose loader before it'll do much; a generic/leaked loader
+  may give limited access, while the device's own vendor-signed loader
+  (if you can obtain one) gives full read/write. Not every device's
+  loader is publicly available.
+- **MediaTek BROM**: gated by SLA/DAA fusing, as detailed in §9.2 above
+  — full access on many older/budget chips, authenticated-only (and
+  sometimes read-only, sometimes fully blocked) on others.
+- **Samsung Odin mode**: generally works for read/write once in download
+  mode, but Samsung's KNOX fuse trips (permanently) the moment you flash
+  anything not Samsung-signed, which has consequences beyond this guide's
+  scope (warranty, some KNOX-gated features) — know this before flashing,
+  not after.
+- **UNISOC/HiSilicon**: tooling is immature enough that read/write
+  behavior is best treated as "unknown until tested" per device.
+
+Treat every entry in this table as "the documented starting point to
+investigate for this vendor," not "a guaranteed full-access backdoor" —
+confirm actual read/write behavior on your specific chip/firmware
+revision with the tool's own device-support notes before planning your
+unbrick strategy (§6.5) around it.
 
 ## Next
 

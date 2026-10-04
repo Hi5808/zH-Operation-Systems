@@ -1,5 +1,9 @@
 # 7. Tool Reference
 
+Run [scripts/check-tools.sh](scripts/check-tools.sh) to see which of the
+tools below are already installed on this machine, with install hints
+for anything missing.
+
 ## Dumping & unpacking (§1)
 | Tool | Purpose | Source |
 |---|---|---|
@@ -12,6 +16,7 @@
 | `fsck.erofs --extract` | Extract EROFS-formatted `system`/`vendor` images | github.com/erofs/erofs-utils |
 | `qdl` / `edl.py` | Qualcomm EDL-mode full partition dump on unbootable devices | github.com/openpst/qdl, github.com/bkerler/edl |
 | `mtkclient` | MediaTek BROM/Preloader mode dump/unbrick | github.com/bkerler/mtkclient |
+| `unisoc-unlock` (`pip install unisoc-unlock`) | UNISOC bootloader unlock on Anbernic's T618/T820 handheld line (confirmed working via the GammaOS project, §9.4) | pypi.org/project/unisoc-unlock, github.com/TheGammaSqueeze/GammaOSNext |
 | `Heimdall` | Samsung Exynos Odin-protocol dump/flash | github.com/Benjamin-Dobell/Heimdall |
 | `sunxi-tools` (`sunxi-fel`) | Allwinner FEL-mode dump/flash | github.com/linux-sunxi/sunxi-tools |
 | `rkdeveloptool` | Rockchip maskrom-mode dump/flash | github.com/rockchip-linux/rkdeveloptool |

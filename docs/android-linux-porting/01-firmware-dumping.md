@@ -4,6 +4,14 @@ Goal: get every partition that matters off the device (or out of an OTA
 package) as a plain file you can inspect, and recover the kernel/DTB/modules
 in a form a disassembler or kernel build can consume.
 
+The mechanical parts of §1.3-§1.5 below are automated by
+[scripts/unpack-boot.sh](scripts/unpack-boot.sh),
+[scripts/extract-kernel-config.sh](scripts/extract-kernel-config.sh), and
+[scripts/dump-vendor-partition.sh](scripts/dump-vendor-partition.sh) — see
+[scripts/README.md](scripts/README.md). The manual commands are still
+given below since the scripts are thin wrappers around exactly these
+steps, not a black box.
+
 ## 1.1 Sources of firmware
 
 - **OTA / full-firmware ZIP** from the vendor (easiest, most complete,
@@ -17,16 +25,24 @@ in a form a disassembler or kernel build can consume.
   - `fastboot` can't read partitions, only flash/erase, so prefer `dd`
     over a root shell or a custom recovery (TWRP) shell.
   - **BootROM-level recovery-mode dumps** — every major SoC vendor has a
-    hardware-level download mode that gives raw access to flash/dump any
-    partition, independent of Android's own lock state: Qualcomm's EDL
-    (9008 mode, via `qdl`/`edl.py`/QFIL), MediaTek's BROM mode (via
-    `mtkclient`), Samsung's Odin download mode (via Heimdall), or
+    hardware-level download mode: Qualcomm's EDL (9008 mode, via
+    `qdl`/`edl.py`/QFIL), MediaTek's BROM mode (via `mtkclient`),
+    Samsung's Odin download mode (via Heimdall), or
     Rockchip/Allwinner/Tegra's maskrom/FEL/APX modes. See
-    [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) for the exact
-    mode, tool, and button combo per vendor. This is the most reliable
-    dump method precisely because it works even on devices that refuse to
-    boot, won't root, or have a locked bootloader that still permits this
-    lower-level mode.
+    [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) §9.7 for the
+    exact mode/tool/button-combo per vendor — **and read that section's
+    caveat before relying on this**: these modes are *not* a universal
+    read/write bypass independent of all lock state. Each vendor gates
+    actual read/write access behind its own chip-level authentication
+    (Qualcomm's Sahara/Firehose loader signing, MediaTek's SLA/DAA
+    fusing, etc.), which is a separate thing from — and doesn't
+    necessarily track — the Android-level bootloader-unlock toggle. On
+    many older/budget devices this hardware-level mode is wide open
+    regardless of Android unlock state (which is exactly why it's the
+    preferred dump method there), but on a device with the chip's own
+    authentication enforced, it may give read-only access, or need a
+    chip-specific bypass that may or may not exist for your exact SoC.
+    Confirm actual behavior for your device before planning around it.
 - **Factory/engineering images** some vendors publish (Google Pixel,
   Sony Xperia "unlockable bootloader" program, Xiaomi EU/global ROM
   mirrors, etc.).
