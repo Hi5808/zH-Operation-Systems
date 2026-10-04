@@ -109,3 +109,10 @@ Stock Android firmware (OTA zip / dump from device)
 Nothing in §1-§8 assumes a specific chipset; every command that differs by
 vendor (dump mode, flashing tool, clock/pinctrl naming) is called out and
 deferred to §9.
+
+## Devices tracked in this repo
+
+| Device | SoC vendor / chip | Status |
+|---|---|---|
+| [Blackview BL6000 Pro 5G](devices/blackview-bl6000-pro-5g/profile.md) | MediaTek Dimensity 800 (MT6873) | Profile created, firmware not yet dumped |
+| [Anbernic RG405M](devices/anbernic-rg405m/profile.md) | UNISOC Tiger T618 | Profile created, firmware not yet dumped — existing GammaOS/LineageOS prior art identified |
