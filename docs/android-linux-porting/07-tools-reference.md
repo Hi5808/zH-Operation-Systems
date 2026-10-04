@@ -12,6 +12,11 @@
 | `fsck.erofs --extract` | Extract EROFS-formatted `system`/`vendor` images | github.com/erofs/erofs-utils |
 | `qdl` / `edl.py` | Qualcomm EDL-mode full partition dump on unbootable devices | github.com/openpst/qdl, github.com/bkerler/edl |
 | `mtkclient` | MediaTek BROM/Preloader mode dump/unbrick | github.com/bkerler/mtkclient |
+| `Heimdall` | Samsung Exynos Odin-protocol dump/flash | github.com/Benjamin-Dobell/Heimdall |
+| `sunxi-tools` (`sunxi-fel`) | Allwinner FEL-mode dump/flash | github.com/linux-sunxi/sunxi-tools |
+| `rkdeveloptool` | Rockchip maskrom-mode dump/flash | github.com/rockchip-linux/rkdeveloptool |
+| `nvflash` / `tegrarcm` | NVIDIA Tegra APX/RCM-mode dump/flash | developer.nvidia.com, github.com/NVIDIA/tegrarcm |
+| `sgdisk` / `parted` | Inspect/edit GPT partition tables on a raw storage dump | distro package `gdisk`/`parted` |
 
 ## Reverse engineering (§2)
 | Tool | Purpose |

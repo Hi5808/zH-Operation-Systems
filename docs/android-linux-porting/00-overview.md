@@ -1,9 +1,12 @@
-# Porting Mainline Linux to an Unsupported Android Device
+# Porting Mainline Linux to Any Unsupported Android Device
 
 ## What this guide covers
 
-A high-level, end-to-end methodology for taking an Android device whose
-vendor never shipped (or stopped shipping) a mainline Linux / Ubuntu Touch /
+A vendor-agnostic, end-to-end methodology for taking **any** Android
+device — regardless of SoC vendor (Qualcomm, MediaTek, Samsung Exynos,
+UNISOC, HiSilicon, or a tablet-class Allwinner/Rockchip/Tegra chip; see
+[09-soc-vendor-specifics.md](09-soc-vendor-specifics.md)) — whose vendor
+never shipped (or stopped shipping) a mainline Linux / Ubuntu Touch /
 postmarketOS build, and bringing a real Linux userspace up on it by:
 
 1. Dumping the stock firmware (bootloader, kernel, vendor partitions).
@@ -86,3 +89,23 @@ Stock Android firmware (OTA zip / dump from device)
 | [06-bootloader-and-flashing.md](06-bootloader-and-flashing.md) | Boot chain, repacking images, flashing, recovery |
 | [07-tools-reference.md](07-tools-reference.md) | Full tool list with install notes |
 | [08-case-studies.md](08-case-studies.md) | Real-world references: Halium, postmarketOS, PinePhone, Sailfish |
+| [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) | Per-SoC-vendor boot chain, unbrick mode, GPU/modem specifics (Qualcomm, MediaTek, Exynos, UNISOC, HiSilicon, Allwinner, Rockchip, Tegra) |
+| [10-device-profile-template.md](10-device-profile-template.md) | Fill-in worksheet for tracking a specific device's port end-to-end |
+| [11-troubleshooting-and-debugging.md](11-troubleshooting-and-debugging.md) | Symptom-indexed fixes for every stage of the pipeline |
+
+## How to use this for a new/unlisted device
+
+1. Read §1-§8 once, straight through, for the general methodology.
+2. Jump to [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) and
+   find your device's SoC vendor (or the closest match) to learn its
+   boot-ROM recovery mode, dump/flash tooling, and mainline maturity.
+3. Copy [10-device-profile-template.md](10-device-profile-template.md)
+   into `devices/<codename>/profile.md` and fill it in as you work through
+   §1-§6 for your specific device.
+4. Keep [11-troubleshooting-and-debugging.md](11-troubleshooting-and-debugging.md)
+   open while bringing the device up — most first-boot issues map
+   directly to one of its entries.
+
+Nothing in §1-§8 assumes a specific chipset; every command that differs by
+vendor (dump mode, flashing tool, clock/pinctrl naming) is called out and
+deferred to §9.

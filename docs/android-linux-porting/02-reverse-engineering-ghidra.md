@@ -82,7 +82,93 @@ Practical Ghidra workflow:
   recovering AIDL/HIDL interface vtables from HAL `.so` files) — useful when
   the thing you're RE'ing is a HAL rather than a kernel module.
 
-## 2.5 Cross-referencing with public symbol/debug info
+## 2.5 Calling conventions & structure recovery (any ARM SoC)
+
+This applies identically regardless of SoC vendor — it's an ARM/AArch64
+ABI concern, not a chip-specific one.
+
+- **AArch64 (ARMv8, 64-bit)**: standard AAPCS64 — first 8 integer/pointer
+  args in `x0`-`x7`, return value in `x0` (or `x0`/`x1` for 128-bit/struct
+  returns), `x29`/`x30` frame pointer/link register. Ghidra's analyzer
+  gets this right automatically almost all the time; the manual work is
+  recognizing kernel-specific calling patterns like `container_of`-style
+  pointer arithmetic (a function receiving a generic `struct device *` or
+  `struct i2c_client *` and immediately subtracting an offset to reach a
+  driver-private struct — Ghidra shows this as raw pointer math; manually
+  define the private struct's layout once you see the pattern repeated and
+  apply it as a Ghidra data type for much more readable decompilation).
+- **AArch32 (ARMv7, 32-bit, older/budget SoCs)**: first 4 args in
+  `r0`-`r3`, rest on stack, return in `r0`/`r1`. Watch for **Thumb-2**
+  interworking — Ghidra needs the low bit of a function's address (the
+  "Thumb bit") to disassemble it correctly; if a function looks like
+  garbage, check whether it should be analyzed as Thumb instead of ARM
+  mode (Ghidra's auto-analysis usually gets this right from ELF symbol
+  info, but raw/stripped blobs sometimes need a manual override).
+- **Recovering a driver's private state struct**: in a `probe()`
+  function, the pattern `devm_kzalloc(dev, sizeof(X), ...)` followed by
+  dozens of field reads/writes at different offsets is your cue to define
+  a Ghidra structure `X` and retype the pointer — this single step turns
+  an unreadable wall of `*(undefined4 *)(param_1 + 0x48)` into named field
+  accesses and usually resolves 80% of the confusion in RE'ing a vendor
+  driver.
+- **Resolving regmap/ioctl constant tables**: vendor drivers frequently
+  define register-address/value tables as a `static const` array of
+  structs. Once you've defined the struct layout (register, value,
+  delay_us is a common three-field shape), Ghidra's "Create Structure"
+  + "Apply data type" on the array turns the whole init-sequence table
+  into an immediately readable, exportable list — this *is* the artifact
+  you want for a new mainline driver, so plan to export it (Ghidra
+  scripting, or just manually transcribing a short table) directly into
+  your porting notes.
+
+## 2.6 TrustZone / QSEE / secure monitor firmware
+
+Every major vendor has an equivalent of Qualcomm's TrustZone/QSEE,
+MediaTek's/Samsung's TEE images, etc. — a separate, signed firmware image
+running in the ARM TrustZone secure world, handling verified boot, DRM
+keys, and sometimes modem/DSP firmware authentication.
+
+- **Goal is narrow**: you almost never need to fully reverse the secure
+  firmware itself. What you need is the **SMC (Secure Monitor Call) ABI**
+  — which SMC function IDs the normal-world (Linux) kernel must call, in
+  what order, during boot and during normal operation, to avoid a secure
+  watchdog panic or a feature silently failing.
+- **How to find it quickly**: grep the vendor's normal-world kernel
+  (`.ko`/`vmlinux`) for `smc`/`hvc` instruction use (Ghidra will show these
+  as distinct mnemonics you can search for directly — Search → For
+  Instruction Patterns), then decompile the small wrapper functions around
+  each call site rather than the secure firmware itself. This gives you
+  the SMC function-ID/argument contract from the *caller* side, which is
+  all a new kernel driver needs to replicate.
+- **Anti-rollback/fuse concerns**: some secure firmware enforces an
+  anti-rollback counter that can permanently prevent flashing an older
+  signed stage once a newer one has booted. This is a hardware fuse, not
+  something RE helps with — always check the vendor's own documentation
+  on anti-rollback behavior before experimenting with older bootloader/TZ
+  images.
+
+## 2.7 Handling stripped, obfuscated, or packed vendor binaries
+
+- **Stripped `.ko`/`.so` with no symbols**: still has
+  `MODULE_DEVICE_TABLE`/`of_match_table` data structures intact (they're
+  referenced by the module-loading infrastructure, so they survive
+  stripping) — use those as anchor points per §2.3 even with zero symbol
+  names elsewhere.
+- **Packed/compressed sections** (occasionally seen in bootloader stage1/2
+  images to save space): `binwalk -e` to check for embedded
+  compressed/archived regions before assuming raw disassembly is the right
+  starting point; decompress to a flat binary, then re-import to Ghidra at
+  the correct base address.
+- **Control-flow obfuscation**: rare in Android driver code (vendors
+  generally don't bother obfuscating kernel modules/HALs the way malware
+  authors do), but if you hit it, Ghidra's P-Code and the decompiler's
+  "Simplify" options handle most compiler-generated noise; genuine
+  hand-obfuscation on a device driver is unusual enough that it's worth
+  double-checking you're not looking at a copy-protection/DRM component
+  instead of a hardware driver — those are a different (and generally out
+  of scope for device-porting) problem.
+
+## 2.8 Cross-referencing with public symbol/debug info
 
 - Many vendor kernels, even stripped, retain enough of `vmlinux`/`.ko`
   `.symtab` for Ghidra to label functions — check before assuming a blind

@@ -2,18 +2,33 @@
 
 ## 6.1 Respect the secure/verified boot chain where you can't bypass it
 
-Most Android bootloaders chain-load: `PBL -> SBL/XBL -> ABL/LK -> boot.img
-(kernel+ramdisk) or kernel+DTB`. On devices with an unlockable bootloader
-(`fastboot oem unlock` / `fastboot flashing unlock`), the chain from
-`ABL`/`LK` onward trusts whatever you flash to `boot`/`dtbo`, so you don't
-need to touch the earlier, harder-to-RE stages (`xbl`, `tz`, `hyp`) at all
-— leave them exactly as dumped.
+Every vendor's boot chain follows the same shape, just with different
+stage names — a BootROM, one or two SoC-vendor-signed early-boot stages,
+then a more flexible bootloader stage that's the actual flashing/boot
+interface:
+
+| Vendor | Chain | Flashing interface it hands off to |
+|---|---|---|
+| Qualcomm | `PBL → SBL/XBL → ABL` | `fastboot` |
+| MediaTek | `BROM → Preloader → LK` | `fastboot` (where present) |
+| Samsung Exynos | `iROM → BL1 → BL2 → sboot` | Odin protocol (`Heimdall`), sometimes also `fastboot` |
+| Allwinner | `BootROM → boot0 → U-Boot` | `fastboot` or `sunxi-tools` FEL |
+| Rockchip | `BootROM → idbloader → U-Boot` | `fastboot` or `rkdeveloptool` |
+| NVIDIA Tegra | `BootROM → NV-TBOOT/U-Boot` | `fastboot` or `nvflash`/`tegrarcm` |
+
+On devices with an unlockable bootloader, the chain from the last
+vendor-controlled stage onward (ABL/LK/sboot/U-Boot) trusts whatever you
+flash to `boot`/`dtbo`/equivalent, so you don't need to touch the earlier,
+harder-to-RE stages (early SBL/Preloader/BL1/BL2, TrustZone/TEE) at all —
+leave them exactly as dumped. See
+[09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) for exactly which
+stage is "the one fastboot/Odin/U-Boot talks to" for your vendor.
 
 If the device has **no unlock mechanism** at all, that's a hardware
 security boundary, not a software porting problem — this guide assumes a
 device you can legitimately unlock (OEM unlock toggle, vendor unlock tool,
-or a documented EDL/test-point method for that SoC). Bypassing a locked
-bootloader's cryptographic verification is out of scope here.
+or a documented BootROM-mode method for that SoC, per §9). Bypassing a
+locked bootloader's cryptographic verification is out of scope here.
 
 ## 6.2 Repacking the boot image
 
@@ -66,10 +81,45 @@ fastboot flash userdata rootfs.img       # or keep Android's userdata and overla
 fastboot reboot
 ```
 
-Prefer `fastboot boot boot-new.img` (RAM-boots the image without writing
-any partition) for every iteration until the port is solid, and only
-`fastboot flash` once it's stable — this avoids needing a full re-flash or
-EDL recovery cycle after every kernel tweak.
+On devices that don't expose standard `fastboot` (many Samsung Exynos
+models), use **Heimdall** against Odin download mode instead:
+
+```bash
+heimdall flash --BOOT boot-new.img --no-reboot
+heimdall flash --DTBO dtbo-new.img
+heimdall reboot
+```
+
+And on Allwinner/Rockchip/Tegra tablet-class devices, the equivalent is
+`sunxi-fel`, `rkdeveloptool`, or `nvflash` respectively (§9.6) — same
+concept, different wire protocol.
+
+Prefer a RAM-boot option (`fastboot boot boot-new.img`, or the
+equivalent "boot without flashing" mode for your tool) for every
+iteration until the port is solid, and only commit to a real flash once
+it's stable — this avoids needing a full re-flash or BootROM-mode
+recovery cycle after every kernel tweak.
+
+## 6.4.1 GPT partition-table considerations
+
+Most modern devices of every vendor use a standard GPT partition table on
+the storage device, which means standard Linux tools work for inspection
+even outside any vendor-specific tool:
+
+```bash
+sudo sgdisk -p /dev/sdX        # or: parted /dev/sdX print
+                                # (only meaningful if you've dumped the
+                                # raw storage device itself, e.g. via a
+                                # BootROM-mode full dump, §9 — not
+                                # something you do over a live adb shell)
+```
+
+If you need to **add** a partition for your Linux rootfs rather than
+reusing an existing Android partition (e.g. repurposing `userdata`),
+resize/add it with `sgdisk`/`parted` against your *backed-up* raw image,
+never against the live device directly, and re-flash the whole modified
+image via your SoC's BootROM-mode tool rather than trying to resize a
+live GPT table through `fastboot`.
 
 ## 6.5 Recovery plan
 
@@ -84,11 +134,17 @@ done
 adb pull /sdcard/  ./backups/
 ```
 
-Know your SoC's unbrick path (EDL for Qualcomm, BROM/Preloader mode for
-MediaTek, Odin-download mode for Samsung Exynos) *before* you need it.
+Know your SoC's unbrick path — EDL for Qualcomm, BROM for MediaTek, Odin
+download mode for Samsung Exynos, FEL/maskrom/APX for
+Allwinner/Rockchip/Tegra (full table in
+[09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) §9.7) — *before*
+you need it, and confirm you can actually enter it on this exact device
+(test the button combo/mode, don't just read that it exists).
 
 ## Next
 
 → [07-tools-reference.md](07-tools-reference.md) for the consolidated
-tool list, and [08-case-studies.md](08-case-studies.md) for real projects
-that followed this exact pipeline.
+tool list, [08-case-studies.md](08-case-studies.md) for real projects that
+followed this exact pipeline, and
+[09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) for the
+per-vendor detail referenced throughout this chapter.

@@ -16,9 +16,17 @@ in a form a disassembler or kernel build can consume.
     partitions, etc. — enumerate with `ls -l /dev/block/by-name/`).
   - `fastboot` can't read partitions, only flash/erase, so prefer `dd`
     over a root shell or a custom recovery (TWRP) shell.
-  - EDL / test-point dumps (Qualcomm) via `qdl`/`QFIL`/`edl.py` if the
-    device is otherwise unbootable — gives you *every* partition
-    including ones Android never exposes.
+  - **BootROM-level recovery-mode dumps** — every major SoC vendor has a
+    hardware-level download mode that gives raw access to flash/dump any
+    partition, independent of Android's own lock state: Qualcomm's EDL
+    (9008 mode, via `qdl`/`edl.py`/QFIL), MediaTek's BROM mode (via
+    `mtkclient`), Samsung's Odin download mode (via Heimdall), or
+    Rockchip/Allwinner/Tegra's maskrom/FEL/APX modes. See
+    [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) for the exact
+    mode, tool, and button combo per vendor. This is the most reliable
+    dump method precisely because it works even on devices that refuse to
+    boot, won't root, or have a locked bootloader that still permits this
+    lower-level mode.
 - **Factory/engineering images** some vendors publish (Google Pixel,
   Sony Xperia "unlockable bootloader" program, Xiaomi EU/global ROM
   mirrors, etc.).
@@ -87,13 +95,29 @@ the blobs you'll later load from the Halium shim or flash as-is.
 
 ## 1.6 Modem / TrustZone / other "radio" partitions
 
-On Qualcomm devices, also grab `modem`, `tz`, `hyp`, `keymaster`, `abl`,
-`xbl`, `devcfg`, `dsp` partitions — these never change OS and can usually be
-reused verbatim on the ported Linux system (the applications processor's OS
-doesn't talk to the modem directly; it's a separate SoC core managed via a
-shared-memory protocol like QMI/RMNET, which you reimplement or reuse from
-`oFono`/`ModemManager`/`rmtfs`/`qrtr` userspace tooling — see
-[05-rootfs-and-userspace.md](05-rootfs-and-userspace.md)).
+Also grab every secure-world/co-processor partition your SoC vendor uses
+— on Qualcomm that's `modem`, `tz`, `hyp`, `keymaster`, `abl`, `xbl`,
+`devcfg`, `dsp`; MediaTek, Exynos, and others have their own equivalents
+(see [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) for naming).
+These never change OS and can usually be reused verbatim on the ported
+Linux system — the applications processor's OS doesn't talk to the modem
+directly on any vendor; it's a separate core managed via a shared-memory
+protocol (QMI on Qualcomm, vendor-specific elsewhere), which you reuse
+from `oFono`/`ModemManager`/`rmtfs`/`qrtr` userspace tooling where a
+compatible protocol stack exists — see
+[05-rootfs-and-userspace.md](05-rootfs-and-userspace.md).
+
+## 1.7 Dealing with eMMC vs. UFS storage
+
+- **eMMC** devices expose partitions as `/dev/block/mmcblk0p*`; `dd` and
+  the BootROM-mode tools above work uniformly.
+- **UFS** devices (most modern flagships) expose
+  `/dev/block/sd*`/`/dev/block/by-name/*` via the SCSI/UFS stack; dumping
+  mechanics are identical from a tooling perspective, but note that UFS
+  has its own replay-protected memory block (RPMB) partition used for
+  secure storage (e.g. Keymaster/StrongBox key material) — this is
+  normally inaccessible and irrelevant to the port; don't expect to dump
+  or need it.
 
 ## Next
 

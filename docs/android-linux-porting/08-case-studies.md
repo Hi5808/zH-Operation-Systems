@@ -48,6 +48,24 @@ version of each step in this guide actually look like."
   project with its own large set of device ports and porting documentation,
   useful as a second reference implementation alongside Halium's.
 
+## Per-SoC-vendor mainlining efforts
+
+Beyond the full-device projects above, several SoC-vendor-focused
+upstream efforts are worth tracking directly, since they determine how
+much of §4's "pick a kernel base" decision tilts toward mainline for your
+specific chip:
+
+- **`qcom-mainline`** — Linaro/Qualcomm-driven mainline Snapdragon
+  support; the most mature effort of any vendor (§9.1).
+- **`linux-mtk`** — MediaTek mainline effort (Collabora/BayLibre), rapidly
+  improving for recent Dimensity chips (§9.2).
+- **`linux-exynos`** — Samsung Exynos mainline effort, strongest for
+  standalone Exynos (Chromebooks, Exynos Auto) and growing for phone SoCs
+  (§9.3).
+- **`linux-sunxi`**, **`linux-rockchip`**, **`linux-tegra`** — the three
+  most mature *tablet*-class mainlining communities; if your device uses
+  one of these chips (§9.6), check here before anything else.
+
 ## How to use these in this repo
 
 When porting a specific device, create a new directory here, e.g.

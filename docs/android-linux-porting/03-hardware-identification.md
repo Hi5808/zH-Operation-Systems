@@ -28,14 +28,33 @@ already has a driver for that `compatible` string (check
 |---|---|---|
 | Display panel | `dsi@.../panel@0` node, `vendor/lib/modules/*panel*` | Often a `simple-panel` with init sequence RE'd per §2.3; sometimes already in `drm/panel/panel-*.c` upstream |
 | Touchscreen | I2C node under `soc/i2c@.../touch@..` | Synaptics/FocalTech/Goodix/ILITEK chips mostly have mainline drivers already — the work is usually just DT wiring, not new driver code |
-| GPU | `gpu@..` compatible (`qcom,adreno-...`, `arm,mali-...`) | Reused via vendor blob + `libhybris`/`freedreno`/`panfrost` depending on whether an open driver exists for that GPU generation |
-| Audio codec/DSP | `sound`/`qcom,apr*`/`mediatek,mt*-afe` nodes | Often the hardest subsystem; may need the vendor's DSP firmware kept as-is, with only the AP-side kernel driver ported |
-| Modem | `remoteproc@..`, `qcom,mss` or similar | Reuse vendor modem firmware + `qrtr`/`rmtfs`/`ModemManager`; essentially never reimplemented |
+| GPU | `gpu@..` compatible (`qcom,adreno-...`, `arm,mali-...`, `mediatek,mt*-mfgsys`, `samsung,exynos-g3d`) | Reused via vendor blob + `libhybris`, or an open driver (Freedreno for Adreno, Panfrost/Panthor/Lima for Mali) depending on generation — see [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) §9.1-§9.6 for which applies to your vendor |
+| Audio codec/DSP | `sound`/`qcom,apr*`/`mediatek,mt*-afe`/`samsung,exynos-snd-*` nodes | Often the hardest subsystem regardless of vendor; may need the vendor's DSP firmware kept as-is, with only the AP-side kernel driver ported |
+| Modem | `remoteproc@..`, `qcom,mss`, or vendor-specific equivalent | Reuse vendor modem firmware + a compatible protocol stack (`qrtr`/`rmtfs`/ModemManager on Qualcomm; vendor-specific and often less mature elsewhere — see §9) — essentially never reimplemented from scratch |
 | Wi-Fi/BT | `wifi@../bluetooth@..`, usually SDIO/PCIe/USB | Mainline `ath1x`/`brcmfmac`/`wcn36xx`/`wcn3990` drivers frequently already support the chip — check firmware blob naming under `vendor/firmware/` |
-| Sensors (accel/gyro/light/prox) | I2C nodes, `iio` subsystem | Almost always already mainlined (Bosch BMI, InvenSense ICM/MPU, STMicro) |
+| Sensors (accel/gyro/light/prox) | I2C nodes, `iio` subsystem | Almost always already mainlined (Bosch BMI, InvenSense ICM/MPU, STMicro) — vendor-independent, these chips are shared across the whole industry |
 | Fingerprint | Often SPI, vendor-proprietary | Usually unsupported upstream; lowest priority, frequently skipped in community ports |
-| Battery/charging/PMIC | `qcom,pm8998`/`mediatek,mt6358` etc. | Usually has solid mainline support per PMIC family |
+| Battery/charging/PMIC | `qcom,pm8998`, `mediatek,mt6358`, `samsung,s2mpg*`, etc. | Usually has solid mainline support per PMIC family, independent of the AP SoC vendor |
 | USB/USB-C PD | `usb@..`, `typec@..` | Depends on PMIC/USB controller; often mainlined per-SoC |
+
+### Clock & pinmux node naming by vendor
+
+The DT nodes that gate every other peripheral's power-on sequence use
+different `compatible` prefixes per SoC vendor — recognize these before
+assuming a node is something unusual:
+
+| Vendor | Clock controller | Pin controller |
+|---|---|---|
+| Qualcomm | `qcom,gcc-<chip>` (+ `qcom,rpmh-*` on newer chips) | `qcom,tlmm` |
+| MediaTek | `mediatek,mt<chip>-topckgen`/`pericfg` | `mediatek,mt<chip>-pinctrl` |
+| Samsung Exynos | `samsung,exynos<chip>-clock` | `samsung,exynos<chip>-pinctrl` |
+| Allwinner | `allwinner,sun*i-*-ccu` | `allwinner,sun*i-*-pinctrl` |
+| Rockchip | `rockchip,rk*-cru` | `rockchip,rk*-pinctrl` |
+| NVIDIA Tegra | `nvidia,tegra*-car` | `nvidia,tegra*-pinmux` |
+
+See [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) for the full
+per-vendor picture (boot chain, dump tooling, GPU/modem specifics) once
+you've identified which row above applies to your device.
 
 ## 3.3 Memory map & bootloader handoff
 
