@@ -182,7 +182,7 @@ against stock firmware rather than reconstructing from zero — see
 
 **If a dump already exists locally** (e.g. on a laptop with physical
 device access), skip straight to
-[../../HANDOFF.md](../../HANDOFF.md)'s Anbernic checklist instead of
+the unified checklist in [../../HANDOFF.md](../../HANDOFF.md) instead of
 re-deriving these steps — it's the concrete, ready-to-run version of the
 list below.
 

@@ -1,108 +1,123 @@
-# Handoff: What a Local (Hardware-Attached) Agent Needs to Do
+# Handoff: Local Agent Checklist
 
-This repo's guide and device profiles were written in a cloud session
-with **no physical device access** — everything that needs a real
-device, a real dump, or a USB cable has been left as `TBD` on purpose.
-This file is the single, concrete list of what a local agent (one that
-can see the actual Blackview BL6000 Pro 5G / Anbernic RG405M, or a USB
-port) should do next, and exactly how to get the results back into this
-repo.
+This repo was written in a cloud session with **no physical device
+access**. Everything that needs a real device, a real dump, or a USB
+cable is on this one checklist. Steps are shared across both devices;
+where a device differs, it's called out inline.
 
-## One-time machine setup
+| | Blackview BL6000 Pro 5G | Anbernic RG405M |
+|---|---|---|
+| Folder | `devices/blackview-bl6000-pro-5g/` | `devices/anbernic-rg405m/` |
+| SoC | MediaTek Dimensity 800 (MT6873) | UNISOC Tiger T618 |
+| Unlock method | Standard Android OEM-unlock toggle + fastboot (confirmed by community) | UNISOC-specific: `unisoc-unlock` or GammaOS web tool (confirmed by GammaOS docs) |
+| Dump/flash tool | `mtkclient` (BROM) or SP Flash Tool | GammaOS Next flasher / `unisoc-unlock` |
+| Biggest open question | Does BROM give **write** access? (SLA/DAA unknown) | Does unlock grant arbitrary partition read/write, or only GammaOS's install flow? |
+| Prior art to start from | None device-specific; request GPL source from Blackview | GammaOS Next `v.1.1.0-ANBERNICT618` |
 
-```bash
-cd docs/android-linux-porting
-./scripts/check-tools.sh
-```
+All commands below run from `docs/android-linux-porting/`. Replace
+`$DEV` with the device folder name from the table.
 
-Install whatever it flags as missing for the device you're working on
-(at minimum: `adb`, `fastboot`; for the Blackview, `mtkclient`; for the
-Anbernic, clone `github.com/TheGammaSqueeze/GammaOS` and read its own
-install docs). `mtkclient` in particular needs OS-specific USB setup
-(udev rules on Linux so the BROM-mode VCOM port is accessible without
-root, or the right driver on Windows) — follow its own README for that,
-not this guide.
+## 0. Machine setup (once)
 
-## Per-device checklist
+- [ ] `./scripts/check-tools.sh` — install whatever's missing.
+- [ ] Both: `adb`, `fastboot`.
+- [ ] Blackview: `mtkclient` + its OS-specific USB setup (udev rules on
+      Linux / driver on Windows — follow its README).
+- [ ] Anbernic: `pip3 install unisoc-unlock`; clone
+      `github.com/TheGammaSqueeze/GammaOSNext`; on Windows, install the
+      UNISOC drivers bundled with the GammaOS release.
 
-### Blackview BL6000 Pro 5G (`devices/blackview-bl6000-pro-5g/`)
+## 1. Catalog what's already on the laptop (no device needed)
 
-1. **Confirm the OEM-unlock toggle** — `Settings > About phone`, tap
-   build number 7×, then `Settings > Developer options` for "OEM
-   unlocking." Record whether it's present in `profile.md` §Identity.
-2. **Test BROM read access first, separately from write.** Run
-   `mtkclient`'s own read/dump command against this exact unit (check
-   its README for current syntax — this guide won't assert it, see
-   §12.1) and confirm it actually returns data before assuming anything
-   about write access. This answers the open SLA/DAA question in the
-   profile.
-3. **Get a dump into this repo's workflow**, whichever path worked:
-   - If you have root + adb: `./scripts/backup-partitions.sh devices/blackview-bl6000-pro-5g/backups boot dtbo vendor_boot vbmeta vendor system`
-   - If you dumped via `mtkclient` onto disk: `./scripts/catalog-dump.sh devices/blackview-bl6000-pro-5g/backups mtkclient boot=<path> vendor=<path> ...`
-4. **Unpack what you got:**
-   ```bash
-   ./scripts/unpack-boot.sh devices/blackview-bl6000-pro-5g/backups/boot.img devices/blackview-bl6000-pro-5g/boot_out/
-   ./scripts/extract-kernel-config.sh devices/blackview-bl6000-pro-5g/boot_out/kernel devices/blackview-bl6000-pro-5g/kernel.config
-   ./scripts/dump-vendor-partition.sh devices/blackview-bl6000-pro-5g/backups/vendor.img devices/blackview-bl6000-pro-5g/vendor_mnt/
-   ```
-5. **Fill in `profile.md`** §Identity (`getprop` values), §1 (check off
-   what was obtained), §3 (real `compatible` strings from
-   `boot_out/device.dts`, real driver list from `vendor_mnt/lib*/modules/`),
-   §4, §6 (real `boot.img` header/offsets from `unpack-boot.sh`'s output).
-6. **Run the restore round-trip** (§12.5) on a low-risk partition
-   (`dtbo`) before any real porting work — this is where "does mtkclient
-   actually have write access on this unit" finally gets answered instead
-   of guessed at:
-   ```bash
-   ./scripts/restore-oem.sh devices/blackview-bl6000-pro-5g/backups/manifest.tsv --method plan-only --only dtbo
-   # then either --method fastboot (if unlocked) or follow mtkclient's own
-   # write command for the plan above, per §12.1
-   ```
-   Record the result in `profile.md`'s backups section — Y/N, and which
-   method actually worked.
+- [ ] Run `catalog-dump.sh` against the existing dump files, recording
+      which tool produced them:
+      ```bash
+      ./scripts/catalog-dump.sh devices/$DEV/backups <tool-used> \
+        boot=/path/boot.img vendor=/path/vendor.img dtbo=/path/dtbo.img ...
+      ```
+- [ ] Sanity-check the manifest without touching any device:
+      ```bash
+      ./scripts/restore-oem.sh devices/$DEV/backups/manifest.tsv --method plan-only
+      ```
+- [ ] **Confirm each dump came from *this* physical unit**, not a
+      firmware-mirror download. IMEI/calibration partitions
+      (`modemst1`/`modemst2`/`persist`/NV-equivalents) must never be
+      restored from another unit (§12.4). The Anbernic has no modem, so
+      this matters mainly for the Blackview.
 
-### Anbernic RG405M (`devices/anbernic-rg405m/`)
+## 2. Extract what the profile needs (no device needed)
 
-1. **Start with GammaOS, not a raw dump.** Clone
-   `github.com/TheGammaSqueeze/GammaOS` and read its kernel/device tree
-   and install docs first — it almost certainly already documents a
-   working UNISOC download-mode flash procedure for this exact chip
-   family. Use that procedure rather than reverse-engineering the
-   protocol from scratch.
-2. Once you have a working dump (via GammaOS's own tooling or a direct
-   UNISOC download-mode dump), same steps as the Blackview above:
-   `catalog-dump.sh` or `backup-partitions.sh` → `unpack-boot.sh` →
-   `extract-kernel-config.sh` → `dump-vendor-partition.sh` → fill in
-   `profile.md`.
-3. Run the restore round-trip (§12.5) the same way, recording whether
-   the UNISOC download-mode tool actually grants write access on this
-   unit — this is unconfirmed in the profile for the same reason as the
-   Blackview's SLA/DAA state.
+- [ ] `./scripts/unpack-boot.sh devices/$DEV/backups/boot.img devices/$DEV/boot_out/`
+- [ ] `./scripts/extract-kernel-config.sh devices/$DEV/boot_out/kernel devices/$DEV/kernel.config`
+- [ ] `./scripts/dump-vendor-partition.sh devices/$DEV/backups/vendor.img devices/$DEV/vendor_mnt/`
+- [ ] Anbernic only: also clone GammaOS's kernel/device tree and diff its
+      DT against `boot_out/device.dts` — expect GammaOS's to be the more
+      complete reference.
 
-## What comes back into this repo (and what doesn't)
+## 3. Fill in the profile (no device needed)
 
-**Commit:** `profile.md` updates, `re-notes.md` entries, `kernel.config`
-(text), `device.dts` (text, not the binary `.dtb`), `manifest.tsv`
-(checksums and filenames only, no binary content).
+From the step-2 output, update `devices/$DEV/profile.md`:
 
-**Never commit:** the actual `.img`/`.bin` dump files, the raw `boot_out/kernel`
-and `boot_out/ramdisk` binaries, anything under `vendor_mnt/` (HAL `.so`,
-vendor `.ko`, firmware blobs). A repo-root `.gitignore` now blocks the
-obvious cases, but it's not a substitute for checking `git status` before
-committing — the gitignore patterns match the directory layout the
-scripts above produce by default; a different output path won't be
-caught automatically.
+- [ ] §3 hardware table — real `compatible` strings from
+      `boot_out/device.dts`; driver list from `vendor_mnt/lib*/modules/`.
+      Priority TBDs: Wi-Fi/BT chip model, touchscreen controller, PMIC
+      (both); fingerprint vendor (Blackview); gamepad/Hall-stick ADC
+      driver (Anbernic).
+- [ ] §4 — reserved-memory regions from the `.dts`; note `kernel.config`
+      location.
+- [ ] §6 — `boot.img` header version/base/offsets from `unpack-boot.sh`
+      output.
 
-If a local agent is doing this work, it should still follow this
-session's own rule: confirm before pushing (`git status`, review the
-diff), and never force-push. Normal commits to this branch are fine and
-expected.
+## 4. On-device checks (device connected)
 
-## If something doesn't match what the profile predicted
+- [ ] `adb shell getprop ro.board.platform` and `ro.hardware` → profile §Identity.
+- [ ] `adb shell "su -c 'ls /dev/block/by-name/'"` (if rooted) → record
+      the full partition list; back up anything not already in the
+      manifest with `./scripts/backup-partitions.sh devices/$DEV/backups <partitions...>`.
+- [ ] Confirm the unlock path matches what research found:
+  - Blackview: is "OEM unlocking" in Developer Options? Which works —
+    `fastboot flashing unlock` or `fastboot oem unlock`?
+  - Anbernic: does the device show `LOCK FLAG IS : UNLOCK!!!` at boot?
+    (If yes, it's already unlocked — skip the unlock step.)
+  - ⚠ Unlocking wipes the device on both. Steps 1–3 must be done first.
+    GammaOS Next install is fresh-install-only — it wipes regardless.
 
-That's expected — the profiles were built from public specs and the
-guide's general methodology, not from this exact unit. Update the
-profile with what's actually true rather than treating a mismatch as an
-error in the local agent's work. [11-troubleshooting-and-debugging.md](11-troubleshooting-and-debugging.md)
-covers the common cases (BROM mode not responding, checksum mismatches,
-unexpected partition layouts, etc.).
+## 5. Prove read/write before relying on it
+
+The single most important open item for both devices (§12.1, §12.5).
+
+- [ ] **Read test:** dump one partition with the device's tool and
+      confirm its sha256 matches the manifest.
+  - Blackview: `mtkclient` read in BROM mode (check its README for
+    current syntax — this guide won't assert it).
+  - Anbernic: whatever read path GammaOS's tooling exposes.
+- [ ] **Write round-trip** on a low-risk partition (`dtbo`):
+      ```bash
+      ./scripts/restore-oem.sh devices/$DEV/backups/manifest.tsv --method plan-only --only dtbo
+      # then --method fastboot --only dtbo (dry run), then add --yes
+      # or use the vendor tool's own write command per the plan
+      ```
+      Then confirm the device still boots normally.
+- [ ] Record in profile.md's "Backups taken before first flash": Y/N,
+      and which method actually worked. For the Blackview, this
+      answers the SLA/DAA question; for the Anbernic, whether unlock
+      access extends beyond GammaOS's own installer.
+
+## 6. Bring results back
+
+- [ ] `git status` — confirm no `.img`, `boot_out/kernel`/`ramdisk`,
+      or `vendor_mnt/` content is staged. The root `.gitignore` blocks
+      the default paths; anything written elsewhere won't be caught.
+- [ ] Commit only: `profile.md`, `re-notes.md`, `kernel.config`,
+      `boot_out/device.dts`, `backups/manifest.tsv`.
+- [ ] Update the status column in `00-overview.md`'s "Devices tracked"
+      table.
+- [ ] Normal commit + push to this branch. No force-push.
+
+## If reality doesn't match the profile
+
+Expected — the profiles came from public specs and community reports,
+not this exact unit. Update the profile with what's actually true;
+a mismatch is a finding, not an error. See
+[11-troubleshooting-and-debugging.md](11-troubleshooting-and-debugging.md)
+for common cases.

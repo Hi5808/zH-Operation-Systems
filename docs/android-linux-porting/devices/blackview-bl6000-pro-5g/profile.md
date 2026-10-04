@@ -164,7 +164,7 @@ as components are RE'd per [02-reverse-engineering-ghidra.md](../../02-reverse-e
 
 **If a dump already exists locally** (e.g. on a laptop with physical
 device access), skip straight to
-[../../HANDOFF.md](../../HANDOFF.md)'s Blackview checklist instead of
+the unified checklist in [../../HANDOFF.md](../../HANDOFF.md) instead of
 re-deriving these steps — it's the concrete, ready-to-run version of the
 list below.
 
