@@ -120,6 +120,40 @@ device is yours, the result is yours, and it was only possible because
 of named, credited work that came before it — all three of those are
 true at once, not in tension with each other.
 
+## Why this is shared openly
+
+This project is written and maintained in the spirit of open-source
+community etiquette: document what you learned, credit where it came
+from, and publish it so the next person can build on it. That's a
+deliberate choice, not a default.
+
+Hardware knowledge has a way of disappearing. Vendors stop supporting
+devices, firmware mirrors go offline, forum threads vanish, and the
+understanding of how a given phone or handheld actually works ends up
+either lost or locked inside proprietary tools and private repositories.
+Projects like postmarketOS, Halium, LineageOS, and GammaOS exist because
+people chose to write down and share that knowledge while it was still
+recoverable — before it became closed off for good.
+
+This guide aims to do the same:
+
+- **Methodology over secrets.** Everything here is meant to be
+  repeatable by anyone with the same hardware, not a private recipe.
+- **Notes, not binaries.** Vendor firmware stays with the device owner;
+  what gets shared is the understanding derived from it — register
+  tables, init sequences, device trees, porting notes — which is what
+  actually helps the next port.
+- **Contribute back.** A finished device port is most valuable as a
+  public reference: upstream kernel patches, a postmarketOS/Halium device
+  port, or at minimum a published device profile in this repo's format.
+- **Keep the engineering visible.** The reason to do this openly is the
+  same reason most people got into this field: seeing how real systems
+  are built, taking them apart, and learning from it. Shared, credited
+  work keeps that path open for whoever comes next.
+
+While this repo is being drafted it may be kept private; the intent is
+for the finished guide to be published under these same principles.
+
 ## Legal / scope notes (read first)
 
 - Work only on hardware you own or are explicitly authorized to modify.
