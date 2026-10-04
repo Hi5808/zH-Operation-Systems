@@ -19,8 +19,12 @@ marketing specs alone.
 - Bootloader unlock method: TBD — MediaTek devices vary by vendor
   policy; check `Settings > About phone > build number` tap-7x for
   Developer Options, then `Settings > Developer options` for an
-  "OEM unlocking" toggle. If absent, BROM mode (below) is still usable for
-  dumping regardless of unlock state (§9.2)
+  "OEM unlocking" toggle. If absent, BROM mode (below) *may* still be
+  usable for dumping independent of that toggle — but whether BROM gives
+  read-only, full read/write, or nothing on this exact unit depends on
+  whether Blackview enforces MediaTek's SLA/DAA authentication on this
+  firmware build, which is **unconfirmed** — test with `mtkclient`
+  directly rather than assuming either way (§9.2)
 - SoC vendor: **MediaTek** — see
   [09-soc-vendor-specifics.md](../../09-soc-vendor-specifics.md) §9.2
 - Exact SoC model: **MediaTek Dimensity 800 (MT6873V/C)**, octa-core
@@ -96,8 +100,11 @@ as components are RE'd per [02-reverse-engineering-ghidra.md](../../02-reverse-e
   `unpack_bootimg` on the stock `boot.img` once dumped
 - AVB/vbmeta handling needed: TBD
 - Confirmed unbrick path tested before first flash: **BROM mode via
-  `mtkclient`** — TBD, confirm the exact button/USB combo for this model
-  before any flashing attempt (§6.5, §9.2)
+  `mtkclient`** — TBD. Confirm *both* the exact button/USB combo for this
+  model *and* that `mtkclient` actually gets write access (not just
+  read) on this unit's specific SLA/DAA state before any flashing
+  attempt — do not assume write access just because read/dump worked
+  (§6.5, §9.2)
 
 ## Status
 
@@ -123,9 +130,16 @@ as components are RE'd per [02-reverse-engineering-ghidra.md](../../02-reverse-e
 ## Next steps (in order)
 1. Obtain a firmware dump — either the stock SP-Flash-Tool package (fast
    path, confirm checksum/provenance) or a direct `mtkclient` BROM dump
-   from the physical device (more authoritative, works regardless of
-   unlock state). See [01-firmware-dumping.md](../../01-firmware-dumping.md)
-   and [09-soc-vendor-specifics.md](../../09-soc-vendor-specifics.md) §9.2.
+   from the physical device. The BROM dump is more authoritative (ground
+   truth from the actual unit rather than a possibly-different firmware
+   build someone else uploaded), but whether it actually gives read
+   and/or write access on this specific unit depends on Blackview's
+   SLA/DAA configuration for this chip/firmware — that is **not known**
+   until `mtkclient` is actually run against the device; don't assume it
+   works regardless of lock state. See
+   [01-firmware-dumping.md](../../01-firmware-dumping.md) and
+   [09-soc-vendor-specifics.md](../../09-soc-vendor-specifics.md) §9.2
+   and §9.7.
 2. Unpack `boot.img`, recover `kernel.config` and the DTB/`.dts`
    (§1.3-§1.4).
 3. Fill in the §3 hardware table above with real `compatible` strings

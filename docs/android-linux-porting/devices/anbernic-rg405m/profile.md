@@ -18,8 +18,16 @@ confirmation from the device/firmware itself.
   confirm via `adb shell getprop` or the dumped DT
 - Bootloader unlock method: TBD — no confirmed public documentation
   found; UNISOC devices generally lack a standardized
-  `fastboot oem unlock` equivalent (§9.4), so plan on the SPRD/UNISOC
-  download-mode dump path regardless of unlock state
+  `fastboot oem unlock` toggle (§9.4), so the SPRD/UNISOC download-mode
+  path is the realistic dump route by default. That said, UNISOC chips
+  have their own secure-boot/authentication options too, and whether
+  this exact chip/firmware has them enabled — and therefore whether
+  download mode gives full read/write, read-only, or nothing without a
+  bypass — is **unconfirmed**. GammaOS's existence (it ships installable
+  firmware for this exact chip family) is reasonably strong circumstantial
+  evidence that *some* level of community access works, but confirm
+  actual read/write behavior directly before relying on it, same caveat
+  as §9.7 generally
 - SoC vendor: **UNISOC (Spreadtrum)** — see
   [09-soc-vendor-specifics.md](../../09-soc-vendor-specifics.md) §9.4.
   This is the guide's "minimal community tooling, expect heavy

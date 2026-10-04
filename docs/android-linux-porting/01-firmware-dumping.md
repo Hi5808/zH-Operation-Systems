@@ -25,16 +25,24 @@ steps, not a black box.
   - `fastboot` can't read partitions, only flash/erase, so prefer `dd`
     over a root shell or a custom recovery (TWRP) shell.
   - **BootROM-level recovery-mode dumps** — every major SoC vendor has a
-    hardware-level download mode that gives raw access to flash/dump any
-    partition, independent of Android's own lock state: Qualcomm's EDL
-    (9008 mode, via `qdl`/`edl.py`/QFIL), MediaTek's BROM mode (via
-    `mtkclient`), Samsung's Odin download mode (via Heimdall), or
+    hardware-level download mode: Qualcomm's EDL (9008 mode, via
+    `qdl`/`edl.py`/QFIL), MediaTek's BROM mode (via `mtkclient`),
+    Samsung's Odin download mode (via Heimdall), or
     Rockchip/Allwinner/Tegra's maskrom/FEL/APX modes. See
-    [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) for the exact
-    mode, tool, and button combo per vendor. This is the most reliable
-    dump method precisely because it works even on devices that refuse to
-    boot, won't root, or have a locked bootloader that still permits this
-    lower-level mode.
+    [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) §9.7 for the
+    exact mode/tool/button-combo per vendor — **and read that section's
+    caveat before relying on this**: these modes are *not* a universal
+    read/write bypass independent of all lock state. Each vendor gates
+    actual read/write access behind its own chip-level authentication
+    (Qualcomm's Sahara/Firehose loader signing, MediaTek's SLA/DAA
+    fusing, etc.), which is a separate thing from — and doesn't
+    necessarily track — the Android-level bootloader-unlock toggle. On
+    many older/budget devices this hardware-level mode is wide open
+    regardless of Android unlock state (which is exactly why it's the
+    preferred dump method there), but on a device with the chip's own
+    authentication enforced, it may give read-only access, or need a
+    chip-specific bypass that may or may not exist for your exact SoC.
+    Confirm actual behavior for your device before planning around it.
 - **Factory/engineering images** some vendors publish (Google Pixel,
   Sony Xperia "unlockable bootloader" program, Xiaomi EU/global ROM
   mirrors, etc.).

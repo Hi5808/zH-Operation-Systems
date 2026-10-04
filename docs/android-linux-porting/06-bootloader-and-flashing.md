@@ -138,8 +138,13 @@ Know your SoC's unbrick path — EDL for Qualcomm, BROM for MediaTek, Odin
 download mode for Samsung Exynos, FEL/maskrom/APX for
 Allwinner/Rockchip/Tegra (full table in
 [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) §9.7) — *before*
-you need it, and confirm you can actually enter it on this exact device
-(test the button combo/mode, don't just read that it exists).
+you need it, and confirm **both** that you can enter it on this exact
+device (test the button combo/mode) **and** that it actually grants
+write access on this device's chip-level authentication state, not just
+read — §9.7's caveat on BROM/EDL/Odin not being a universal read/write
+bypass applies directly here. A recovery mode that only lets you read
+back partitions is still useful for verifying what's on the device, but
+it is not, by itself, your unbrick path if it can't write.
 
 ## Next
 
