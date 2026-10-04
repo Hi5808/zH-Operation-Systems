@@ -146,6 +146,10 @@ against stock firmware rather than reconstructing from zero — see
 
 ## Backups taken before first flash
 - [ ] Not yet started — no dump obtained yet.
+- [ ] Restore round-trip verified (not just backed up) — see
+  [12-oem-restore.md](../../12-oem-restore.md) §12.5. GammaOS's install
+  docs are a likely source for a known-working flash procedure to adapt
+  for this.
 
 ## Next steps (in order)
 1. Clone and read `github.com/TheGammaSqueeze/GammaOS`'s kernel/device

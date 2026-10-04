@@ -83,5 +83,9 @@ See [re-notes.md](re-notes.md) in this folder.
 | Battery/charging | | |
 
 ## Backups taken before first flash
-- [ ] Every partition in §6 backed up to: ______
+- [ ] Every partition in §6 backed up to: ______ (`scripts/backup-partitions.sh` or `scripts/catalog-dump.sh` — see [12-oem-restore.md](../../12-oem-restore.md))
 - [ ] Unbrick path confirmed accessible (tested entering recovery mode, not actually used): ______
+- [ ] **Restore round-trip actually verified** (not just "backed up") —
+  restored a low-risk partition from the backup and confirmed the device
+  still boots, per [12-oem-restore.md](../../12-oem-restore.md) §12.5:
+  Y/N, method used: [fastboot / adb-dd / plan-only + vendor tool]

@@ -126,6 +126,10 @@ as components are RE'd per [02-reverse-engineering-ghidra.md](../../02-reverse-e
 
 ## Backups taken before first flash
 - [ ] Not yet started — no dump obtained yet.
+- [ ] Restore round-trip verified (not just backed up) — see
+  [12-oem-restore.md](../../12-oem-restore.md) §12.5. Given the
+  unconfirmed SLA/DAA state noted above, this is also where you'll
+  learn whether `mtkclient` actually has write access on this unit.
 
 ## Next steps (in order)
 1. Obtain a firmware dump — either the stock SP-Flash-Tool package (fast

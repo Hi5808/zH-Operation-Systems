@@ -123,15 +123,14 @@ live GPT table through `fastboot`.
 
 ## 6.5 Recovery plan
 
-Before your first flash of anything:
+Before your first flash of anything, back up every partition you're
+about to touch and verify you can actually restore from that backup —
+see [12-oem-restore.md](12-oem-restore.md) for the full procedure and
+[scripts/backup-partitions.sh](scripts/backup-partitions.sh) /
+[scripts/restore-oem.sh](scripts/restore-oem.sh) to automate it:
 
 ```bash
-# Full backup of every partition touched, so a bad flash is a `fastboot
-# flash <part> backup.img` away from recovery, not a brick:
-for p in boot dtbo vendor_boot vbmeta vbmeta_system; do
-  adb shell su -c "dd if=/dev/block/by-name/$p of=/sdcard/backup_$p.img"
-done
-adb pull /sdcard/  ./backups/
+./scripts/backup-partitions.sh devices/<codename>/backups boot dtbo vendor_boot vbmeta vbmeta_system
 ```
 
 Know your SoC's unbrick path — EDL for Qualcomm, BROM for MediaTek, Odin
@@ -144,7 +143,9 @@ write access on this device's chip-level authentication state, not just
 read — §9.7's caveat on BROM/EDL/Odin not being a universal read/write
 bypass applies directly here. A recovery mode that only lets you read
 back partitions is still useful for verifying what's on the device, but
-it is not, by itself, your unbrick path if it can't write.
+it is not, by itself, your unbrick path if it can't write. The round-trip
+test in [12-oem-restore.md](12-oem-restore.md) §12.5 is how you confirm
+this *before* you're relying on it.
 
 ## Next
 
