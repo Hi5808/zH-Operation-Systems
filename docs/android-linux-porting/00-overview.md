@@ -31,6 +31,57 @@ ships on it; the goal is to understand it well enough to run a different,
 otherwise-compatible OS on your own device — not to break DRM, pull
 somebody else's copyrighted content, or redistribute the vendor's binaries.
 
+## Why do this
+
+Before the methodology, the motivation — because "why would anyone
+reverse engineer their own phone" is a fair question, and the answer
+shapes which parts of this guide matter for a given project.
+
+- **The hardware outlives the vendor's software support.** Android
+  OEMs, especially budget/regional vendors, routinely stop shipping
+  security patches 1-3 years after release while the hardware itself
+  keeps working fine. A device with a dead Android build is still a
+  capable ARM computer with a screen, battery, radios, and storage — the
+  software is the only thing that's actually obsolete. Porting a
+  maintained Linux distribution is how the hardware keeps receiving
+  security updates after the vendor has moved on, instead of becoming
+  e-waste or a permanently-vulnerable "it still works, don't connect it
+  to anything important" device.
+- **Repurposing hardware for a job it wasn't sold for.** A phone or
+  handheld with a real Linux userspace can run as a dedicated
+  single-purpose device — a small server, a diagnostic/field tool, a
+  retro-emulation frontend without Android's background-service
+  overhead, a kiosk, a SDR/radio front-end, a portable dev environment —
+  none of which need or benefit from stock Android's app model, Play
+  Services, or ad/telemetry stack. This is the exact motivation behind
+  the Anbernic case in this repo: GammaOS already proves the hardware is
+  capable of more than its stock firmware exposes.
+- **Software freedom and reduced attack surface.** Stock Android on
+  most devices ships a substantial closed-source stack (OEM apps,
+  telemetry, Google/GMS services, vendor-specific "optimizations") that
+  the device owner cannot audit, remove, or fully control, even on their
+  own hardware. A Linux userspace with only the drivers/blobs actually
+  required for hardware function (and nothing else) is a meaningfully
+  smaller, more inspectable, more owner-controlled system.
+- **It's how the broader ecosystem actually advances.** Every device
+  this methodology successfully supports is also a contribution back:
+  mainline kernel patches, a new postmarketOS/Halium device port, a
+  driver that the next person porting a similar chip doesn't have to
+  write from scratch (§4.1, §8, §9). The guide's "check for existing
+  prior art first" principle throughout exists because this is a
+  cumulative community effort, not a series of isolated one-off hacks.
+- **Direct, hands-on understanding of how the device actually works.**
+  Independent of any practical outcome, reverse engineering your own
+  hardware's boot chain, drivers, and HAL boundary is a genuinely
+  effective way to learn embedded Linux, ARM SoC architecture, and
+  Android internals that no amount of reading about them substitutes
+  for — this is explicitly legitimate, protected activity (§Legal
+  below), not a byproduct that needs separate justification.
+
+None of this requires bypassing DRM, defeating a security boundary you
+don't have the right to cross, or touching hardware you don't own — see
+the legal scope below for exactly where this guide's methodology stops.
+
 ## Legal / scope notes (read first)
 
 - Work only on hardware you own or are explicitly authorized to modify.

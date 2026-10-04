@@ -126,16 +126,28 @@ methodology and expect to do more from-scratch RE.
 
 - **Boot chain**: BootROM → **FDL1/FDL2** (Flash Download agents,
   loaded over USB, analogous to Qualcomm's Firehose) → bootloader → kernel.
-- **Unbrick/full-dump**: UNISOC's SPRD download-mode protocol. Tools:
-  community reverse-engineered implementations exist (search
-  `sprd_dump`/`unisoc` tooling on GitHub; this ecosystem is far less
-  mature/standardized than Qualcomm/MediaTek's, so expect more manual
-  protocol work).
+- **Unbrick/full-dump**: UNISOC's SPRD download-mode protocol. Tooling
+  is fragmented and vendor/device-specific rather than one universal
+  client: community reverse-engineered implementations exist (search
+  `sprd_dump`/`unisoc` tooling on GitHub), and for Anbernic's T618/T820
+  handheld line specifically, the `unisoc-unlock` Python package
+  (`pip install unisoc-unlock`) and the GammaOS project's own flasher
+  implement a working unlock/flash flow (confirmed via GammaOS's install
+  docs — see `devices/anbernic-rg405m/profile.md` for the device-specific
+  detail). Notably, this flow does **not** use the standard Android
+  Developer-Options "OEM unlocking" toggle or AOSP `fastboot flashing
+  unlock` — UNISOC bootloaders on these devices report their own native
+  lock state (a boot-time "LOCK FLAG" message) and are unlocked through a
+  vendor-specific USB protocol instead. Treat any given UNISOC device's
+  actual unlock/dump tooling as something to search for by exact chip +
+  device family, not assumed from this general entry.
 - **Mainline/community status**: minimal — UNISOC chips (common in
   budget devices) have very little mainline Linux or Halium community
   support. A UNISOC device port is one of the more "from scratch" cases
   this guide's methodology is designed for; lean harder on §2 Ghidra RE
-  since there's less prior art to diff against.
+  since there's less prior art to diff against. The Anbernic/GammaOS
+  T618 line is a notable exception with real, working community tooling
+  — check for a similar project before assuming "from scratch" applies.
 
 ## 9.5 HiSilicon (Kirin) — legacy Huawei devices
 

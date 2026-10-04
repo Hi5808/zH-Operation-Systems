@@ -16,18 +16,33 @@ confirmation from the device/firmware itself.
 - `getprop ro.board.platform` / `ro.hardware`: TBD — expect a `ums9230`/
   `t618`-family string (UNISOC's internal codename for Tiger T618),
   confirm via `adb shell getprop` or the dumped DT
-- Bootloader unlock method: TBD — no confirmed public documentation
-  found; UNISOC devices generally lack a standardized
-  `fastboot oem unlock` toggle (§9.4), so the SPRD/UNISOC download-mode
-  path is the realistic dump route by default. That said, UNISOC chips
-  have their own secure-boot/authentication options too, and whether
-  this exact chip/firmware has them enabled — and therefore whether
-  download mode gives full read/write, read-only, or nothing without a
-  bypass — is **unconfirmed**. GammaOS's existence (it ships installable
-  firmware for this exact chip family) is reasonably strong circumstantial
-  evidence that *some* level of community access works, but confirm
-  actual read/write behavior directly before relying on it, same caveat
-  as §9.7 generally
+- Bootloader unlock method: **confirmed, documented, and working** —
+  but it is a UNISOC-specific procedure, not standard AOSP
+  `fastboot oem unlock`/`fastboot flashing unlock` (and the GammaOS
+  Next install docs explicitly note the standard command is absent from
+  this flow — no "OEM unlocking" Developer-Options toggle is involved
+  either). The confirmed procedure, per GammaOS Next's own install wiki:
+  1. Enable USB debugging (Developer Options).
+  2. `adb reboot bootloader`, then `fastboot reboot fastboot` to enter
+     UNISOC's fastbootd-like mode.
+  3. Unlock via either a hosted browser tool
+     (`thegammasqueeze.github.io/subut-rehost/` — Connect, select the
+     device, click Unlock) or the `unisoc-unlock` Python package
+     (`pip3 install unisoc-unlock && python3 -m unisoc_unlock`).
+  4. Confirm on-device via the **Home/Back button** — explicitly *not*
+     Volume Down (the guide calls this out directly, implying it's a
+     common mistake).
+  The device reports its own native lock state at boot as a message
+  "LOCK FLAG IS : UNLOCK!!!" once unlocked — this is UNISOC's own
+  concept, distinct from the Android-level toggle most of this guide's
+  other vendor chapters assume. This confirms §9.4's general claim that
+  UNISOC doesn't use the standard Android unlock flow, while also
+  confirming a *working*, documented alternative exists for this exact
+  chip/device family — see §9.4 (updated) for the general pattern.
+  Whether this unlock is sufficient for full partition read/write (vs.
+  GammaOS's own flasher doing something more specific) is still worth
+  confirming directly, but a full custom-ROM install via this exact path
+  is a strong existence proof that write access is achievable here.
 - SoC vendor: **UNISOC (Spreadtrum)** — see
   [09-soc-vendor-specifics.md](../../09-soc-vendor-specifics.md) §9.4.
   This is the guide's "minimal community tooling, expect heavy
@@ -64,7 +79,11 @@ a stock-firmware binary dump.
 
 ## §1 Firmware acquired
 - [ ] Stock firmware package — TBD, check Anbernic's own support site
-- [ ] GammaOS source/kernel tree cloned for reference — TBD
+- [ ] GammaOS source/kernel tree cloned for reference — TBD. Specific
+      release to start from:
+      `github.com/TheGammaSqueeze/GammaOSNext/releases/tag/v.1.1.0-ANBERNICT618`
+      (confirmed to target this chip family; verify it's listed for the
+      RG405M specifically vs. a sibling model before relying on it)
 - [ ] Direct device dump (adb/root) — TBD
 - [ ] Full download-mode dump (UNISOC SPRD protocol) — TBD; tooling is
       less standardized than Qualcomm/MediaTek's (§9.4), check
@@ -92,8 +111,9 @@ against stock firmware rather than reconstructing from zero — see
 | GPU | TBD (`sprd,...` or `unisoc,...` expected) | — | **Mali-G52** → Panfrost (Bifrost/Valhall-class Mali has reasonable Mesa support, same driver family as §9.3 Exynos/§9.2 MediaTek Mali parts) | Likely native, verify against Panfrost's support matrix for this exact Mali revision |
 | Audio | TBD | — | TBD | TBD |
 | Cellular modem | **None** — no SIM/cellular radio on this device | — | N/A | N/A |
-| Wi-Fi/BT | 802.11ac + BT 5.0, chipset TBD | SDIO/USB (typical) | TBD | TBD |
-| Gamepad controls (d-pad, ABXY, L/R, analog sticks) | TBD — likely a GPIO matrix + ADC for analog sticks, or an I2C/HID microcontroller | GPIO/ADC/I2C (TBD) | Not a standard phone peripheral — check GammaOS's kernel source first, this is very likely already solved there | Native, fork from GammaOS |
+| Wi-Fi/BT | **Confirmed**: dual-band 802.11a/b/g/n/ac (2.4/5GHz) + Bluetooth 5.0, chipset model TBD | SDIO/USB (typical) | TBD | TBD |
+| Gamepad controls: d-pad/ABXY/L/R | TBD — likely a GPIO matrix or I2C/HID microcontroller | GPIO/I2C (TBD) | Not a standard phone peripheral — check GammaOS's kernel source first, this is very likely already solved there | Native, fork from GammaOS |
+| Gamepad controls: analog sticks | **Confirmed Hall-effect** (magnetic, not potentiometer) — implies ADC or a dedicated Hall-sensor driver reading analog voltage per axis, not a simple GPIO digital read | ADC (typical for Hall-effect sticks) | Check GammaOS's kernel source for the exact driver/IIO channel setup | Native, fork from GammaOS |
 | Sensors | TBD (if any — many handhelds omit accel/gyro entirely) | — | TBD | TBD |
 | Battery/charging | TBD | — | TBD | TBD |
 | USB-C | Present (charging + likely USB-OTG/display-out) | — | TBD | TBD |
@@ -122,10 +142,17 @@ against stock firmware rather than reconstructing from zero — see
   (standard UNISOC chain, §9.4)
 - `boot.img` header version / base / offsets: TBD
 - AVB/vbmeta handling needed: TBD
-- Confirmed unbrick path tested before first flash: TBD — identify the
-  UNISOC download-mode entry combo for this exact model before any
-  flashing attempt; check GammaOS's install instructions first since they
-  necessarily document a working flash/unbrick procedure for this device
+- Confirmed unbrick path tested before first flash: **GammaOS Next's own
+  unlock+flash procedure is confirmed documented and working** (see
+  §Identity above for the exact steps) — this is a real existence proof,
+  not a TBD guess. What's still worth confirming directly on this unit:
+  whether that same access extends to arbitrary partition read/write via
+  `restore-oem.sh --method plan-only` + whatever UNISOC tool backs
+  GammaOS's flasher, vs. being narrowly scoped to GammaOS's own
+  installer flow. Note GammaOS Next's install docs state this is a
+  **fresh install only** — it wipes the device regardless of current
+  unlock state, so back up (§12) *before* touching this procedure, not
+  after.
 
 ## Status
 
@@ -171,3 +198,15 @@ list below.
 4. Decide, subsystem by subsystem, native vs. Halium shim per
    [03-hardware-identification.md](../../03-hardware-identification.md)
    §3.4, informed by what GammaOS already proves works.
+
+## Research sources
+
+Gathered via web research (not hands-on testing): GammaOS Next's own
+install wiki (fetched directly — this is the most authoritative source
+in this profile, since it's the project's own documentation of a
+procedure its users actually run); retrohandheldguides.com and
+joeysretrohandhelds.com third-party setup guides; gbatemp.net and
+retrododo.com hardware reviews (Hall-effect stick confirmation);
+vendor/press spec listings (Anbernic's own site, slickdeals listings).
+Treat anything not marked "confirmed" above as still needing direct
+verification against the physical device.
