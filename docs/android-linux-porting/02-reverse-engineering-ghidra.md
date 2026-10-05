@@ -17,8 +17,11 @@ new OS via a shim, without needing to rewrite it.
 
 ## 2.2 Setting up Ghidra for ARM/AArch64 Android binaries
 
-1. Install Ghidra (≥11.x has solid AArch64/Thumb support) —
-   see [07-tools-reference.md](07-tools-reference.md).
+1. Install Ghidra (≥11.x has solid AArch64/Thumb support; 11.3+ bundles
+   PyGhidra for CPython scripting) — see
+   [07-tools-reference.md](07-tools-reference.md). The headless CLI
+   (`support/analyzeHeadless`) and scripting APIs come with the same
+   install; no separate package. A JDK is the one external prerequisite.
 2. Import binaries as **ELF**, not raw — Android `.ko`/`.so` are standard
    ELFs; Ghidra's ELF loader auto-detects `EM_ARM`/`EM_AARCH64` and endianness.
 3. For bare bootloaders (`abl.elf`, `lk.bin`, `u-boot.bin`) that aren't a
@@ -75,9 +78,34 @@ Practical Ghidra workflow:
   a known mainline driver for the same chip family (e.g. Synaptics/FocalTech
   touch controllers, OV/Samsung camera sensors) to spot what's actually
   different instead of RE'ing from zero.
-- **`ghidra_bridge`** — script Ghidra from an external Python process to
-  batch-process dozens of `.ko` files the same way (handy when a device
-  ships 50+ vendor modules).
+- **Headless batch analysis** — a device ships dozens of vendor `.ko`/`.so`
+  files and you rarely want to open each by hand. Ghidra's headless CLI
+  imports, auto-analyzes, and runs a script over a binary with no GUI:
+
+  ```bash
+  # Ghidra's own CLI (support/analyzeHeadless). Creates/uses a project,
+  # imports every module, runs a post-analysis script on each:
+  "$GHIDRA_HOME/support/analyzeHeadless" ./proj vendor_modules \
+    -import vendor_mnt/lib/modules/*.ko \
+    -postScript dump_of_match.py \
+    -scriptPath ./ghidra_scripts
+  ```
+
+  The script (`dump_of_match.py`) can, for example, pull the
+  `of_match_table` compatible strings and `probe` addresses out of every
+  module at once, so you get a device-wide map of "which module claims
+  which DT node" in one run — the §2.9 step 1 anchor, batched.
+- **PyGhidra** (bundled with Ghidra 11.3+; was the external `pyhidra`
+  project before that) — write those scripts in real CPython 3 with
+  normal `pip` packages available, instead of Ghidra's built-in Jython.
+  It also gives an interactive interpreter against an analyzed program,
+  which is the fastest way to explore a struct layout or dump a constant
+  table (§2.5) without clicking through the GUI. Scripts written for
+  PyGhidra run under `analyzeHeadless -postScript` the same way.
+- **`ghidra_bridge`** — the older approach: drive a *running* GUI Ghidra
+  from an external Python process. Still useful when you want to script
+  against a session you're also inspecting by hand; for pure batch work,
+  prefer headless + PyGhidra above.
 - **HAL interface recovery** — HIDL/AIDL HALs keep their interface
   descriptor strings (e.g. `android.hardware.sensors@2.0::ISensors`) in
   the `.so`; searching for them in Ghidra is the fastest way to map
@@ -177,11 +205,96 @@ keys, and sometimes modem/DSP firmware authentication.
   `.symtab` for Ghidra to label functions — check before assuming a blind
   disassembly.
 - SoC vendors (Qualcomm, MediaTek) publish partial kernel source
-  (Qualcomm's CodeLinaro-hosted trees — formerly CodeAurora, shut down in 2022 — , or MediaTek's kernel
-  releases required by GPLv2) for many chips — diffing the vendor binary
-  against the matching open BSP source is usually far faster than reading
-  raw disassembly, and is the standard first move before touching Ghidra at
-  all.
+  (Qualcomm's CodeLinaro-hosted trees — formerly CodeAurora, shut down in
+  2022 — or MediaTek's kernel releases required by GPLv2) for many chips —
+  diffing the vendor binary against the matching open BSP source is usually
+  far faster than reading raw disassembly, and is the standard first move
+  before touching Ghidra at all.
+
+## 2.9 Worked example: recovering a touch-controller init sequence
+
+This walks the §2.3 workflow end to end on a representative I2C touch
+driver. The decompiler snippets below are illustrative of the kernel
+idioms you'll actually see (real register values differ per chip); the
+*method* is what to copy, not the numbers.
+
+**Goal:** no mainline driver binds this panel's touch controller, so you
+need the exact power-on + register-init sequence the vendor `probe()`
+runs, to feed a `drm_panel`/`input` driver (§4.4).
+
+**1. Find the entry point.** Auto-analysis done, go to the
+`of_match_table`. Even in a stripped module it survives (§2.7); Ghidra
+shows it as an array of `{char *compatible, void *data}`:
+
+```
+00081a40  "focaltech,fts_ts"   00081b00
+```
+
+The `compatible` string matches a node in the DTB from §1.3 — follow the
+data pointer, or just xref the `probe` function the driver registered.
+
+**2. Define the private struct.** `probe()` opens with:
+
+```c
+ts = devm_kzalloc(&client->dev, 0x118, GFP_KERNEL);   // sizeof(struct fts_ts_data)
+```
+
+That `0x118` is the struct size — create a 0x118-byte Ghidra structure,
+retype `ts`, and the later `*(undefined4 *)(ts + 0x40)` reads become
+named fields (§2.5). Do this first; everything downstream gets readable.
+
+**3. Transcribe the power-on sequence.** Follow the regulator/GPIO calls
+before any I2C traffic:
+
+```c
+regulator_enable(ts->vdd);                 // pull from the DTS regulator name
+usleep_range(1000, 1100);
+gpiod_set_value(ts->reset_gpio, 0);        // assert reset
+usleep_range(10000, 11000);
+gpiod_set_value(ts->reset_gpio, 1);        // release reset
+msleep(200);                               // mandatory post-reset settle
+```
+
+Every delay matters — a missing `msleep` here is the classic "driver
+probes cleanly but the panel is black" bug (§11.3).
+
+**4. Transcribe the register writes.** The init itself is usually a loop
+over a `static const` table (§2.5). Ghidra shows the table as bytes until
+you define the element struct — here a `{u8 reg; u8 val;}` pair:
+
+```c
+for (i = 0; i < 7; i++)
+    fts_i2c_write(client, init_tbl[i].reg, init_tbl[i].val);
+```
+
+Define the 2-byte structure, apply it across the array, and the table
+reads out directly:
+
+| reg | val | meaning (from the vendor header if you have it, else note "unknown") |
+|---|---|---|
+| 0x00 | 0x00 | mode: normal/active |
+| 0xA4 | 0x01 | interrupt mode: trigger |
+| 0x80 | 0x3C | touch threshold |
+| … | … | … |
+
+**5. Note the IRQ contract.** Find `devm_request_threaded_irq` and record
+the trigger type (`IRQF_TRIGGER_FALLING` etc.) and which GPIO — a
+mismatch here is "device node exists, no input events" (§11.3).
+
+**6. Export to `re-notes.md`.** The committed artifact is a text table,
+never the binary (§CONTRIBUTING):
+
+```markdown
+## Touchscreen — FocalTech FTS (compatible: focaltech,fts_ts)
+- Source: vendor touch .ko, probe() @ 0x81c40 (RE'd, no public source)
+- Power-on: vdd on → 1ms → reset low → 10ms → reset high → 200ms
+- Init table: 0x00=0x00, 0xA4=0x01, 0x80=0x3C, ...
+- IRQ: GPIO<n>, falling-edge, threaded
+```
+
+That note is enough to write or wire up a mainline driver without ever
+touching the vendor binary again — and if your first boot shows the panel
+probing but dead, §11.3 sends you straight back to step 3's delays.
 
 ## Next
 
