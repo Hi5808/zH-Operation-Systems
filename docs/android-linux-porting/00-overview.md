@@ -305,7 +305,7 @@ Conventions for adding to this guide — above all "notes, not binaries" and "do
 | Device | SoC vendor / chip | Status |
 |---|---|---|
 | [Blackview BL6000 Pro 5G](devices/blackview-bl6000-pro-5g/profile.md) | MediaTek Dimensity 800 (MT6873) | Profile created; dump files exist locally, not yet cataloged into this repo — see [HANDOFF.md](HANDOFF.md) |
-| [Anbernic RG405M](devices/anbernic-rg405m/profile.md) | UNISOC Tiger T618 | Profile created; dump files exist locally, not yet cataloged into this repo — see [HANDOFF.md](HANDOFF.md). Existing GammaOS/LineageOS prior art identified |
+| [Anbernic RG405M](devices/anbernic-rg405m/profile.md) | UNISOC Tiger T618 (`rg405m`) | Hardware-proven native Yocto port (RGOS) — kernel/DT/drivers in the RGOS BSP; see the [case study](08-case-studies.md) |
 
 **[HANDOFF.md](HANDOFF.md)** is the concrete, per-device checklist for
 whoever has physical access to these devices (a local agent, or you) —
