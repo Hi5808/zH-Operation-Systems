@@ -68,7 +68,7 @@ go. Read it from the stock image before building anything:
 
 | Header | Typical devices | Where the DTB goes | Notes |
 |---|---|---|---|
-| v0 / v1 | Older devices (roughly Android 9 and earlier) | **Appended to the kernel** (`cat Image.gz <board>.dtb > Image.gz-dtb`), not a `--dtb` argument | v1 adds a recovery DTBO field; many bootloaders also read a separate `dtbo` partition. |
+| v0 / v1 | Older devices (roughly Android 9 and earlier) | **Appended to the kernel** (`cat Image.gz BOARD.dtb > Image.gz-dtb`), not a `--dtb` argument | v1 adds a recovery DTBO field; many bootloaders also read a separate `dtbo` partition. |
 | v2 | Android 10-era devices | `--dtb` in `boot.img` (as above) | Base/offsets still come from the header. |
 | v3 / v4 | Android 11+ launches, GKI devices | In **`vendor_boot`**, not `boot` | `boot.img` holds only kernel + generic ramdisk with a fixed layout; base, offsets, DTB, vendor ramdisk and vendor cmdline move to `vendor_boot`. |
 
@@ -116,7 +116,9 @@ bootloader (common on newer devices — unlocking disables the *enforcement*
 but the bootloader may still check a flag), you'll typically need:
 
 ```bash
-fastboot flash vbmeta --disable-verity --disable-verification vbmeta.img
+# NB: --disable-verity/--disable-verification are global flags and must
+# come BEFORE the `flash` subcommand, not after the partition:
+fastboot --disable-verity --disable-verification flash vbmeta vbmeta.img
 # or flash a vbmeta.img you've re-signed with the AOSP `avbtool` using the
 # device's "test" key path, per the vendor's unlock documentation.
 ```
