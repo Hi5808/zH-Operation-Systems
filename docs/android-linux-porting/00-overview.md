@@ -235,11 +235,27 @@ Stock Android firmware (OTA zip / dump from device)
    §1.
 4. Keep [11-troubleshooting-and-debugging.md](11-troubleshooting-and-debugging.md)
    open while bringing the device up — most first-boot issues map
-   directly to one of its entries.
+   directly to one of its entries, and set up your restore path
+   ([12-oem-restore.md](12-oem-restore.md)) **before** the first flash.
+5. When it works, give it back ([14-upstreaming.md](14-upstreaming.md)).
 
-Nothing in §1-§8 assumes a specific chipset; every command that differs by
-vendor (dump mode, flashing tool, clock/pinctrl naming) is called out and
-deferred to §9.
+Nothing in §1-§9's methodology assumes a specific chipset; every command
+that differs by vendor (dump mode, flashing tool, clock/pinctrl naming)
+is called out and deferred to §9.
+
+### Reading paths
+
+The guide is a reference, not a novel — read for your goal:
+
+- **"I just want to understand the approach"** → §00, §08 (especially the
+  RGOS worked example), §13 glossary. Skip the command-level chapters.
+- **"I'm porting a specific device"** → §00 → §09 (your vendor) → §01 →
+  §03 → §04 → §05 → §06, scaffolding a profile (§10) as you go and
+  keeping §11 and §12 open.
+- **"I'm stuck on one subsystem"** → §03 (identify it) → §02 (RE it) →
+  §11 (symptom lookup) → §15 (if you need to probe hardware).
+- **"I have a working port"** → §14 (upstream it) and publish the profile.
+- **New to the terms** → §13 first.
 
 ## Devices tracked in this repo
 
