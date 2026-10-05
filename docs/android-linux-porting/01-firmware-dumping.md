@@ -53,24 +53,27 @@ steps, not a black box.
 # Extract payload.bin from the OTA zip
 unzip ota.zip payload.bin
 
-# Use Android's own payload dumper (AOSP update_engine / android-ota-payload-dumper)
-pip install update-payload-extractor   # or use: https://github.com/vm03/payload_dumper
-python payload_dumper.py payload.bin   # dumps boot.img, vendor.img, system.img, dtbo.img, ...
+# Community payload dumpers (pick one):
+#   https://github.com/vm03/payload_dumper        (Python: python payload_dumper.py payload.bin)
+#   https://github.com/ssut/payload-dumper-go     (Go binary: payload-dumper-go payload.bin)
+# Both write boot.img, vendor.img, system.img, dtbo.img, ... to an output dir.
 ```
 
 ## 1.3 Unpacking boot.img / recovery.img (kernel + ramdisk + DTB)
 
 ```bash
-# AOSP tool, handles most Android Boot Image Header v0-v4 formats
-pip install unpack_bootimg   # https://github.com/osm0sis/Android-Image-Kitchen is the classic alternative
+# AOSP's unpack_bootimg handles Android Boot Image Header v0-v4. It lives in
+# https://android.googlesource.com/platform/system/tools/mkbootimg (some
+# distros also package it as part of "mkbootimg"). Android-Image-Kitchen
+# (github.com/osm0sis/Android-Image-Kitchen) is the classic alternative.
 unpack_bootimg --boot_img boot.img --out boot_out/
 #   boot_out/kernel        -> raw kernel (zImage/Image.gz/Image, maybe gzip/lz4 compressed)
 #   boot_out/ramdisk       -> initramfs cpio (usually gzip)
 #   boot_out/dtb           -> device tree blob(s), sometimes appended to kernel
 
-# For devices that append DT to the kernel image, split them:
-python split_bootimg.py kernel          # or use `extract-dtb` (https://github.com/PabloCastellano/extract-dtb)
-extract-dtb kernel -o dtb/
+# For devices that append DT(s) to the kernel image, split them out with
+# extract-dtb (https://github.com/PabloCastellano/extract-dtb):
+extract-dtb boot_out/kernel -o dtb/
 
 # Decompile DTB to human-readable .dts source
 dtc -I dtb -O dts -o device.dts dtb/00_kernel.dtb
@@ -97,10 +100,10 @@ vendor kernel enables, which narrows what you need to reverse engineer.
 
 ```bash
 # system.img / vendor.img are usually sparse ext4 or erofs
-simg2img vendor_sparse.img vendor.img          # android sparse -> raw, if sparse
+simg2img vendor_sparse.img vendor.img          # android sparse -> raw, if sparse (Debian: android-sdk-libsparse-utils)
 mkdir vendor_mnt && sudo mount -o loop vendor.img vendor_mnt/   # ext4
 # or for EROFS (common on newer devices):
-fsck.erofs --extract=vendor_mnt vendor.img     # https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git
+fsck.erofs --extract=vendor_mnt vendor.img     # erofs-utils >= 1.5 (distro package: erofs-utils)
 ```
 
 Inside `vendor/lib(64)/hw/`, `vendor/lib(64)/`, and `vendor/firmware/` you
@@ -130,7 +133,7 @@ compatible protocol stack exists — see
 - **UFS** devices (most modern flagships) expose
   `/dev/block/sd*`/`/dev/block/by-name/*` via the SCSI/UFS stack; dumping
   mechanics are identical from a tooling perspective, but note that UFS
-  has its own replay-protected memory block (RPMB) partition used for
+  (like eMMC) has a replay-protected memory block (RPMB) area used for
   secure storage (e.g. Keymaster/StrongBox key material) — this is
   normally inaccessible and irrelevant to the port; don't expect to dump
   or need it.

@@ -14,7 +14,7 @@ for anything missing.
 | `scripts/extract-ikconfig` | Recover `.config` from a raw kernel binary | in any `torvalds/linux` checkout |
 | `simg2img` | Android sparse image → raw image | distro package `android-tools`/`simg2img` |
 | `fsck.erofs --extract` | Extract EROFS-formatted `system`/`vendor` images | github.com/erofs/erofs-utils |
-| `qdl` / `edl.py` | Qualcomm EDL-mode full partition dump on unbootable devices | github.com/openpst/qdl, github.com/bkerler/edl |
+| `qdl` / `edl.py` | Qualcomm EDL-mode full partition dump on unbootable devices | github.com/linux-msm/qdl, github.com/bkerler/edl |
 | `mtkclient` | MediaTek BROM/Preloader mode dump/unbrick | github.com/bkerler/mtkclient |
 | `unisoc-unlock` (`pip install unisoc-unlock`) | UNISOC bootloader unlock on Anbernic's T618/T820 handheld line (confirmed working via the GammaOS project, §9.4) | pypi.org/project/unisoc-unlock, github.com/TheGammaSqueeze/GammaOSNext |
 | `Heimdall` | Samsung Exynos Odin-protocol dump/flash | github.com/Benjamin-Dobell/Heimdall |
@@ -38,7 +38,7 @@ for anything missing.
 | `aarch64-linux-gnu-gcc` / Android NDK's `clang` toolchain | Cross-compiling the kernel |
 | `dtc` | Building/validating device trees |
 | `scripts/diffconfig` (in-tree) | Compare `.config` against the vendor's recovered `kernel.config` |
-| LineageOS/CodeAurora/MediaTek kernel source mirrors | Starting point for a real (non-RE'd) kernel base |
+| LineageOS/CodeLinaro (ex-CodeAurora)/MediaTek kernel source mirrors | Starting point for a real (non-RE'd) kernel base |
 
 ## Userspace / Halium (§5)
 | Tool | Purpose |
@@ -47,7 +47,7 @@ for anything missing.
 | `halium-boot` / `hybris-boot` | Build scripts/device-repo layout for the Android HAL container |
 | `droidmedia` | Camera/media HAL bridge used by Halium ports |
 | `pmbootstrap` | postmarketOS build/porting tool, has built-in Halium device-porting mode |
-| `clickable` | UBports/Ubuntu Touch app & device tooling |
+| `clickable` | UBports/Ubuntu Touch *app* build tool (not device-porting tooling) |
 | `debootstrap` | From-scratch Debian/Ubuntu rootfs build |
 
 ## Boot chain & flashing (§6)

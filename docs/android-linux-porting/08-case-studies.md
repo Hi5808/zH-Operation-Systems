@@ -55,11 +55,11 @@ upstream efforts are worth tracking directly, since they determine how
 much of §4's "pick a kernel base" decision tilts toward mainline for your
 specific chip:
 
-- **`qcom-mainline`** — Linaro/Qualcomm-driven mainline Snapdragon
+- **Qualcomm mainline** (`linux-arm-msm` list; Linaro, Qualcomm and postmarketOS's per-SoC `*-mainline` groups) — mainline Snapdragon
   support; the most mature effort of any vendor (§9.1).
-- **`linux-mtk`** — MediaTek mainline effort (Collabora/BayLibre), rapidly
+- **MediaTek mainline** (`linux-mediatek` list) (Collabora/BayLibre), rapidly
   improving for recent Dimensity chips (§9.2).
-- **`linux-exynos`** — Samsung Exynos mainline effort, strongest for
+- **Exynos mainline** (`linux-samsung-soc` list), strongest for
   standalone Exynos (Chromebooks, Exynos Auto) and growing for phone SoCs
   (§9.3).
 - **`linux-sunxi`**, **`linux-rockchip`**, **`linux-tegra`** — the three

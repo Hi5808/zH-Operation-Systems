@@ -16,7 +16,8 @@ if [[ -z "$BOOT_IMG" || ! -f "$BOOT_IMG" ]]; then
 fi
 
 if ! command -v unpack_bootimg >/dev/null 2>&1; then
-  echo "error: unpack_bootimg not found. Install with: pip install unpack_bootimg" >&2
+  echo "error: unpack_bootimg not found. Get it from AOSP system/tools/mkbootimg" >&2
+  echo "       (android.googlesource.com) or your distro's mkbootimg package" >&2
   echo "       (or use Android-Image-Kitchen — see 07-tools-reference.md)" >&2
   exit 1
 fi
