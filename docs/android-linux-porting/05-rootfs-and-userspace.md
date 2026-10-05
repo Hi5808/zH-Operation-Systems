@@ -103,6 +103,63 @@ debootstrap --arch=arm64 --foreign bookworm rootfs/ http://deb.debian.org/debian
   loop wherever the bootloader supports it, instead of flashing every
   attempt.
 
+## 5.5 Bring-up order
+
+Bring subsystems up in an order where each one gives you the tools to
+debug the next:
+
+1. **Serial console** (§15): kernel log before anything else works.
+2. **USB networking**: the kernel's USB gadget (RNDIS/NCM via configfs)
+   gives you SSH over the USB cable with no display or Wi-Fi.
+   postmarketOS enables this by default in its initramfs and documents
+   the device address and debug shell on its wiki.
+3. **Storage/rootfs mounted**: the system actually boots past initramfs.
+4. **Display**, then **touch/buttons**: you can see and interact.
+5. **Battery/charging**: before long sessions, so you don't drain the
+   device on a kernel that doesn't charge.
+6. **Wi-Fi/Bluetooth**, then **audio**, then **modem**, then **camera**,
+   roughly in increasing order of difficulty.
+
+## 5.6 The stack per subsystem, on each path
+
+Which userspace component talks to each subsystem depends on whether it
+runs natively (§5.1B) or through the Android container (§5.1A):
+
+| Subsystem | Native (mainline drivers) | Halium / libhybris path |
+|---|---|---|
+| GPU / display | Mesa (Freedreno, Panfrost/Panthor, …) + KMS/DRM | Vendor EGL/GLES via `libhybris`; display via the vendor hwcomposer HAL |
+| Audio | ALSA + UCM profiles, PipeWire or PulseAudio | PulseAudio's droid modules talking to the vendor audio HAL |
+| Modem | ModemManager (QMI/MBIM, Qualcomm especially) | oFono with a binder/RIL plugin talking to the vendor radio HAL |
+| Camera | libcamera (where supported) | `droidmedia` + GStreamer `gst-droid` |
+| Sensors | IIO + `iio-sensor-proxy` | Vendor sensors HAL via a hybris sensor bridge |
+| Wi-Fi/BT | Mainline driver + firmware, NetworkManager/BlueZ | Usually still native kernel driver + firmware; Android only for unusual vendor stacks |
+
+Component names on the Halium side differ between distributions
+(Ubuntu Touch, Droidian, Sailfish OS). Check the distribution you're
+targeting for the exact packages rather than mixing parts across them.
+
+## 5.7 Choosing a distribution and UI
+
+| Option | Base | Path | Notes |
+|---|---|---|---|
+| **postmarketOS** | Alpine | Native, and downstream kernels | UIs: Phosh, Plasma Mobile, Sxmo, others. Best tooling for new device ports (`pmbootstrap`). |
+| **Mobian** | Debian | Native | Phosh-focused; best for devices with good mainline support. |
+| **Droidian** | Debian | Halium | Phosh on top of the Android container — good fit for devices that need vendor HALs. |
+| **Ubuntu Touch** (UBports) | Ubuntu | Halium | Lomiri UI; large existing Halium device base. |
+| **Sailfish OS** | Own (Mer/Nemo) | libhybris | Proprietary UI layer on an open base; long history of hybris ports. |
+
+Rule of thumb: if §3.4 put GPU, audio and modem on the native path, start
+with postmarketOS or Mobian. If those subsystems need vendor HALs, start
+with Droidian or Ubuntu Touch, whose tooling assumes the Halium path.
+
+## 5.8 What "done" means
+
+A port is usable day-to-day when the profile's Status table (§10) shows
+working display, touch, charging, Wi-Fi, audio and suspend/resume.
+Suspend/resume is the one most often skipped and most often broken.
+Without it, battery life makes the device impractical even if everything
+else works, so test it early rather than last.
+
 ## Next
 
 → [06-bootloader-and-flashing.md](06-bootloader-and-flashing.md) to wire
