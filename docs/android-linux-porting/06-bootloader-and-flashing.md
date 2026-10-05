@@ -39,11 +39,13 @@ locked bootloader's cryptographic verification is out of scope here.
                                                 # usually do, to pivot into the
                                                 # real rootfs)
 
+# The cmdline below is a Qualcomm/UFS example; console device and root
+# path vary per SoC and storage type.
 mkbootimg \
   --kernel out/arch/arm64/boot/Image.gz \
   --ramdisk ramdisk.img \
   --dtb out/arch/arm64/boot/dts/<vendor>/<board>.dtb \
-  --cmdline "console=ttyMSM0,115200n8 root=/dev/sda1 rw" \   # example only: console device and root path vary per SoC/storage
+  --cmdline "console=ttyMSM0,115200n8 root=/dev/sda1 rw" \
   --base 0x80000000 \
   --kernel_offset 0x8000 --ramdisk_offset 0x1000000 --tags_offset 0x100 \
   --header_version 2 \
