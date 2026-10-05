@@ -46,12 +46,12 @@ for f in glob.glob("*.md") + glob.glob("devices/*/*.md"):
         if r.returncode != 0:
             problems.append(f"bash block {i} in {f}: {r.stderr.strip()}")
 
-# 5. Every scripts/<name>.sh referenced in the docs exists on disk
-on_disk = {os.path.basename(p) for p in glob.glob("scripts/*.sh")}
+# 5. Every scripts/<name>.{sh,py} referenced in the docs exists on disk
+on_disk = {os.path.basename(p) for p in glob.glob("scripts/*.sh") + glob.glob("scripts/*.py")}
 doc_text = "".join(open(f).read() for f in
                    glob.glob("*.md") + glob.glob("devices/*/*.md") + ["HANDOFF.md"]
                    if os.path.exists(f))
-for ref in sorted(set(re.findall(r'scripts/([a-z-]+\.sh)', doc_text))):
+for ref in sorted(set(re.findall(r'scripts/([a-z-]+\.(?:sh|py))', doc_text))):
     if ref not in on_disk:
         problems.append(f"docs reference scripts/{ref} but it does not exist")
 

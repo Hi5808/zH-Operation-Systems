@@ -53,6 +53,10 @@ No script access? Copy
 - **Backups taken before first flash** — a final checklist gate before
   touching real hardware, per [06-bootloader-and-flashing.md](06-bootloader-and-flashing.md) §6.5.
 
+## Generating a readiness checklist
+
+Once a device folder exists, `scripts/gen-checklist.py <device-dir> --target <os> --goal <phone|handheld|general>` turns this template's requirements into a tailored, auto-checked checklist: it marks which artifacts (dump, DTS, kernel config, vendor tree, ...) are already present, lists what each still-missing item needs and the chapter/script that provides it, and adds the target-OS-specific inputs (Halium device tree for Ubuntu Touch/Droidian; pmaports packages for postmarketOS; a plain arm64 rootfs for Debian/Kali/Arch on your ported kernel). It plans the work; it does not build the image (ch.4-6 and the real build tools do that). `--write` saves it as `checklist.md` in the device folder.
+
 ## Why this template matters for "supporting any device"
 
 The rest of this guide (§1-§9) is deliberately written as *methodology*,
