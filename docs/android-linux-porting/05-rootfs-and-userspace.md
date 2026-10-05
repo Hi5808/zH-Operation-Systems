@@ -7,8 +7,9 @@ it.
 
 ### A. Halium / libhybris compatibility shim
 
-Used by UBports (Ubuntu Touch), postmarketOS's "Halium" devices, and
-Sailfish OS's `hybris` ports. Runs a *container* with the original
+Used by UBports (Ubuntu Touch), Droidian, and Sailfish OS's `hybris`
+ports (postmarketOS supports it for some devices, but its strength is the
+native path below). Runs a *container* with the original
 Android userspace (HALs, `init`, `surfaceflinger` or a GPU shim) inside a
 chroot/LXC namespace alongside a normal Linux rootfs, bridged by
 `libhybris`, which translates Bionic-ABI calls from the Android HAL `.so`
@@ -79,8 +80,9 @@ this pattern for anything proprietary in this repo too.
 ## 5.3 Building the Linux rootfs
 
 ```bash
-# postmarketOS path (recommended starting point; it already has Halium
-# device-porting docs and infra: https://wiki.postmarketos.org/wiki/Porting_to_a_new_device)
+# postmarketOS path -- recommended for its device-porting tooling
+# (pmbootstrap) and its strong native/mainline support:
+# https://wiki.postmarketos.org/wiki/Porting_to_a_new_device
 pmbootstrap init
 # Replace VENDOR/CODENAME with your device's values:
 pmbootstrap aportgen "device-VENDOR-CODENAME"   # scaffold a new device package

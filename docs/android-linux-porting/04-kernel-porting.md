@@ -32,7 +32,7 @@ small set of device-specific drivers" using the RE'd init sequences from
 |---|---|
 | Vendor's own kernel source (as found in §4.1) | Fastest path to "boots at all"; keeps every vendor driver/quirk; usually an old LTS (4.9/4.14/4.19/5.4) |
 | A community BSP fork for the same SoC (LineageOS, postmarketOS `linux-*` kernels) | Best balance — often already has out-of-tree drivers cleaned up and cross-device DT support |
-| Mainline `torvalds/linux` + out-of-tree patches | Best long-term maintainability; realistic only for SoCs with strong mainline support (e.g. recent Qualcomm Snapdragon with `qcom-mainline` efforts, Samsung Exynos via `linux-exynos`) |
+| Mainline `torvalds/linux` + out-of-tree patches | Best long-term maintainability; realistic only for SoCs with strong mainline support (e.g. recent Qualcomm Snapdragon via the `linux-arm-msm` effort, Samsung Exynos via `linux-samsung-soc`) — see §8 |
 
 Most real-world ports (Halium, postmarketOS "downstream kernel" devices)
 start from the vendor/BSP kernel and mainline individual drivers over

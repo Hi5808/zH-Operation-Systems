@@ -27,10 +27,13 @@ for anything missing.
 | Tool | Purpose |
 |---|---|
 | Ghidra | Primary disassembler/decompiler for ARM/AArch64 ELFs, raw bootloader binaries |
-| `ghidra_bridge` | Script Ghidra from external Python for batch analysis across many `.ko`/`.so` |
-| BinDiff (or Ghidra's built-in version tracking) | Diff vendor binaries against known/mainline equivalents |
+| `analyzeHeadless` (ships with Ghidra, `support/analyzeHeadless`) | Ghidra's headless CLI — import + auto-analyze + run a script over a binary with no GUI; the basis for batch-processing a device's vendor modules in CI/scripts |
+| **PyGhidra** (bundled since Ghidra 11.3; formerly the `pyhidra` project) | Drive Ghidra's full API from CPython — scripts and an interactive interpreter against a real Python 3, instead of Jython |
+| Ghidra scripting (Jython / Java `GhidraScript`) | In-GUI or headless scripts using the built-in interpreter, no external deps |
+| `ghidra_bridge` | Script a *running* Ghidra instance from an external CPython process (predates PyGhidra; still handy for driving an open GUI session) |
+| BinDiff (+ BinExport) or Ghidra's built-in Version Tracking | Diff vendor binaries against known/mainline equivalents |
 | `jadx` | Decompile the Java/Kotlin side of HALs when logic lives in a `.jar`/APK rather than native `.so` |
-| `radare2`/`r2ghidra` | Scriptable alternative/companion to Ghidra for quick triage |
+| `radare2`/`r2ghidra`, `Cutter` | Scriptable alternative/companion to Ghidra (r2ghidra embeds Ghidra's decompiler; Cutter is radare2's GUI) for quick triage |
 
 ## Kernel & device tree (§3-4)
 | Tool | Purpose |
