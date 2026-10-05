@@ -174,6 +174,26 @@ for the finished guide to be published under these same principles.
 
 ## Pipeline at a glance
 
+```mermaid
+flowchart TD
+    T["Triage: portable? scope the goal (16)"] --> F["Stock firmware (OTA or device dump)"]
+    F --> E["Extract partitions (boot, vendor, ...)"]
+    E --> K["Recover kernel + DTB + config"]
+    E --> RE["Ghidra RE of closed ko / HAL / bootloader"]
+    RE --> K
+    K --> B["Buildable kernel tree + device tree"]
+    B --> U{"Per subsystem (3.5)"}
+    U -->|open driver| N["Native Linux driver"]
+    U -->|blob needed| H["Halium / libhybris HAL shim"]
+    N --> R["Linux rootfs + bootloader glue"]
+    H --> R
+    R --> I["Reversible boot + test (17/18)"]
+    I -->|not working| B
+    I -->|working| UP["Validate, then upstream (14)"]
+```
+
+Plain-text version of the same flow:
+
 ```
 Stock Android firmware (OTA zip / dump from device)
         │
@@ -219,25 +239,38 @@ Stock Android firmware (OTA zip / dump from device)
 | [13-glossary.md](13-glossary.md) | Definitions for EDL, AVB, DAA, SMC, HAL, DT and the other terms used throughout |
 | [14-upstreaming.md](14-upstreaming.md) | Giving a finished port back: device profile, postmarketOS port, mainline kernel patches |
 | [15-hardware-lab.md](15-hardware-lab.md) | Bench setup: finding a serial console (1.8V vs 3.3V), logic-analyser capture of undocumented buses, safety |
+| [16-feasibility-triage.md](16-feasibility-triage.md) | **Read first.** Gates that decide whether a device is portable at all, and how much effort it'll take |
+| [17-reversible-development.md](17-reversible-development.md) | Making mistakes cheap: RAM-boot, boot-from-SD/dual-boot, A/B slots |
+| [18-validation-and-testing.md](18-validation-and-testing.md) | Confirming a subsystem actually works, not just probes; suspend/soak/thermal |
+| [19-hard-subsystems.md](19-hard-subsystems.md) | Audio, camera, modem in depth — why they stall and the realistic options |
 
 ## How to use this for a new/unlisted device
 
-1. Read §1-§8 once, straight through, for the general methodology.
-2. Jump to [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) and
+1. **Triage first** ([16-feasibility-triage.md](16-feasibility-triage.md)):
+   confirm the device can run your own code at all, and scope the goal to
+   what the effort gates allow — before sinking time into a dump.
+2. Read §1-§8 once for the general methodology.
+3. Jump to [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) and
    find your device's SoC vendor (or the closest match) to learn its
    boot-ROM recovery mode, dump/flash tooling, and mainline maturity.
-3. Run `./scripts/new-device.sh <codename> "<Display Name>" [vendor] [model]`
+4. Run `./scripts/new-device.sh CODENAME "Display Name" VENDOR MODEL`
    (see [10-device-profile-template.md](10-device-profile-template.md) and
    [scripts/README.md](scripts/README.md)) to scaffold
-   `devices/<codename>/profile.md`, and fill it in as you work through
+   `devices/CODENAME/profile.md`, and fill it in as you work through
    §1-§6 for your specific device. `./scripts/check-tools.sh` and the
    other scripts in [scripts/](scripts/) automate the mechanical parts of
    §1.
-4. Keep [11-troubleshooting-and-debugging.md](11-troubleshooting-and-debugging.md)
-   open while bringing the device up — most first-boot issues map
-   directly to one of its entries, and set up your restore path
-   ([12-oem-restore.md](12-oem-restore.md)) **before** the first flash.
-5. When it works, give it back ([14-upstreaming.md](14-upstreaming.md)).
+5. Work in a reversible loop
+   ([17-reversible-development.md](17-reversible-development.md)) and set
+   up your restore path ([12-oem-restore.md](12-oem-restore.md)) **before**
+   the first flash. Keep
+   [11-troubleshooting-and-debugging.md](11-troubleshooting-and-debugging.md)
+   open — most first-boot issues map directly to one of its entries.
+6. Confirm each subsystem actually works, not just probes
+   ([18-validation-and-testing.md](18-validation-and-testing.md)); expect
+   audio, camera and modem to be the long tail
+   ([19-hard-subsystems.md](19-hard-subsystems.md)).
+7. When it works, give it back ([14-upstreaming.md](14-upstreaming.md)).
 
 Nothing in §1-§9's methodology assumes a specific chipset; every command
 that differs by vendor (dump mode, flashing tool, clock/pinctrl naming)
@@ -249,12 +282,16 @@ The guide is a reference, not a novel — read for your goal:
 
 - **"I just want to understand the approach"** → §00, §08 (especially the
   RGOS worked example), §13 glossary. Skip the command-level chapters.
-- **"I'm porting a specific device"** → §00 → §09 (your vendor) → §01 →
-  §03 → §04 → §05 → §06, scaffolding a profile (§10) as you go and
-  keeping §11 and §12 open.
+- **"Is this device even worth attempting?"** → §16 triage, then §09 for
+  your vendor.
+- **"I'm porting a specific device"** → §16 → §09 (your vendor) → §01 →
+  §03 → §04 → §05 → §06, working reversibly (§17) and scaffolding a
+  profile (§10) as you go, keeping §11 and §12 open, validating with §18.
 - **"I'm stuck on one subsystem"** → §03 (identify it) → §02 (RE it) →
-  §11 (symptom lookup) → §15 (if you need to probe hardware).
-- **"I have a working port"** → §14 (upstream it) and publish the profile.
+  §11 (symptom lookup) → §19 (if it's audio/camera/modem) → §15 (if you
+  need to probe hardware).
+- **"I have a working port"** → §18 (prove it works) → §14 (upstream it)
+  and publish the profile.
 - **New to the terms** → §13 first.
 
 ## Contributing
