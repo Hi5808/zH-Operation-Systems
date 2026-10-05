@@ -148,7 +148,7 @@ targeting for the exact packages rather than mixing parts across them.
 | **postmarketOS** | Alpine | Native, and downstream kernels | UIs: Phosh, Plasma Mobile, Sxmo, others. Best tooling for new device ports (`pmbootstrap`). |
 | **Mobian** | Debian | Native | Phosh-focused; best for devices with good mainline support. |
 | **Droidian** | Debian | Halium | Phosh on top of the Android container — good fit for devices that need vendor HALs. |
-| **Ubuntu Touch** (UBports) | Ubuntu | Halium | Lomiri UI; large existing Halium device base. |
+| **Ubuntu Touch** (UBports) | Ubuntu | Halium | Lomiri UI; the longest-running community mobile-Linux OS, volunteer-maintained since Canonical left in 2017; largest Halium device base and the most complete porting docs (§8). |
 | **Sailfish OS** | Own (Mer/Nemo) | libhybris | Proprietary UI layer on an open base; long history of hybris ports. |
 
 Rule of thumb: if §3.5 put GPU, audio and modem on the native path, start

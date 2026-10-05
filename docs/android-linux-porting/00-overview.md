@@ -243,6 +243,7 @@ Stock Android firmware (OTA zip / dump from device)
 | [17-reversible-development.md](17-reversible-development.md) | Making mistakes cheap: RAM-boot, boot-from-SD/dual-boot, A/B slots |
 | [18-validation-and-testing.md](18-validation-and-testing.md) | Confirming a subsystem actually works, not just probes; suspend/soak/thermal |
 | [19-hard-subsystems.md](19-hard-subsystems.md) | Audio, camera, modem in depth — why they stall and the realistic options |
+| [20-credits-and-resources.md](20-credits-and-resources.md) | Credits & reference map: the kernels, DT/DTS, drivers, tooling and communities a port stands on |
 
 ## How to use this for a new/unlisted device
 

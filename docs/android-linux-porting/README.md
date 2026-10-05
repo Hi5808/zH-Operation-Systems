@@ -6,7 +6,7 @@ for different goals.
 
 Quick orientation:
 
-- **Chapters** `00`–`19` — the methodology, in order (triage → dump → RE
+- **Chapters** `00`–`20` — the methodology, in order (triage → dump → RE
   → kernel → userspace → flash → validate → upstream), plus reference
   chapters (tools, per-vendor specifics, troubleshooting, glossary, …).
 - **[scripts/](scripts/)** — automation for the mechanical steps; run
