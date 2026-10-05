@@ -44,7 +44,7 @@ locked bootloader's cryptographic verification is out of scope here.
 mkbootimg \
   --kernel out/arch/arm64/boot/Image.gz \
   --ramdisk ramdisk.img \
-  --dtb out/arch/arm64/boot/dts/<vendor>/<board>.dtb \
+  --dtb "out/arch/arm64/boot/dts/$VENDOR/$BOARD.dtb" \
   --cmdline "console=ttyMSM0,115200n8 root=/dev/sda1 rw" \
   --base 0x80000000 \
   --kernel_offset 0x8000 --ramdisk_offset 0x1000000 --tags_offset 0x100 \
@@ -55,7 +55,59 @@ mkbootimg \
 Match `--base`/offsets/`--header_version` to what `unpack_bootimg`
 reported for the *original* `boot.img` (§1.3) — the bootloader expects the
 same header version and memory layout unless you've also patched the
-bootloader itself.
+bootloader itself. Recent versions of AOSP's `unpack_bootimg` can print
+the original image's parameters directly as `mkbootimg` arguments
+(`--format=mkbootimg`), which avoids transcription mistakes. Also copy
+`--os_version`/`--os_patch_level` from the stock image rather than
+leaving them empty.
+
+### 6.2.1 Which layout your device uses
+
+The boot image header version decides where the kernel, ramdisk and DTB
+go. Read it from the stock image before building anything:
+
+| Header | Typical devices | Where the DTB goes | Notes |
+|---|---|---|---|
+| v0 / v1 | Older devices (roughly Android 9 and earlier) | **Appended to the kernel** (`cat Image.gz <board>.dtb > Image.gz-dtb`), not a `--dtb` argument | v1 adds a recovery DTBO field; many bootloaders also read a separate `dtbo` partition. |
+| v2 | Android 10-era devices | `--dtb` in `boot.img` (as above) | Base/offsets still come from the header. |
+| v3 / v4 | Android 11+ launches, GKI devices | In **`vendor_boot`**, not `boot` | `boot.img` holds only kernel + generic ramdisk with a fixed layout; base, offsets, DTB, vendor ramdisk and vendor cmdline move to `vendor_boot`. |
+
+### 6.2.2 Repacking a v3/v4 pair
+
+On v3/v4 devices you rebuild **two** images, and the final kernel command
+line is the concatenation of the vendor cmdline (in `vendor_boot`) and
+the boot cmdline:
+
+```bash
+# Set these from the stock images first, e.g. via
+# unpack_bootimg --format=mkbootimg on boot.img and vendor_boot.img:
+# OS_VERSION, OS_PATCH_LEVEL, BOOT_CMDLINE, VENDOR_CMDLINE, BASE, PAGESIZE, DTB
+mkbootimg \
+  --header_version 4 \
+  --kernel out/arch/arm64/boot/Image.gz \
+  --ramdisk generic-ramdisk.img \
+  --os_version "$OS_VERSION" --os_patch_level "$OS_PATCH_LEVEL" \
+  --cmdline "$BOOT_CMDLINE" \
+  -o boot-new.img
+
+mkbootimg \
+  --header_version 4 \
+  --vendor_ramdisk vendor-ramdisk.img \
+  --dtb "$DTB" \
+  --vendor_cmdline "$VENDOR_CMDLINE" \
+  --base "$BASE" --pagesize "$PAGESIZE" \
+  --vendor_boot vendor_boot-new.img
+```
+
+- Flash or RAM-boot both together. A new `boot` with a stock
+  `vendor_boot` (or vice versa) mixes kernels with mismatched DTBs and
+  modules.
+- `fastboot boot` RAM-boots only a `boot` image. On v3/v4 devices,
+  testing a DTB change means flashing `vendor_boot`, so back it up first
+  (§6.5, §12).
+- On GKI devices, the stock vendor ramdisk contains the vendor kernel
+  modules (§4.7). If you replace the kernel, those modules won't load,
+  so plan the vendor ramdisk contents accordingly.
 
 ## 6.3 vbmeta / AVB considerations
 
