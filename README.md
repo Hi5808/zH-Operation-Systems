@@ -31,6 +31,7 @@ tablet-class Allwinner/Rockchip/Tegra devices.
 - **`templates/`:** the source templates `new-device.sh` renders from.
 - **`devices/`:** per-device profiles tracking a specific port end-to-end.
 - **`HANDOFF.md`:** the checklist for whoever has physical device access.
+- **`CONTRIBUTING.md`:** conventions for contributors (notes not binaries, verify before stating, run the checker).
 
 **Devices tracked:**
 

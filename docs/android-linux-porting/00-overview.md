@@ -257,6 +257,10 @@ The guide is a reference, not a novel — read for your goal:
 - **"I have a working port"** → §14 (upstream it) and publish the profile.
 - **New to the terms** → §13 first.
 
+## Contributing
+
+Conventions for adding to this guide — above all "notes, not binaries" and "don't state what you haven't verified" — are in [CONTRIBUTING.md](CONTRIBUTING.md). Run `./scripts/check-docs.sh` before opening a PR.
+
 ## Devices tracked in this repo
 
 | Device | SoC vendor / chip | Status |

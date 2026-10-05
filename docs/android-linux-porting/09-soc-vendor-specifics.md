@@ -148,6 +148,9 @@ methodology and expect to do more from-scratch RE.
   since there's less prior art to diff against. The Anbernic/GammaOS
   T618 line is a notable exception with real, working community tooling
   — check for a similar project before assuming "from scratch" applies.
+  For the RG405M (T618), a full *native Linux* port already exists (RGOS,
+  a Yocto OS — see §8), so on that device the work is mainlining, not
+  bring-up from zero.
 
 ## 9.5 HiSilicon (Kirin) — legacy Huawei devices
 
