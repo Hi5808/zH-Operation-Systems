@@ -178,6 +178,67 @@ keys, and sometimes modem/DSP firmware authentication.
   on anti-rollback behavior before experimenting with older bootloader/TZ
   images.
 
+### Worked example: recovering an SMC call contract
+
+Say the GPU won't come out of secure mode without the zap-shader unlock
+(§9.1) and you need to know exactly what SMC call the vendor kernel makes
+to load it. As with §2.9, the snippet below is representative of the
+idiom, not a dump from a specific device.
+
+**1. Find the call sites.** In Ghidra, Search → For Instruction Patterns
+for the `smc` mnemonic (AArch64: `smc #0`). Each hit is a call into the
+secure monitor. Follow the xrefs up to the small C wrapper around it:
+
+```c
+// Ghidra decompiles the SMC wrapper to something like:
+long qcom_scm_call(uint svc, uint cmd, ulong a0, ulong a1, ulong a2) {
+    reg x0 = 0x02000000 | (svc << 10) | cmd;   // the SMC function ID
+    reg x1 = a0; reg x2 = a1; reg x3 = a2;
+    smc(0);                                     // trap to EL3
+    return x0;                                  // status in x0 on return
+}
+```
+
+**2. Recover the function ID.** The value built into `x0` is the SMC
+Function ID — the thing you must replicate. Decode its fields against the
+ARM SMC Calling Convention (SMCCC): bit 31 = call type (fast/yielding),
+bit 30 = 32- vs 64-bit, bits 29-24 = owner/service, bits 15-0 =
+function number. On Qualcomm the `0x02000000` base + `svc`/`cmd` shifts
+*are* Qualcomm's SCM convention; mainline already encodes it in
+`drivers/firmware/qcom_scm.c`, so your job is usually to confirm the
+`svc`/`cmd` pair the vendor used, not invent the ABI.
+
+**3. Recover the arguments at the call you care about.** Decompile the
+caller (the zap-load path here) to see what it passes:
+
+```c
+qcom_scm_call(0x01 /*SVC_PIL*/, 0x06 /*CMD_PIL_INIT_IMAGE*/,
+              MEM_PA(fw_metadata),   // physical addr of the firmware header
+              fw_metadata_size, 0);
+// ... later: a MEM_SETUP, then an AUTH_AND_RESET command
+```
+
+That tells you the sequence (init-image → mem-setup → auth-and-reset) and
+which physical buffers each stage expects — the same "peripheral image
+loader" (PIL) handshake mainline's `qcom_scm_pas_*` functions implement.
+
+**4. Map to mainline before writing anything.** For Qualcomm and, to a
+lesser extent, other vendors, the SMC/SCM layer is already upstream —
+the RE here is to *confirm which documented call the vendor used*, then
+use the mainline wrapper, not to hand-roll `smc` instructions in your
+driver. You only write new SMC plumbing when the call genuinely has no
+mainline equivalent (rare, and worth asking the SoC's mailing list about
+before assuming, §14).
+
+**5. Export to `re-notes.md`** — the call contract, never the TZ binary:
+
+```markdown
+## GPU zap unlock — SCM/PIL handshake (RE'd from vendor kernel)
+- SMC base 0x02000000, SVC_PIL(0x01): INIT_IMAGE(0x06), MEM_SETUP, AUTH_AND_RESET
+- Args: physical addr + size of a540_zap metadata (§9.1 for the blob)
+- Mainline equivalent: drivers/firmware/qcom_scm.c qcom_scm_pas_* — use it
+```
+
 ## 2.7 Handling stripped, obfuscated, or packed vendor binaries
 
 - **Stripped `.ko`/`.so` with no symbols**: still has

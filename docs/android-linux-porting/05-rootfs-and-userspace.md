@@ -163,6 +163,34 @@ Suspend/resume is the one most often skipped and most often broken.
 Without it, battery life makes the device impractical even if everything
 else works, so test it early rather than last.
 
+## 5.9 Known-hard subsystems (effort reference)
+
+The per-subsystem decision (§3.5) and stack (§5.6) tell you *what* to do;
+this table is the blunt reality of *how hard* each is, consolidated so
+you can sequence effort and set expectations. "Difficulty" assumes no
+existing port for your device — a sibling-device port or a §8-style
+prior art collapses most of these.
+
+| Subsystem | Difficulty | Why | Usual outcome |
+|---|---|---|---|
+| Sensors, buttons, vibrator | Easy | Industry-standard parts, mainline `iio`/`input` drivers, DT wiring only (§3.2) | Native |
+| PMIC / charging | Easy–moderate | Good mainline coverage per PMIC family; charging logic can be fiddly | Native |
+| Touchscreen | Easy–moderate | Mainline driver usually exists; the work is IRQ/reset/firmware-path wiring (§2.9, §11.3) | Native |
+| Wi-Fi / Bluetooth | Moderate | Driver often mainline; the trap is the per-board calibration/NVRAM firmware files (§11.3) | Native + vendor firmware blobs |
+| Display panel | Moderate | Needs the RE'd init sequence (§2.3/§2.9); timing-sensitive | Native panel driver |
+| GPU | Moderate–hard | Open driver depends on generation (§9); Qualcomm also needs the signed zap blob (§9.1) | Mesa where supported, else blob via Halium |
+| Suspend / resume | Hard | Touches every driver's power path; silently skipped, then wrecks battery life (§5.8) | Often the last thing to work |
+| Audio (DSP routing) | Hard | Mixer/routing paths must match what the vendor HAL did; capture (mic) harder than playback (§11.3) | Native kernel driver + careful UCM, or HAL shim |
+| Camera (ISP) | Hard | Complex ISP pipeline, little open support | Usually `droidmedia`/HAL shim, or unsupported |
+| Modem (cellular) | Hard | Qualcomm (QMI) is the tractable case via `qrtr`/`rmtfs`/ModemManager; other vendors' protocols are often never fully ported (§9) | QMI bridge on Qualcomm; Android-side-only or unsupported elsewhere |
+
+Rule of thumb for a new port: get the Easy rows working first (they give
+you a usable device and the debug channels of §5.5), prove GPU/display
+early enough to know which §5.1 path you're on, and treat
+audio/camera/modem as the long tail — a device that boots with display,
+touch, Wi-Fi, charging and suspend is already genuinely useful even if
+those three never land.
+
 ## Next
 
 → [06-bootloader-and-flashing.md](06-bootloader-and-flashing.md) to wire
