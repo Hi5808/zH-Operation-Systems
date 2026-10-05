@@ -71,16 +71,19 @@ Practical Ghidra workflow:
 
 ## 2.4 Useful Ghidra scripts/plugins for this workflow
 
-- **Kalkulator/BinDiff-style diffing** — compare the vendor driver against
+- **Binary diffing (BinDiff + BinExport, or Ghidra's built-in Version Tracking)** — compare the vendor driver against
   a known mainline driver for the same chip family (e.g. Synaptics/FocalTech
   touch controllers, OV/Samsung camera sensors) to spot what's actually
   different instead of RE'ing from zero.
 - **`ghidra_bridge`** — script Ghidra from an external Python process to
   batch-process dozens of `.ko` files the same way (handy when a device
   ships 50+ vendor modules).
-- **Android HAL-aware scripts** (community Ghidra scripts exist for
-  recovering AIDL/HIDL interface vtables from HAL `.so` files) — useful when
-  the thing you're RE'ing is a HAL rather than a kernel module.
+- **HAL interface recovery** — HIDL/AIDL HALs keep their interface
+  descriptor strings (e.g. `android.hardware.sensors@2.0::ISensors`) in
+  the `.so`; searching for them in Ghidra is the fastest way to map
+  vtable entries to interface methods. The matching `.hal`/`.aidl`
+  definitions are public in AOSP's `hardware/interfaces` tree, which
+  gives you method order and signatures for free.
 
 ## 2.5 Calling conventions & structure recovery (any ARM SoC)
 
@@ -174,7 +177,7 @@ keys, and sometimes modem/DSP firmware authentication.
   `.symtab` for Ghidra to label functions — check before assuming a blind
   disassembly.
 - SoC vendors (Qualcomm, MediaTek) publish partial kernel source
-  (`CodeAurora`/the Linux-kernel upstream BSP trees, or MediaTek's kernel
+  (Qualcomm's CodeLinaro-hosted trees — formerly CodeAurora, shut down in 2022 — , or MediaTek's kernel
   releases required by GPLv2) for many chips — diffing the vendor binary
   against the matching open BSP source is usually far faster than reading
   raw disassembly, and is the standard first move before touching Ghidra at

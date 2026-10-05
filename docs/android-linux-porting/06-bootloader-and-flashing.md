@@ -34,11 +34,13 @@ locked bootloader's cryptographic verification is out of scope here.
 
 ```bash
 # After building Image.gz + dtbs (§4.5) and your initramfs/rootfs (§5):
-mkbootfs rootfs/ | gzip > ramdisk.img          # if you need an Android-style
+(cd rootfs && find . | cpio -o -H newc) | gzip > ramdisk.img   # if you need an Android-style
                                                 # ramdisk stage (Halium ports
                                                 # usually do, to pivot into the
                                                 # real rootfs)
 
+# The cmdline below is a Qualcomm/UFS example; console device and root
+# path vary per SoC and storage type.
 mkbootimg \
   --kernel out/arch/arm64/boot/Image.gz \
   --ramdisk ramdisk.img \
@@ -85,9 +87,8 @@ On devices that don't expose standard `fastboot` (many Samsung Exynos
 models), use **Heimdall** against Odin download mode instead:
 
 ```bash
-heimdall flash --BOOT boot-new.img --no-reboot
-heimdall flash --DTBO dtbo-new.img
-heimdall reboot
+heimdall print-pit                        # partition names come from the device's PIT, not a fixed list
+heimdall flash --BOOT boot-new.img --DTBO dtbo-new.img   # reboots when done unless --no-reboot
 ```
 
 And on Allwinner/Rockchip/Tegra tablet-class devices, the equivalent is

@@ -13,7 +13,7 @@ confirmation from the device/firmware itself.
   4" IPS touchscreen, physical d-pad/buttons/analog sticks)
 - Release year: March 2023
 - Android version(s) shipped: Android 12
-- `getprop ro.board.platform` / `ro.hardware`: TBD — expect a `ums9230`/
+- `getprop ro.board.platform` / `ro.hardware`: TBD — expect a `ums512`/
   `t618`-family string (UNISOC's internal codename for Tiger T618),
   confirm via `adb shell getprop` or the dumped DT
 - Bootloader unlock method: **confirmed, documented, and working** —

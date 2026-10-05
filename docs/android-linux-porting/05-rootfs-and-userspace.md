@@ -36,7 +36,7 @@ GPU, camera ISP, DSP-based audio, modem.
 Key tools/repos: `libhybris`, `halium-boot`/`hybris-boot`, `droidmedia`
 (camera/media bridge), `android_vendor_<device>` trees (packaging of the
 dumped vendor blobs for the build system), `pmbootstrap` (postmarketOS) or
-UBports' `clickable`/device porting guide.
+UBports' device porting docs (docs.ubports.com).
 
 ### B. Fully native Linux (no Android container at all)
 
@@ -65,9 +65,9 @@ whole device — you're choosing per subsystem.
 #                                       which /vendor,/system files to extract
 #                                       from the user's own dump (never checked
 #                                       into git as binaries)
-./build.sh -d <codename>             # halium build system; produces
-                                      # system.img equivalent containing the
-                                      # bionic/HAL side
+# Build commands differ by Halium version (7.1 / 9 / 10+ / GSI-based);
+# follow the porting guide for the version you target rather than a
+# fixed command here: https://docs.halium.org and docs.ubports.com
 ```
 
 The `proprietary-blobs.txt` pattern is the standard, legally clean way to
@@ -82,7 +82,8 @@ this pattern for anything proprietary in this repo too.
 # postmarketOS path (recommended starting point; it already has Halium
 # device-porting docs and infra: https://wiki.postmarketos.org/wiki/Porting_to_a_new_device)
 pmbootstrap init
-pmbootstrap checkout device/<new-device>    # or create a new device port dir
+pmbootstrap aportgen device-<vendor>-<codename>   # scaffold a new device package
+pmbootstrap aportgen linux-<vendor>-<codename>    # scaffold its kernel package
 pmbootstrap build linux-<codename>
 pmbootstrap install
 pmbootstrap export

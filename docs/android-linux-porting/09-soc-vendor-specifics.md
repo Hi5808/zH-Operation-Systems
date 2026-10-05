@@ -33,7 +33,7 @@ methodology and expect to do more from-scratch RE.
   `qrtr`, `rmtfs`, ModemManager's QMI backend. Firmware stays untouched —
   this is the single most successful "never reimplement, just bridge"
   story in the whole mobile-Linux ecosystem.
-- **Mainline status**: by far the best of any vendor — `qcom-mainline`
+- **Mainline status**: by far the best of any vendor — Qualcomm mainline (`linux-arm-msm`)
   kernel effort, most recent flagship SoCs (SM8450/SM8550 and newer) get
   mainline support within a year or two of release, maintained largely by
   Linaro/postmarketOS/Qualcomm-employed upstream developers.
@@ -60,7 +60,7 @@ methodology and expect to do more from-scratch RE.
     requires an authentication handshake first. Some configurations allow
     an unauthenticated **read-only** dump but block writes; others block
     both. `mtkclient` implements known per-chip-generation bypasses
-    (e.g. "kamakiri", "hashimoto") for *some* SoCs, but this is a
+    (e.g. "kamakiri") for *some* SoCs, but this is a
     chip-specific exploit, not a general guarantee — check
     `mtkclient`'s own device-support notes for your exact chip before
     assuming either read or write access, and never assume BROM alone
@@ -71,8 +71,8 @@ methodology and expect to do more from-scratch RE.
 - **Clock/pinctrl in DT**: `mediatek,mt<chip>-pericfg`/`topckgen` (clock),
   `mediatek,mt<chip>-pinctrl`.
 - **GPU**: PowerVR (older MT6xxx) or Arm Mali (newer MT6xxx/Dimensity).
-  Mali has decent **Panfrost**/**Panthor** (Mesa) open-driver coverage for
-  newer Midgard/Bifrost/Valhall GPUs; PowerVR has essentially no open
+  Mali has decent **Panfrost** (Midgard/Bifrost/Valhall-JM, e.g. G52/G57)
+  and **Panthor** (Valhall-CSF, e.g. G310/G610+) open-driver coverage; PowerVR has essentially no open
   driver — expect to need the vendor blob there.
 - **Modem**: on many MediaTek phones the modem is integrated into the same
   die/firmware blob rather than a fully separate subsystem; protocol is
@@ -82,14 +82,14 @@ methodology and expect to do more from-scratch RE.
 - **Mainline status**: improving but behind Qualcomm — recent Dimensity
   chips have growing upstream support (Collabora/BayLibre-driven), but
   older MT65xx/MT67xx tablet-class chips are mostly community
-  (`linux-mtk`/postmarketOS) rather than fully mainline.
+  (postmarketOS/downstream) rather than fully mainline.
 - **Reference ports**: numerous Halium devices; `mtkclient`'s own wiki is
   also an excellent source of per-chip partition-layout and unbrick notes.
 
 ## 9.3 Samsung Exynos
 
 - **Boot chain**: iROM (mask ROM) → `BL1` → `BL2` → **`sboot`**
-  (Samsung's bootloader, descended from U-Boot on some generations) →
+  (Samsung's bootloader) →
   kernel. Samsung devices additionally have **Odin download mode**
   (volume-button combo) as the primary flashing interface, using the
   proprietary Odin/Heimdall protocol rather than standard `fastboot` (many
@@ -116,7 +116,7 @@ methodology and expect to do more from-scratch RE.
 - **Mainline status**: solid for *standalone Exynos SoCs used outside
   Samsung's own phones* (Exynos Auto, some Chromebooks); phone-specific
   Exynos (Galaxy S/Note series) has an active but smaller mainlining
-  community (`linux-exynos`, Simon Shields/others upstream work) compared
+  community (`linux-samsung-soc` list) compared
   to Qualcomm.
 - **Reference ports**: Halium has several Exynos Galaxy devices; also
   check LineageOS's Exynos kernel trees, which are usually the most

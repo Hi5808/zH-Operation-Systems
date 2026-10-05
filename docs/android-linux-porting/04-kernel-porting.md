@@ -11,7 +11,7 @@ Before reconstructing anything from the binary:
 
 1. Check the vendor's open-source compliance site (required by GPL) —
    search `"<device codename>" kernel source opensource.<vendor>.com`.
-2. Check SoC-vendor BSP trees (Qualcomm's `codeaurora.org`/
+2. Check SoC-vendor BSP trees (Qualcomm's `git.codelinaro.org` (CodeAurora's successor)/
    `github.com/LineageOS/android_kernel_<vendor>_<chip>` mirrors, MediaTek's
    kernel releases) — community LineageOS/kernel trees for the same SoC are
    an enormous head start even if not for your exact model.

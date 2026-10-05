@@ -17,12 +17,12 @@ check() {
 }
 
 echo "== Dumping & unpacking (01-firmware-dumping.md) =="
-check unpack_bootimg "pip install unpack_bootimg"
+check unpack_bootimg "AOSP system/tools/mkbootimg (android.googlesource.com), or distro mkbootimg package"
 check extract-dtb    "pip install extract-dtb"
 check dtc            "distro package: device-tree-compiler"
-check simg2img       "distro package: android-tools / simg2img"
-check fsck.erofs     "build from github.com/erofs/erofs-utils"
-check mtkclient      "pip install from github.com/bkerler/mtkclient (MediaTek)"
+check simg2img       "Debian/Ubuntu: android-sdk-libsparse-utils"
+check fsck.erofs     "distro package: erofs-utils (>= 1.5)"
+check mtk            "mtkclient's CLI -- install per github.com/bkerler/mtkclient README (MediaTek)"
 check heimdall       "distro package heimdall-flash, or github.com/Benjamin-Dobell/Heimdall (Samsung)"
 check rkdeveloptool  "build from github.com/rockchip-linux/rkdeveloptool (Rockchip)"
 check sunxi-fel      "distro package: sunxi-tools (Allwinner)"
@@ -43,7 +43,7 @@ echo
 echo "== Userspace / rootfs (05-rootfs-and-userspace.md) =="
 check pmbootstrap "pip install --user pmbootstrap -- see wiki.postmarketos.org"
 check debootstrap "distro package: debootstrap"
-check clickable   "pip install clickable -- see docs.ubports.com"
+check clickable   "UBports app build tool, optional -- see docs.ubports.com"
 
 echo
 echo "== Boot chain & flashing (06-bootloader-and-flashing.md) =="
