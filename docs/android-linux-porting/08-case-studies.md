@@ -5,13 +5,39 @@ Reading their device-porting trees is more valuable than any amount of
 abstract guidance — they are the ground truth for "what does a finished
 version of each step in this guide actually look like."
 
-## Halium / UBports (Ubuntu Touch)
+## Ubuntu Touch / UBports
 
-- **Project**: github.com/Halium, UBports (ubuntu-touch.io)
-- **Approach**: exactly the mixed native-kernel + Android-HAL-container
-  strategy described in §5.1A. Device ports live in `device/<vendor>/<codename>`
-  + `vendor/<vendor>/<codename>` repos, each containing a `proprietary-blobs.txt`
-  manifest rather than committed binaries.
+- **Project**: UBports (ubports.com, devices.ubuntu-touch.io,
+  github.com/ubports), with the **Lomiri** shell (formerly Unity 8).
+- **Why it deserves first mention**: Ubuntu Touch is the longest-running
+  community mobile-Linux OS still shipping. Canonical built the original
+  Ubuntu Touch and the `libhybris` approach, then discontinued the phone
+  effort in 2017; the **UBports community adopted it and has maintained
+  and advanced it ever since**, entirely volunteer-driven. Much of the
+  practical knowledge this guide distills — how to run vendor Android
+  HALs under a glibc Linux userspace on a real phone, day to day —
+  exists because that community kept it alive and documented. Treat their
+  work, and the credit for it, as foundational (§"ownership and credit"
+  in [00-overview.md](00-overview.md)).
+- **Approach**: the mixed native-kernel + Android-HAL-container strategy
+  of §5.1A, via Halium (below). The Lomiri UI sits on top. Ports are
+  tracked openly with a per-device feature matrix on the UBports device
+  wiki — a good model for the status table every device profile here
+  keeps (§10).
+- **For a porter**: the UBports porting documentation (docs.ubports.com)
+  is one of the most complete community walkthroughs of the Halium path
+  in existence; read it alongside this guide's §5. Note `clickable` is
+  their *app* SDK, not a device-porting tool (§7).
+
+## Halium
+
+- **Project**: github.com/Halium, docs.halium.org — the shared base that
+  UBports, Droidian, and others build on.
+- **Approach**: exactly the native-kernel + Android-HAL-container
+  strategy described in §5.1A. Device ports live in
+  `device/<vendor>/<codename>` + `vendor/<vendor>/<codename>` repos, each
+  containing a `proprietary-blobs.txt` manifest rather than committed
+  binaries — the pattern this guide recommends (§5.2, §CONTRIBUTING).
 - **Why it's the best first reference**: dozens of community device ports
   covering a huge range of Qualcomm/MediaTek SoCs, all using the same
   repo layout — find one for a SoC close to your target device and diff
