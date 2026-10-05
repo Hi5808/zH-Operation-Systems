@@ -218,6 +218,7 @@ Stock Android firmware (OTA zip / dump from device)
 | [12-oem-restore.md](12-oem-restore.md) | Backing up and restoring stock/OEM firmware — the safety net every other chapter depends on |
 | [13-glossary.md](13-glossary.md) | Definitions for EDL, AVB, DAA, SMC, HAL, DT and the other terms used throughout |
 | [14-upstreaming.md](14-upstreaming.md) | Giving a finished port back: device profile, postmarketOS port, mainline kernel patches |
+| [15-hardware-lab.md](15-hardware-lab.md) | Bench setup: finding a serial console (1.8V vs 3.3V), logic-analyser capture of undocumented buses, safety |
 
 ## How to use this for a new/unlisted device
 
