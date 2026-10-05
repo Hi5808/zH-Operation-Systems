@@ -261,6 +261,7 @@ Stock Android firmware (OTA zip / dump from device)
    §1-§6 for your specific device. `./scripts/check-tools.sh` and the
    other scripts in [scripts/](scripts/) automate the mechanical parts of
    §1.
+   Run `./scripts/gen-checklist.py devices/CODENAME --target <os> --goal <phone|handheld|general>` any time for a tailored, auto-checked list of what's still needed.
 5. Work in a reversible loop
    ([17-reversible-development.md](17-reversible-development.md)) and set
    up your restore path ([12-oem-restore.md](12-oem-restore.md)) **before**
