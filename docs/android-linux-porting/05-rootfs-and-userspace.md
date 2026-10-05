@@ -82,9 +82,10 @@ this pattern for anything proprietary in this repo too.
 # postmarketOS path (recommended starting point; it already has Halium
 # device-porting docs and infra: https://wiki.postmarketos.org/wiki/Porting_to_a_new_device)
 pmbootstrap init
-pmbootstrap aportgen device-<vendor>-<codename>   # scaffold a new device package
-pmbootstrap aportgen linux-<vendor>-<codename>    # scaffold its kernel package
-pmbootstrap build linux-<codename>
+# Replace VENDOR/CODENAME with your device's values:
+pmbootstrap aportgen "device-VENDOR-CODENAME"   # scaffold a new device package
+pmbootstrap aportgen "linux-VENDOR-CODENAME"    # scaffold its kernel package
+pmbootstrap build "linux-CODENAME"
 pmbootstrap install
 pmbootstrap export
 

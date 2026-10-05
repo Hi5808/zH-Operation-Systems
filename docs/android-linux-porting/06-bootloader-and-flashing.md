@@ -183,7 +183,7 @@ see [12-oem-restore.md](12-oem-restore.md) for the full procedure and
 [scripts/restore-oem.sh](scripts/restore-oem.sh) to automate it:
 
 ```bash
-./scripts/backup-partitions.sh devices/<codename>/backups boot dtbo vendor_boot vbmeta vbmeta_system
+./scripts/backup-partitions.sh devices/CODENAME/backups boot dtbo vendor_boot vbmeta vbmeta_system
 ```
 
 Know your SoC's unbrick path — EDL for Qualcomm, BROM for MediaTek, Odin

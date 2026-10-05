@@ -77,7 +77,7 @@ time — don't block the whole project on 100% mainline from day one.
 
 ```bash
 export ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
-make O=out <device>_defconfig     # seed from vendor defconfig, then merge
+make O=out CODENAME_defconfig     # your device defconfig; seed from vendor, then merge
                                    # kernel.config fragments recovered in §1.4
 make O=out -j$(nproc) Image.gz dtbs modules
 ```

@@ -1,0 +1,27 @@
+name: check-docs
+
+# Validates the android-linux-porting guide: internal links resolve,
+# the chapter index is complete, scripts lint clean, and fenced bash
+# blocks parse. See docs/android-linux-porting/scripts/check-docs.sh.
+
+on:
+  push:
+    paths:
+      - 'docs/android-linux-porting/**'
+      - '.github/workflows/check-docs.yml'
+  pull_request:
+    paths:
+      - 'docs/android-linux-porting/**'
+      - '.github/workflows/check-docs.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Run guide checks
+        run: ./docs/android-linux-porting/scripts/check-docs.sh

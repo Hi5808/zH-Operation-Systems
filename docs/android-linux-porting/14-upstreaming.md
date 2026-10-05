@@ -39,7 +39,7 @@ read `Documentation/process/submitting-patches.rst` first.
 git format-patch -o outgoing/ origin/master..HEAD
 ./scripts/checkpatch.pl outgoing/*.patch          # fix every warning you can
 ./scripts/get_maintainer.pl outgoing/*.patch      # who and which lists to send to
-git send-email --to=<maintainer> --cc=<lists> outgoing/*.patch
+git send-email --to="$MAINTAINER" --cc="$LISTS" outgoing/*.patch   # from get_maintainer.pl
 ```
 
 Things that commonly get patches rejected:

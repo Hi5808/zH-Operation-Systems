@@ -16,6 +16,7 @@ pointer to the relevant doc chapter rather than guessing.
 | `check-tools.sh` | §7 tool reference | `check-tools.sh` — reports which CLI tools are installed, with install hints for what's missing |
 | `unpack-boot.sh` | §1.3 boot.img unpacking | `unpack-boot.sh <boot.img> [out-dir]` — splits kernel/ramdisk/dtb and decompiles the DTB to `.dts` |
 | `extract-kernel-config.sh` | §1.4 kernel config recovery | `extract-kernel-config.sh <kernel-image> [output.config]` — caches a shallow clone of `torvalds/linux` for `extract-ikconfig` |
+| `check-docs.sh` | — (meta) | `check-docs.sh` — validates internal links, the chapter index, script lint, and that fenced bash blocks parse; run in CI by `.github/workflows/check-docs.yml` |
 | `dump-vendor-partition.sh` | §1.5 vendor/system partition extraction | `dump-vendor-partition.sh <image> <out-dir>` — auto-detects sparse/ext4/EROFS and converts/mounts/extracts accordingly |
 | `backup-partitions.sh` | [§12.3](../12-oem-restore.md) OEM backup | `backup-partitions.sh <out-dir> <partition> [partition ...]` — dumps via adb+root `dd`, builds a checksummed manifest |
 | `catalog-dump.sh` | [§12.3](../12-oem-restore.md) OEM backup, from existing files | `catalog-dump.sh <out-dir> <source-method> <partition>=<file> [...]` — catalogs files you already dumped with a vendor tool, no device access needed |
