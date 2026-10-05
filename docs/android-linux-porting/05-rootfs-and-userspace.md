@@ -57,6 +57,27 @@ touch/sensors/PMIC/Wi-Fi, Halium shim for GPU/modem/camera, exactly per the
 per-subsystem decisions made in §3.5. You are not choosing A or B for the
 whole device — you're choosing per subsystem.
 
+### The bridge: four ways a subsystem meets the Linux OS
+
+Every subsystem sits at one of four points on the Android→Linux boundary.
+Naming them gives each device profile a consistent "bridge baseline"
+(§10) — a map of *where the gap is actually bridged*, and how close the
+port is to fully native:
+
+| Bridge | What runs | Gap status |
+|---|---|---|
+| **Native** | Mainline/ported kernel driver + open Linux userspace; no Android code | Closed — the ideal |
+| **Kernel-blob** | Vendor `.ko` built against your kernel, open Linux userspace on top | Mostly closed; one binary kernel driver kept |
+| **HAL-shim** | Vendor Android HAL in the Halium container, bridged by `libhybris` (§5.1A) | Bridged, not closed — Android userspace still present for this subsystem |
+| **Firmware-blob** | Non-executable firmware loaded via `request_firmware()` (Wi-Fi cal, GPU `zap` §9.1, modem fw) | Normal for mainline Linux — not "running Android" |
+
+A port whose every subsystem is Native or Firmware-blob has no Android
+container at all (the RGOS/RG405M baseline, §8). One that leans on
+HAL-shim for GPU/audio/modem is the typical phone baseline. The
+device's bridge baseline is simply this classification filled in per
+subsystem — track it in the profile so "how native is this port" has a
+concrete answer.
+
 ## 5.2 Building the Halium container (if needed)
 
 ```bash

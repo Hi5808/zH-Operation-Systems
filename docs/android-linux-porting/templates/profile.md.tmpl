@@ -58,6 +58,24 @@ See [re-notes.md](re-notes.md) in this folder.
 - `proprietary-blobs.txt` location (list of vendor files needed, not the files themselves): ______
 - Rootfs base: [postmarketOS / Ubuntu Touch / Debian / Arch / other]
 
+## Bridge baseline
+
+Where each subsystem meets the Linux OS (§5.1 four-way bridge:
+Native / Kernel-blob / HAL-shim / Firmware-blob). This is the port's
+architecture at a glance — the closer to all-Native, the fewer Android
+pieces remain.
+
+| Subsystem | Bridge | Notes |
+|---|---|---|
+| Display | | |
+| Touch / input | | |
+| GPU | | |
+| Audio | | |
+| Wi-Fi / BT | | |
+| Modem | | |
+| Sensors | | |
+| Power / charging | | |
+
 ## §6 Boot chain
 - Boot chain stages (fill in from [09-soc-vendor-specifics.md](../../09-soc-vendor-specifics.md) for this SoC vendor): ______
 - `boot.img` header version / base / offsets (from `unpack_bootimg`/`scripts/unpack-boot.sh` on the stock image):

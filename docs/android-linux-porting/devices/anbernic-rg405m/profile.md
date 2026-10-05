@@ -1,4 +1,4 @@
-# Device Profile: Anbernic RG405M (codename: TBD — see §Identity)
+# Device Profile: Anbernic RG405M (codename: rg405m)
 
 Filled in from [10-device-profile-template.md](../../10-device-profile-template.md).
 Not a phone — a handheld gaming device — so the hardware table below
@@ -12,7 +12,8 @@ running device rather than public specs. Where a field is still unproven
 it's marked **TBD**.
 
 ## Identity
-- Manufacturer / model / codename: Anbernic / RG405M / codename TBD
+- Manufacturer / model / codename: Anbernic / RG405M / **`rg405m`**
+  (confirmed: the RGOS BSP uses `MACHINE=rg405m` and `ums512-rg405m.dtb`)
 - Form factor: handheld gaming console (clamshell-free, horizontal grip,
   4" IPS touchscreen, physical d-pad/buttons/analog sticks)
 - Release year: March 2023
@@ -89,22 +90,31 @@ guide describes on top of it" rather than reconstructing the kernel from
 a stock-firmware binary dump.
 
 ## §1 Firmware acquired
-- [ ] Stock firmware package — TBD, check Anbernic's own support site
-- [ ] GammaOS source/kernel tree cloned for reference — TBD. Specific
-      release to start from:
-      `github.com/TheGammaSqueeze/GammaOSNext/releases/tag/v.1.1.0-ANBERNICT618`
-      (confirmed to target this chip family; verify it's listed for the
-      RG405M specifically vs. a sibling model before relying on it)
-- [ ] Direct device dump (adb/root) — TBD
-- [ ] Full download-mode dump (UNISOC SPRD protocol) — TBD; tooling is
-      less standardized than Qualcomm/MediaTek's (§9.4), check
-      `awesome-anbernic` and GammaOS's own build docs for whatever the
-      community has already worked out for this exact device before
-      reverse-engineering the protocol yourself
-- [ ] `kernel.config` recovered — TBD
-- [ ] `.dts`/DTB extracted — TBD (or taken directly from GammaOS's kernel
-      tree, which is likely more complete than a decompiled DTB)
-- [ ] `vendor`/`system` partitions mounted — TBD
+
+The important point for this device: a working native port (**RGOS**,
+`rgos-yocto`) already exists, so the kernel source, device tree and
+driver set don't need to be recovered from a stock dump at all — they're
+in the RGOS `meta-anbernic` BSP. The rows below distinguish "needed for a
+fresh RE effort" from "already solved in the BSP."
+
+- [ ] Stock firmware package — only needed to diff against or to restore
+      Android; check Anbernic's support site. Not on the critical path
+      given the BSP.
+- [x] **Kernel source + device tree — already in the RGOS BSP**:
+      `meta-anbernic/recipes-kernel/linux/` builds `linux-unisoc-t618`
+      (a vendor 7.1 `sprd` tree) plus ~40 patches; the DT source is
+      `ums512-rg405m`. Start here, not from a decompiled `.dtb` (§4.1).
+- [ ] GammaOS source/kernel tree — the Android-side reference to diff
+      against; release targeting this chip family:
+      `github.com/TheGammaSqueeze/GammaOSNext` (confirm the RG405M build
+      vs. a sibling before relying on it).
+- [ ] Direct device dump (adb/root) — only if you need the stock
+      `vendor`/firmware blobs for a subsystem the BSP leaves out.
+- [ ] Full download-mode dump (UNISOC `spd_dump`/FDL) — the flash path,
+      not a prerequisite for the source (§6, §9.4).
+- [x] **Driver inventory — derivable from the BSP patch series**
+      (touch, `singleadcjoy`, `sc2730` ASoC, `sprdwcn`, `sc27xx` power,
+      the eMMC ADMA fix) rather than from RE; see §3 and §8.
 
 ## §2 Reverse engineering notes
 See [re-notes.md](re-notes.md) in this folder. Given the GammaOS prior
@@ -163,6 +173,28 @@ and runs, not that it's mainlined.
   alternative, but there is still no upstream pmaports T618 port, so
   either path is new-device work. RGOS is the existence proof that a
   native userspace runs on this hardware.
+
+## Bridge baseline
+
+Verified from the RGOS port (§5.1 four-way bridge). **This device is the
+guide's all-native reference: no Halium container, no HAL-shim anywhere**
+— every subsystem is a real Linux driver, with only ordinary firmware
+blobs. That is the closed-gap ideal §5.1 describes.
+
+| Subsystem | Bridge | Notes |
+|---|---|---|
+| Display | Native | downstream `drm/sprd`, Weston on DRM |
+| Touch / input | Native | `goodix`; `retrogame_joypad` + `singleadcjoy` for Hall sticks |
+| GPU | Native (software) + Firmware-blob (future) | Weston on pixman today; Mali-G52 via Panfrost is the open path, not yet proven |
+| Audio | Native | `sprdphone-sc2730` ASoC; mic capture still parked |
+| Wi-Fi / BT | Native + Firmware-blob | `sprdwcn` driver + vendor Wi-Fi/BT firmware |
+| Modem | N/A | no cellular radio on this device |
+| Sensors | N/A | none fitted/exposed |
+| Power / charging | Native | `sc27xx` fuel-gauge + charger |
+
+No `proprietary-blobs.txt`/HAL container exists for this port because
+nothing needs one — the contrast case to a phone that must shim
+GPU/modem/camera.
 
 ## §6 Boot chain
 - Boot chain stages: `BootROM → eMMC SPL (ums512_spl) → U-Boot → extlinux

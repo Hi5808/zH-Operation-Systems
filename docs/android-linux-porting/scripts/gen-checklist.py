@@ -181,9 +181,23 @@ def main():
                     "data-only/none) — §19.3")
     elif args.goal == "handheld":
         out.append("- [ ] Gamepad/controls input mapping — §3, §18")
+    # Bridge baseline: a blank map to fill in (§5.1 four-way vocabulary)
+    bridge_rows = ["Display", "Touch / input", "GPU", "Audio", "Wi-Fi / BT"]
+    if args.goal == "phone":
+        bridge_rows.append("Modem")
+    if args.goal == "handheld":
+        bridge_rows.append("Gamepad / controls")
+    bridge_rows += ["Sensors", "Power / charging"]
+    out += ["", "### Bridge baseline (fill in — §5.1)", "",
+            "Where each subsystem meets the Linux OS: "
+            "**Native / Kernel-blob / HAL-shim / Firmware-blob**. "
+            "All-Native/Firmware means no Android container.", "",
+            "| Subsystem | Bridge | Notes |", "|---|---|---|"]
+    out += [f"| {r} | | |" for r in bridge_rows]
     out += ["", "### Validate & give back", "",
             "- [ ] Each subsystem tested, not just probed — §18",
             "- [ ] Status table in profile.md updated — §10",
+            "- [ ] Bridge baseline filled in — §5.1, §10",
             "- [ ] Upstream / publish the profile — §14",
             ""]
 
