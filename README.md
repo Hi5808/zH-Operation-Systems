@@ -23,7 +23,8 @@ tablet-class Allwinner/Rockchip/Tegra devices.
   Ghidra RE → hardware identification → kernel porting → userspace →
   bootloader/flashing → tools → case studies → per-SoC-vendor specifics →
   device-profile template → troubleshooting → OEM restore → glossary →
-  upstreaming → hardware lab.
+  upstreaming → hardware lab → feasibility triage → reversible
+  development → validation/testing → hard subsystems (audio/camera/modem).
 - **`scripts/`:** automation for the mechanical steps — scaffold a device
   profile, unpack a boot image, recover the kernel config, extract vendor
   partitions, back up and restore stock firmware, and a `check-docs.sh`
