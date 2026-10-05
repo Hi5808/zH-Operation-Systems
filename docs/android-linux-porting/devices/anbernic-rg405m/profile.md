@@ -3,9 +3,13 @@
 Filled in from [10-device-profile-template.md](../../10-device-profile-template.md).
 Not a phone — a handheld gaming device — so the hardware table below
 swaps modem/camera for gamepad-specific I/O, but the SoC-level porting
-methodology (§1-§9 of the guide) is identical. Public-spec fields are
-sourced from vendor/press listings; fields marked **TBD** need
-confirmation from the device/firmware itself.
+methodology (§1-§9 of the guide) is identical.
+
+**This device has a hardware-proven native Linux port: RGOS
+(`rgos-yocto`, same GitHub account), a Yocto Scarthgap OS covered as a
+case study in §8.** Most fields below are therefore confirmed from a
+running device rather than public specs. Where a field is still unproven
+it's marked **TBD**.
 
 ## Identity
 - Manufacturer / model / codename: Anbernic / RG405M / codename TBD
@@ -13,9 +17,9 @@ confirmation from the device/firmware itself.
   4" IPS touchscreen, physical d-pad/buttons/analog sticks)
 - Release year: March 2023
 - Android version(s) shipped: Android 12
-- `getprop ro.board.platform` / `ro.hardware`: TBD — expect a `ums512`/
-  `t618`-family string (UNISOC's internal codename for Tiger T618),
-  confirm via `adb shell getprop` or the dumped DT
+- SoC platform name: **`ums512`** (UNISOC's internal name for the T618),
+  confirmed by the RGOS port's DT and machine config (`MACHINE=rg405m`,
+  `ums512-rg405m.dtb`)
 - Bootloader unlock method: **confirmed, documented, and working** —
   but it is a UNISOC-specific procedure, not standard AOSP
   `fastboot oem unlock`/`fastboot flashing unlock` (and the GammaOS
@@ -45,8 +49,11 @@ confirmation from the device/firmware itself.
   is a strong existence proof that write access is achievable here.
 - SoC vendor: **UNISOC (Spreadtrum)** — see
   [09-soc-vendor-specifics.md](../../09-soc-vendor-specifics.md) §9.4.
-  This is the guide's "minimal community tooling, expect heavy
-  from-scratch RE" vendor case — budget accordingly.
+  UNISOC is the guide's "minimal community tooling" vendor case *in
+  general*, but this specific device is a strong exception: between
+  GammaOS (Android) and RGOS (native Yocto), the driver set is already
+  worked out on a downstream kernel — the open work is mainlining, not
+  bring-up from zero.
 - Exact SoC model: **UNISOC Tiger T618**, octa-core
   (2× Cortex-A75 @ 2.0 GHz + 6× Cortex-A55 @ 2.0 GHz), **Mali-G52 GPU**
   @ 850 MHz
@@ -58,12 +65,16 @@ Unlike the guide's general UNISOC warning, this specific chip family
 already has real community traction worth forking from instead of
 starting from Ghidra RE:
 
+- **RGOS (`rgos-yocto`, this GitHub account)** — a working native
+  Yocto Linux port of *this exact device*. Its `meta-anbernic` BSP layer
+  (downstream `linux-unisoc-t618` kernel + ~40 patches), `kas/rg405m.yml`
+  build config, flashing scripts, and `docs/` bring-up logs are the
+  single best reference for this port — most of §3-§6 above is derived
+  from it. Start here.
 - **GammaOS** (`github.com/TheGammaSqueeze/GammaOS`) — a LineageOS 19.1
-  (Android 12) based ROM specifically for Anbernic's UNISOC T618 handheld
-  line (RG405M/RG405V/RG505/etc). This is almost certainly the fastest
-  path to a working kernel source tree and known-good driver set for
-  this exact SoC+board combination (§4.1) — check its kernel tree and
-  device repo *before* any firmware dump/Ghidra work on this device.
+  (Android 12) based ROM for Anbernic's UNISOC T618 handheld line. The
+  Android-side reference (and source of the confirmed unlock flow);
+  useful for the stock driver set to diff against.
 - `github.com/dag7dev/awesome-anbernic` — community link index for
   Anbernic devices generally; useful for finding further prior art
   (firmware dumps, partition layouts, unlock notes) as the community
@@ -104,79 +115,105 @@ against stock firmware rather than reconstructing from zero — see
 
 ## §3 Hardware inventory
 
-| Subsystem | Compatible string | Bus | Mainline driver? | Decision |
+**Most rows below are now hardware-proven by the RGOS native Yocto port
+(`rgos-yocto`, see §8).** Where RGOS has a subsystem working on a
+downstream `linux-unisoc-t618` kernel, that's marked "Proven (RGOS)".
+These are facts from a running device, not guesses — but note RGOS runs
+a *downstream* vendor kernel, so "works in RGOS" means the driver exists
+and runs, not that it's mainlined.
+
+| Subsystem | Chip / driver | Bus | Status | Decision |
 |---|---|---|---|---|
-| Display panel | TBD (4" IPS, 640×480) | MIPI-DSI (typical) | TBD | TBD |
-| Touchscreen | TBD | I2C (typical) | TBD | TBD |
-| GPU | TBD (`sprd,...` or `unisoc,...` expected) | — | **Mali-G52** → Panfrost (Bifrost/Valhall-class Mali has reasonable Mesa support, same driver family as §9.3 Exynos/§9.2 MediaTek Mali parts) | Likely native, verify against Panfrost's support matrix for this exact Mali revision |
-| Audio | TBD | — | TBD | TBD |
-| Cellular modem | **None** — no SIM/cellular radio on this device | — | N/A | N/A |
-| Wi-Fi/BT | **Confirmed**: dual-band 802.11a/b/g/n/ac (2.4/5GHz) + Bluetooth 5.0, chipset model TBD | SDIO/USB (typical) | TBD | TBD |
-| Gamepad controls: d-pad/ABXY/L/R | TBD — likely a GPIO matrix or I2C/HID microcontroller | GPIO/I2C (TBD) | Not a standard phone peripheral — check GammaOS's kernel source first, this is very likely already solved there | Native, fork from GammaOS |
-| Gamepad controls: analog sticks | **Confirmed Hall-effect** (magnetic, not potentiometer) — implies ADC or a dedicated Hall-sensor driver reading analog voltage per axis, not a simple GPIO digital read | ADC (typical for Hall-effect sticks) | Check GammaOS's kernel source for the exact driver/IIO channel setup | Native, fork from GammaOS |
-| Sensors | TBD (if any — many handhelds omit accel/gyro entirely) | — | TBD | TBD |
-| Battery/charging | TBD | — | TBD | TBD |
-| USB-C | Present (charging + likely USB-OTG/display-out) | — | TBD | TBD |
+| Display panel | 4" IPS 640×480, DRM via `sprd` DRM driver; Weston on `card1`, rotate-270 | MIPI-DSI | Proven (RGOS) | Native (downstream `drm/sprd`) |
+| Touchscreen | **Goodix**; touch matrix `0 -1 1 1 0 0` (90° CW) | I2C | Proven (RGOS); needed an IRQ/GPIO-mux fix (RGOS patch 0029) | Native (`goodix`) |
+| GPU | **Mali-G52** (Bifrost) | — | RGOS ships Weston on **pixman (software)**, not Mali GL — so open-GL-on-Mali is *not* yet proven here | Panfrost is the target; verify for this G52 revision. Software rendering is a working fallback |
+| Audio | **`sprdphone-sc2730`** codec (ASoC); speakers + headset-jack playback | — | Proven (RGOS); needed several ASoC routing patches. Headset **boom-mic capture** still parked | Native (downstream `sprd` ASoC) |
+| Cellular modem | **None** — no SIM/cellular radio | — | N/A | N/A |
+| Wi-Fi/BT | UNISOC WCN (`sprdwcn`), SDIO; dual-band 802.11ac + BT 5.0 incl. A2DP | SDIO | Proven (RGOS, NetworkManager + BlueZ/bluealsa) | Native (downstream `sprdwcn`) |
+| Gamepad: d-pad/ABXY/L/R | `gpio-keys` + `retrogame_joypad` (`js0`) | GPIO | Proven (RGOS) | Native |
+| Gamepad: analog sticks | **Hall-effect**; `singleadcjoy` ADC driver (RGOS patch 0002) | ADC | Proven (RGOS) | Native (downstream `singleadcjoy`) |
+| Sensors | None exposed in RGOS bring-up (handheld omits accel/gyro) | — | — | — |
+| Battery/charging | `sc27xx` PMIC/fuel-gauge + AW32257/bq2415x charger; TCPM via `sc27xx_pd` | — | Proven (RGOS); several charger patches (autotimer, Rp default 500 mA) | Native (downstream `sc27xx`) |
+| Vibrator | present (`event0`) | — | Proven (RGOS) | Native |
+| USB-C | `musb` gadget (ACM + RNDIS); Type-C `sc27xx_pd` | — | Proven (RGOS); host/gadget role handling noted as fiddly | Native |
+| eMMC/storage | Samsung eMMC (manfid 0x15), HS400ES | — | **Known bug**: `sdhci-sprd` ADMA faults on 8-bit HS400ES writes — see §8 and RGOS `docs/EMMC-ADMA-ERROR.md`. RGOS works around it by running rootfs from microSD | Native, with the ADMA caveat |
 
 ## §4 Kernel
-- Kernel base chosen: **GammaOS's T618 kernel tree** (strong
-  recommendation per the prior-art note above) rather than reconstructing
-  from a stock dump
-- Defconfig location in this repo: not yet created
-- Device tree location in this repo: not yet created
-- Reserved-memory regions: TBD
-- Known-working kernel command line: TBD
+- Kernel base: **`linux-unisoc-t618` downstream vendor tree (~4.14)**, as
+  used by the proven RGOS port (§8). This is a different, more complete
+  starting point than GammaOS's Android tree for a *native Linux* goal —
+  RGOS carries it forward with ~40 focused patches (touch IRQ, ASoC
+  routing, charger, joystick ADC, the eMMC ADMA fix, etc.), the pattern
+  §4.4 describes as "adapt, don't reimplement."
+- Known kernel gaps to inherit awareness of (from RGOS bring-up):
+  `CONFIG_LOGO` off (no boot penguin); no `ip_tables` module (Tailscale/
+  iptables health check fails, nftables present); Wi-Fi multicast filter
+  warning at associate (log noise).
+- The eMMC ADMA bug (§3 table, §8) is the single most important kernel
+  issue on this SoC — read RGOS `docs/EMMC-ADMA-ERROR.md` before trusting
+  eMMC writes.
 
 ## §5 Userspace strategy
-- Overall approach: TBD — likely mixed (native touchscreen/gamepad/Wi-Fi,
-  Halium/libhybris shim for GPU if Panfrost doesn't fully cover this Mali
-  revision)
-- `proprietary-blobs.txt` location: not yet created
-- Rootfs base: TBD (postmarketOS recommended as a starting point; note
-  there is no existing postmarketOS UNISOC T618 device port to fork from
-  as of this writing, per §9.4's general UNISOC community-maturity note —
-  this would likely be a genuinely new postmarketOS device port)
+- Overall approach: **fully native (no Halium container)** — proven by
+  RGOS: OpenEmbedded/Yocto Scarthgap userspace, Weston 13 on DRM,
+  NetworkManager, BlueZ + bluealsa, PipeWire/ALSA on the `sc2730` codec.
+  GPU is the one open question: RGOS renders with pixman (software), not
+  Mali GL, so a Panfrost-accelerated stack is still unproven here.
+- Rootfs base: RGOS chose **Yocto**; **postmarketOS** remains a reasonable
+  alternative, but there is still no upstream pmaports T618 port, so
+  either path is new-device work. RGOS is the existence proof that a
+  native userspace runs on this hardware.
 
 ## §6 Boot chain
-- Boot chain stages: `BootROM → FDL1/FDL2 → bootloader → kernel`
-  (standard UNISOC chain, §9.4)
-- `boot.img` header version / base / offsets: TBD
-- AVB/vbmeta handling needed: TBD
-- Confirmed unbrick path tested before first flash: **GammaOS Next's own
-  unlock+flash procedure is confirmed documented and working** (see
-  §Identity above for the exact steps) — this is a real existence proof,
-  not a TBD guess. What's still worth confirming directly on this unit:
-  whether that same access extends to arbitrary partition read/write via
-  `restore-oem.sh --method plan-only` + whatever UNISOC tool backs
-  GammaOS's flasher, vs. being narrowly scoped to GammaOS's own
-  installer flow. Note GammaOS Next's install docs state this is a
-  **fresh install only** — it wipes the device regardless of current
-  unlock state, so back up (§12) *before* touching this procedure, not
-  after.
+- Boot chain stages: `BootROM → eMMC SPL (ums512_spl) → U-Boot → extlinux
+  → kernel` (proven by RGOS; standard UNISOC chain, §9.4).
+- **Flashing: UNISOC BootROM download mode via `spd_dump` + FDL.** Enter
+  with the device OFF: hold **POWER + VOL-DOWN + BACK**, plug USB, at the
+  "Waiting for dl_diag" prompt. **Write one large partition per FDL
+  session** (chaining multiple writes in one session is unreliable — a
+  hard-won RGOS rule).
+- **Partition naming gotcha**: the slot-A kernel/boot partition is named
+  **`w_force`**, not `boot_a`. `uboot_a`/`uboot_b` hold U-Boot;
+  `userdata` holds the rootfs. Don't assume AOSP names.
+- **Unlock**: `patrislav1/unisoc-unlock` (the confirmed UNISOC path, §9.4),
+  not AOSP `fastboot`.
+- **Safest development pattern (proven by RGOS): dual-boot from microSD.**
+  Keep stock Android on eMMC untouched; put U-Boot + extlinux + rootfs on
+  a microSD card. Card in → your Linux; card out → stock Android. This
+  makes recovery "pull the card" and sidesteps the irreversible-eMMC-flash
+  risk (§12) entirely during bring-up.
+- USB serial console: appears as `/dev/ttyACM*` (`screen /dev/ttyACM0 115200`).
 
 ## Status
 
+Status reflects the RGOS native Yocto port (§8), which runs a downstream
+`linux-unisoc-t618` kernel. 🟩 = working on that port.
+
 | Subsystem | Status | Notes |
 |---|---|---|
-| Boots to shell | ⬜ Not started | No dump obtained yet; GammaOS confirms the device is at least Android-flashable by the community |
-| Display | ⬜ Not started | |
-| Touch input | ⬜ Not started | |
-| Gamepad controls | ⬜ Not started | Expect to inherit from GammaOS's kernel largely as-is |
-| Wi-Fi | ⬜ Not started | |
-| Bluetooth | ⬜ Not started | |
-| Audio playback | ⬜ Not started | |
-| Audio recording | ⬜ Not started | |
-| Sensors | ⬜ Not started | |
-| GPU acceleration | ⬜ Not started | Mali-G52 — check Panfrost support matrix |
-| Suspend/resume | ⬜ Not started | |
-| Battery/charging | ⬜ Not started | |
+| Boots to shell | 🟩 | RGOS boots to systemd, serial + panel getty + SSH |
+| Display | 🟩 | Weston 13 on DRM, rotate-270 |
+| Touch input | 🟩 | Goodix; needed an IRQ/GPIO-mux fix |
+| Gamepad controls | 🟩 | `retrogame_joypad` (`js0`) + `singleadcjoy` for Hall sticks |
+| Wi-Fi | 🟩 | `sprdwcn` + NetworkManager (multicast-filter warning is log noise) |
+| Bluetooth | 🟩 | BlueZ + A2DP (bluealsa) |
+| Audio playback | 🟩 | Speakers + headset jack, `sprdphone-sc2730` |
+| Audio recording | 🟨 | Headset boom-mic capture parked (needs Android USB debug dump) |
+| Sensors | ⬜ | None exposed / likely none fitted |
+| GPU acceleration | 🟨 | Display works via pixman (software); Mali-G52 GL via Panfrost not yet proven |
+| Suspend/resume | 🟨 | Power-tap → DPMS and hold → poweroff work; `systemctl poweroff` doesn't stay off with VBUS present |
+| Battery/charging | 🟩 | `sc27xx` fuel-gauge + charger |
+| eMMC writes | 🟥 | ADMA fault on 8-bit HS400ES (§3, §8); RGOS runs rootfs from microSD instead |
 
 ## Backups taken before first flash
-- [ ] Not yet started — no dump obtained yet.
-- [ ] Restore round-trip verified (not just backed up) — see
-  [12-oem-restore.md](../../12-oem-restore.md) §12.5. GammaOS's install
-  docs are a likely source for a known-working flash procedure to adapt
-  for this.
+- RGOS sidesteps this by **not writing eMMC at all** during development —
+  stock Android stays on eMMC, RGOS boots from microSD (§6). The recovery
+  path is "pull the card." A stock SPL backup
+  (`spl-boot0-stock.img`) is also kept.
+- [ ] If you *do* intend to write eMMC, verify the restore round-trip
+  first — see [12-oem-restore.md](../../12-oem-restore.md) §12.5 — and be
+  aware of the eMMC ADMA write bug (§3, §8) before relying on any
+  eMMC-resident recovery image.
 
 ## Next steps (in order)
 

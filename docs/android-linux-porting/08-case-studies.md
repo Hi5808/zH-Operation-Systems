@@ -48,6 +48,51 @@ version of each step in this guide actually look like."
   project with its own large set of device ports and porting documentation,
   useful as a second reference implementation alongside Halium's.
 
+## RGOS — a worked native port (Anbernic RG405M, UNISOC T618)
+
+`rgos-yocto` (in this same GitHub account) is a hardware-proven native
+Linux port of the RG405M handheld — not a Halium shim, a real
+OpenEmbedded/Yocto (Scarthgap) userspace on a downstream UNISOC kernel.
+It's the closest thing in this guide to a complete, end-to-end instance
+of the methodology, so it's worth reading alongside the abstract
+chapters. What it demonstrates:
+
+- **The §5.1 mixed reality in practice**: downstream vendor kernel
+  (`linux-unisoc-t618`, a 4.14-era tree) carried forward with a stack of
+  ~40 focused patches, under a fully native Yocto userspace (Weston 13 on
+  DRM, NetworkManager, BlueZ + A2DP, PipeWire/ALSA). No Android container.
+- **Driver work is mostly small patches, not rewrites** (§4.4): the patch
+  series is dominated by one- and two-purpose fixes — a touchscreen IRQ/
+  GPIO-mux fix, ASoC routing fixes for the `sprdphone-sc2730` codec, a
+  joystick ADC driver, charger/fuel-gauge tweaks — exactly the "adapt,
+  don't reimplement" pattern the guide predicts for a downstream-kernel
+  base.
+- **A textbook RE-grade bug writeup**: `docs/EMMC-ADMA-ERROR.md` traces an
+  `mmc3: ADMA error` to mainline `sdhci-sprd.c` emitting a trailing
+  NOP|END descriptor the controller faults on, where the vendor 4.14
+  driver always set END on the last transfer descriptor — found by
+  decoding the SDHCI register dump and diffing against the vendor tree.
+  That is §2's "diff against the vendor source, decode what the silicon
+  actually does" method applied to a live kernel panic.
+- **The boot chain and flashing are real, and device-specific in exactly
+  the way §6/§9 warn about**: UNISOC BootROM download mode (`spd_dump` +
+  FDL), the slot-A kernel partition is named `w_force` rather than
+  `boot_a`, and the hard-won operational rule "write one large partition
+  per FDL session." None of that is guessable from the generic chapters —
+  it's why §10's device profile exists.
+- **Unlock is the confirmed UNISOC path, not AOSP fastboot**: it uses
+  `patrislav1/unisoc-unlock` (the tool §9.4 now cites), consistent with
+  what the Anbernic profile records.
+- **Dual-boot as the safe default**: stock Android stays on eMMC, RGOS
+  boots from microSD (card in → RGOS, card out → Android), so the
+  irreversible-flash risk (§12) is sidestepped entirely during
+  development — pulling the card is the recovery path.
+
+The repo also illustrates the §12 lesson the hard way: its handoff log
+records multiple filesystem-corruption incidents on eMMC writes (the same
+ADMA bug above), which is exactly why "verify the restore path and prefer
+a reversible boot medium" is in the guide at all.
+
 ## Per-SoC-vendor mainlining efforts
 
 Beyond the full-device projects above, several SoC-vendor-focused
