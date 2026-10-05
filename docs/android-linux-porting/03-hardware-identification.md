@@ -14,8 +14,8 @@ dumped (§1) plus light RE (§2) — you rarely need to open the device.
 - Once you know the SoC, check whether it already has *any* mainline or
   postmarketOS/Halium support for a sibling device — SoC-level work
   (clock drivers, pinctrl, interconnect, SMMU) is usually shared across
-  every phone using that chip, so you may inherit 80% of the kernel for
-  free from an existing port and only need device-specific peripheral work.
+  every phone using that chip, so you may inherit much of the kernel
+  from an existing port and only need device-specific peripheral work.
 
 ## 3.2 Peripheral inventory checklist
 
@@ -26,15 +26,15 @@ already has a driver for that `compatible` string (check
 
 | Subsystem | Where to look | Common finding |
 |---|---|---|
-| Display panel | `dsi@.../panel@0` node, `vendor/lib/modules/*panel*` | Often a `simple-panel` with init sequence RE'd per §2.3; sometimes already in `drm/panel/panel-*.c` upstream |
+| Display panel | `dsi@.../panel@0` node, `vendor/lib/modules/*panel*` | Check `drivers/gpu/drm/panel/` upstream first. Mainline's generic `panel-simple` only covers panels that need no init commands; most phone DSI panels need a small dedicated driver built from the init sequence (§2.3). For Qualcomm downstream DTs, `linux-mdss-dsi-panel-driver-generator` (msm8916-mainline project) generates that driver from the vendor DT automatically |
 | Touchscreen | I2C node under `soc/i2c@.../touch@..` | Synaptics/FocalTech/Goodix/ILITEK chips mostly have mainline drivers already — the work is usually just DT wiring, not new driver code |
-| GPU | `gpu@..` compatible (`qcom,adreno-...`, `arm,mali-...`, `mediatek,mt*-mfgsys`, `samsung,exynos-g3d`) | Reused via vendor blob + `libhybris`, or an open driver (Freedreno for Adreno, Panfrost/Panthor/Lima for Mali) depending on generation — see [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) §9.1-§9.6 for which applies to your vendor |
-| Audio codec/DSP | `sound`/`qcom,apr*`/`mediatek,mt*-afe`/`samsung,exynos-snd-*` nodes | Often the hardest subsystem regardless of vendor; may need the vendor's DSP firmware kept as-is, with only the AP-side kernel driver ported |
+| GPU | `gpu@..` compatible (`qcom,adreno-...`; Mali uses `arm,mali-*` such as `arm,mali-bifrost`/`arm,mali-valhall-jm`, often alongside an SoC-specific compatible) | Reused via vendor blob + `libhybris`, or an open driver (Freedreno for Adreno, Panfrost/Panthor/Lima for Mali) depending on generation — see [09-soc-vendor-specifics.md](09-soc-vendor-specifics.md) §9.1-§9.6 for which applies to your vendor |
+| Audio codec/DSP | `sound`, `qcom,apr*`/`qcom,q6*`, `mediatek,mt*-afe*` nodes | Often the hardest subsystem regardless of vendor; may need the vendor's DSP firmware kept as-is, with only the AP-side kernel driver ported |
 | Modem | `remoteproc@..`, `qcom,mss`, or vendor-specific equivalent | Reuse vendor modem firmware + a compatible protocol stack (`qrtr`/`rmtfs`/ModemManager on Qualcomm; vendor-specific and often less mature elsewhere — see §9) — essentially never reimplemented from scratch |
-| Wi-Fi/BT | `wifi@../bluetooth@..`, usually SDIO/PCIe/USB | Mainline `ath1x`/`brcmfmac`/`wcn36xx`/`wcn3990` drivers frequently already support the chip — check firmware blob naming under `vendor/firmware/` |
+| Wi-Fi/BT | `wifi@../bluetooth@..`, usually SDIO/PCIe/USB | Mainline `ath10k`/`ath11k` (Qualcomm, incl. WCN3990 via ath10k), `wcn36xx`, `brcmfmac` (Broadcom/Cypress), `mt76` (MediaTek) frequently already support the chip — check firmware blob naming under `vendor/firmware/` |
 | Sensors (accel/gyro/light/prox) | I2C nodes, `iio` subsystem | Almost always already mainlined (Bosch BMI, InvenSense ICM/MPU, STMicro) — vendor-independent, these chips are shared across the whole industry |
 | Fingerprint | Often SPI, vendor-proprietary | Usually unsupported upstream; lowest priority, frequently skipped in community ports |
-| Battery/charging/PMIC | `qcom,pm8998`, `mediatek,mt6358`, `samsung,s2mpg*`, etc. | Usually has solid mainline support per PMIC family, independent of the AP SoC vendor |
+| Battery/charging/PMIC | `qcom,pm8998`, `mediatek,mt6358`, `samsung,s2mps*`, etc. | Usually has solid mainline support per PMIC family, independent of the AP SoC vendor |
 | USB/USB-C PD | `usb@..`, `typec@..` | Depends on PMIC/USB controller; often mainlined per-SoC |
 
 ### Clock & pinmux node naming by vendor
@@ -65,11 +65,40 @@ nodes:
   DSP, framebuffer) — your kernel must declare the same reservations or the
   secure-world firmware will corrupt/crash.
 - Where the bootloader expects to find the kernel image, DTB, and
-  initramfs in memory, and what calling convention it uses to jump to the
-  kernel entry point (register state, cmdline location) — needed for
-  §6 (boot chain).
+  initramfs in memory — taken from the stock `boot.img` header (§1.3),
+  needed for §6. On arm64 you don't need to reverse engineer the jump
+  into the kernel: the handoff is standardized (DTB physical address in
+  `x0`, MMU off) by the kernel's `Documentation/arch/arm64/booting.rst`,
+  and the command line travels inside the DTB's `/chosen` node. 32-bit
+  ARM devices are similar but may still pass ATAGs on very old
+  bootloaders.
 
-## 3.4 Deciding native-driver vs. HAL-shim per subsystem
+## 3.4 Identifying hardware from the running device
+
+If stock Android still boots, the live system often answers §3.2 faster
+than the dumped `.dts`, because it shows what actually probed:
+
+```bash
+# Full live device tree (needs dtc on the host; pull the tree first)
+adb shell "su -c 'tar -C /sys/firmware/devicetree -cf - base'" > dt.tar
+mkdir dt && tar -xf dt.tar -C dt && dtc -I fs -O dts -o live.dts dt/base
+
+adb shell ls /sys/bus/i2c/devices/          # every I2C device the kernel bound
+adb shell "cat /sys/bus/i2c/devices/*/name" # their driver/chip names
+adb shell cat /proc/interrupts              # which drivers own which IRQs
+adb shell "su -c lsmod"                     # vendor modules actually loaded
+adb shell "su -c dmesg" > dmesg.txt         # probe messages name chips and firmware files
+adb shell getevent -il                      # input devices: touchscreen, buttons, sticks
+adb shell dumpsys sensorservice             # sensor list with vendor and model names
+adb shell ls /sys/class/power_supply/       # battery/charger driver names
+```
+
+Some of these need root (`su`) on recent Android versions; `getevent`
+and `dumpsys` generally work over plain `adb shell`. The live tree
+matters because the dumped DTB may contain several board variants, while
+`/sys/firmware/devicetree` shows the one this unit actually booted with.
+
+## 3.5 Deciding native-driver vs. HAL-shim per subsystem
 
 For each peripheral, decide:
 

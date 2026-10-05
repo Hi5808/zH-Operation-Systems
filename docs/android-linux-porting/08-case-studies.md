@@ -24,7 +24,7 @@ version of each step in this guide actually look like."
 - **Approach**: supports both fully-native ("mainline") device ports and
   Halium-based ("downstream"/`hybris`) device ports from the same
   tooling, which maps directly onto the "decide per subsystem" strategy
-  in §3.4/§5.1.
+  in §3.5/§5.1.
 - Their wiki's per-device pages are a good template for how to document
   your own port's status (which subsystems work, which are blob-shimmed,
   which are unsupported).

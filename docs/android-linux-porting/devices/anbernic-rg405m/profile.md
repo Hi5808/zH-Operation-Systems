@@ -197,7 +197,7 @@ list below.
    once GammaOS's DT (or a stock dump) is in hand.
 4. Decide, subsystem by subsystem, native vs. Halium shim per
    [03-hardware-identification.md](../../03-hardware-identification.md)
-   §3.4, informed by what GammaOS already proves works.
+   §3.5, informed by what GammaOS already proves works.
 
 ## Research sources
 

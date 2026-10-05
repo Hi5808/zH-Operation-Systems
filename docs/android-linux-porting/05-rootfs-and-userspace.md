@@ -15,7 +15,7 @@ chroot/LXC namespace alongside a normal Linux rootfs, bridged by
 into glibc-compatible calls the Linux side can use (and vice versa for
 things like EGL/GL).
 
-Use this for any subsystem you decided in §3.4 needs the vendor blob:
+Use this for any subsystem you decided in §3.5 needs the vendor blob:
 GPU, camera ISP, DSP-based audio, modem.
 
 ```
@@ -47,13 +47,13 @@ oFono/mbim/qmi for modem, etc.). No vendor blobs beyond non-executable
 firmware files (which is normal and fine — firmware blobs loaded via
 `request_firmware()` are not "running Android code").
 
-Use this for subsystems you decided in §3.4 already have mainline drivers.
+Use this for subsystems you decided in §3.5 already have mainline drivers.
 
 ### Realistic default
 
 Almost every real-world device port is a **mix**: native drivers for
 touch/sensors/PMIC/Wi-Fi, Halium shim for GPU/modem/camera, exactly per the
-per-subsystem decisions made in §3.4. You are not choosing A or B for the
+per-subsystem decisions made in §3.5. You are not choosing A or B for the
 whole device — you're choosing per subsystem.
 
 ## 5.2 Building the Halium container (if needed)
@@ -148,7 +148,7 @@ targeting for the exact packages rather than mixing parts across them.
 | **Ubuntu Touch** (UBports) | Ubuntu | Halium | Lomiri UI; large existing Halium device base. |
 | **Sailfish OS** | Own (Mer/Nemo) | libhybris | Proprietary UI layer on an open base; long history of hybris ports. |
 
-Rule of thumb: if §3.4 put GPU, audio and modem on the native path, start
+Rule of thumb: if §3.5 put GPU, audio and modem on the native path, start
 with postmarketOS or Mobian. If those subsystems need vendor HALs, start
 with Droidian or Ubuntu Touch, whose tooling assumes the Halium path.
 
