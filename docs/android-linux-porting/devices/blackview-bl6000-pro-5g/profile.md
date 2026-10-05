@@ -122,6 +122,27 @@ as components are RE'd per [02-reverse-engineering-ghidra.md](../../02-reverse-e
 - Rootfs base: TBD (postmarketOS recommended as the starting point per
   [05-rootfs-and-userspace.md](../../05-rootfs-and-userspace.md) §5.3)
 
+## Bridge baseline
+
+**Projected, not yet verified** (no dump cataloged). This is the typical
+*phone* baseline — the opposite end from the RG405M: a native core with
+HAL-shims expected for the subsystems MediaTek makes hard (§9.2, §19).
+Confirm each once the device is up; the §5.1 four-way bridge applies.
+
+| Subsystem | Bridge (projected) | Notes |
+|---|---|---|
+| Display | Native | panel init via §2.9 once the DTS is in hand |
+| Touch / input | Native | mainline driver likely exists; confirm chip |
+| GPU | HAL-shim, or Native if Panfrost covers Mali-G57 | verify Mesa support for this exact revision |
+| Audio | HAL-shim likely | MTK DSP routing is the hard subsystem (§19.1) |
+| Wi-Fi / BT | Native + Firmware-blob | once the chipset is identified |
+| Modem | HAL-shim / data-only / none | integrated MTK 5G, non-QMI — likely never fully native (§19.3) |
+| Sensors | Native | industry-standard parts |
+| Power / charging | Native | per the PMIC family |
+
+Unlike the RG405M, this device is expected to need a HAL container, so a
+`proprietary-blobs.txt` manifest (§5.2) will be part of its port.
+
 ## §6 Boot chain
 - Boot chain stages: `BROM → Preloader → LK → boot.img` (standard
   MediaTek chain, §9.2)

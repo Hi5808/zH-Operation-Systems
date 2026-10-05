@@ -174,6 +174,28 @@ and runs, not that it's mainlined.
   either path is new-device work. RGOS is the existence proof that a
   native userspace runs on this hardware.
 
+## Bridge baseline
+
+Verified from the RGOS port (§5.1 four-way bridge). **This device is the
+guide's all-native reference: no Halium container, no HAL-shim anywhere**
+— every subsystem is a real Linux driver, with only ordinary firmware
+blobs. That is the closed-gap ideal §5.1 describes.
+
+| Subsystem | Bridge | Notes |
+|---|---|---|
+| Display | Native | downstream `drm/sprd`, Weston on DRM |
+| Touch / input | Native | `goodix`; `retrogame_joypad` + `singleadcjoy` for Hall sticks |
+| GPU | Native (software) + Firmware-blob (future) | Weston on pixman today; Mali-G52 via Panfrost is the open path, not yet proven |
+| Audio | Native | `sprdphone-sc2730` ASoC; mic capture still parked |
+| Wi-Fi / BT | Native + Firmware-blob | `sprdwcn` driver + vendor Wi-Fi/BT firmware |
+| Modem | N/A | no cellular radio on this device |
+| Sensors | N/A | none fitted/exposed |
+| Power / charging | Native | `sc27xx` fuel-gauge + charger |
+
+No `proprietary-blobs.txt`/HAL container exists for this port because
+nothing needs one — the contrast case to a phone that must shim
+GPU/modem/camera.
+
 ## §6 Boot chain
 - Boot chain stages: `BootROM → eMMC SPL (ums512_spl) → U-Boot → extlinux
   → kernel` (proven by RGOS; standard UNISOC chain, §9.4).
