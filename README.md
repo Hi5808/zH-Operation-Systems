@@ -8,7 +8,7 @@ A vendor-agnostic, end-to-end method for turning an Android device whose
 vendor abandoned it into one running a real, maintained Linux userspace.
 
 [![docs check](https://github.com/Hi5808/Operation-Systems/actions/workflows/check-docs.yml/badge.svg)](https://github.com/Hi5808/Operation-Systems/actions/workflows/check-docs.yml)
-![chapters](https://img.shields.io/badge/chapters-19-4f8cff)
+![chapters](https://img.shields.io/badge/chapters-20-4f8cff)
 ![scripts](https://img.shields.io/badge/scripts-9-7c5cff)
 ![shellcheck](https://img.shields.io/badge/shellcheck-clean-36d399)
 ![status](https://img.shields.io/badge/status-first%20edition-blue)
