@@ -268,6 +268,41 @@ list below.
    [03-hardware-identification.md](../../03-hardware-identification.md)
    §3.5, informed by what GammaOS already proves works.
 
+## Staged commands for the on-device session
+
+Copy-paste, from the repo root, when you're at the device. Nothing here
+writes to the device; it only reads files you produce and updates notes.
+For this device the kernel/DT/drivers already live in the RGOS BSP, so a
+stock dump is optional — mainly for stock `vendor` blobs or an Android
+restore image.
+
+```bash
+DEV=docs/android-linux-porting/devices/anbernic-rg405m
+cd "$(git rev-parse --show-toplevel)"
+
+# 1. See exactly what's still needed, tailored to this device/target.
+./docs/android-linux-porting/scripts/check-tools.sh
+./docs/android-linux-porting/scripts/gen-checklist.py "$DEV" --target postmarketos --goal handheld --write
+
+# 2. (Optional) UNISOC download-mode dump via spd_dump / FDL. Exact
+#    invocation is device-specific -- use the rgos-yocto flash helper or
+#    spd_dump's own docs (§9.4); this guide doesn't assert the flags.
+#    Put the resulting partition images somewhere, then catalog them:
+# ./docs/android-linux-porting/scripts/catalog-dump.sh "$DEV/backups" spd_dump \
+#     boot="$HOME/dumps/boot.img" vendor="$HOME/dumps/vendor.img"
+
+# 3. Unpack whatever you dumped (or point at the RGOS BSP's Image/DTB).
+# ./docs/android-linux-porting/scripts/unpack-boot.sh "$HOME/dumps/boot.img" "$DEV/boot_out/"
+# ./docs/android-linux-porting/scripts/extract-kernel-config.sh "$DEV/boot_out/kernel" "$DEV/kernel.config"
+# ./docs/android-linux-porting/scripts/dump-vendor-partition.sh "$HOME/dumps/vendor.img" "$DEV/vendor_mnt/"
+
+# 4. Re-run the checklist to watch readiness climb, then fill the profile
+#    (§3 table + Bridge baseline) and commit the TEXT only -- never the
+#    .img/vendor_mnt binaries (.gitignore backstops this; check git status).
+./docs/android-linux-porting/scripts/gen-checklist.py "$DEV" --target postmarketos --goal handheld
+git status
+```
+
 ## Research sources
 
 Gathered via web research (not hands-on testing): GammaOS Next's own
