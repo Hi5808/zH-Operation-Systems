@@ -34,7 +34,7 @@ locked bootloader's cryptographic verification is out of scope here.
 
 ```bash
 # After building Image.gz + dtbs (§4.5) and your initramfs/rootfs (§5):
-mkbootfs rootfs/ | gzip > ramdisk.img          # if you need an Android-style
+(cd rootfs && find . | cpio -o -H newc) | gzip > ramdisk.img   # if you need an Android-style
                                                 # ramdisk stage (Halium ports
                                                 # usually do, to pivot into the
                                                 # real rootfs)
@@ -43,7 +43,7 @@ mkbootimg \
   --kernel out/arch/arm64/boot/Image.gz \
   --ramdisk ramdisk.img \
   --dtb out/arch/arm64/boot/dts/<vendor>/<board>.dtb \
-  --cmdline "console=ttyMSM0,115200n8 root=/dev/sda1 rw" \
+  --cmdline "console=ttyMSM0,115200n8 root=/dev/sda1 rw" \   # example only: console device and root path vary per SoC/storage
   --base 0x80000000 \
   --kernel_offset 0x8000 --ramdisk_offset 0x1000000 --tags_offset 0x100 \
   --header_version 2 \
@@ -85,9 +85,8 @@ On devices that don't expose standard `fastboot` (many Samsung Exynos
 models), use **Heimdall** against Odin download mode instead:
 
 ```bash
-heimdall flash --BOOT boot-new.img --no-reboot
-heimdall flash --DTBO dtbo-new.img
-heimdall reboot
+heimdall print-pit                        # partition names come from the device's PIT, not a fixed list
+heimdall flash --BOOT boot-new.img --DTBO dtbo-new.img   # reboots when done unless --no-reboot
 ```
 
 And on Allwinner/Rockchip/Tegra tablet-class devices, the equivalent is
