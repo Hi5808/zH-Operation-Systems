@@ -28,6 +28,30 @@ methodology and expect to do more from-scratch RE.
   (Mesa), covers most generations reasonably well; the vendor blob route
   (via Halium/libhybris) is the fallback for the newest chips Freedreno
   hasn't caught up to yet.
+  - **The `zap` shader firmware** is the one Qualcomm-specific GPU gotcha
+    worth knowing up front. On Adreno 5xx and newer, the GPU powers up
+    with its registers locked by the secure world (TrustZone); a small,
+    **vendor-signed** firmware blob — the "zap shader" (so called because
+    it zaps/clears the GPU into a non-secure state) — is loaded via a
+    TrustZone call to unlock it before the kernel driver can drive the
+    GPU. Freedreno uses the *same signed blob* the Android stack does; it
+    is not something you can reimplement or sign yourself, because the
+    unlock is gated on Qualcomm's signature.
+    - **Where it comes from:** `/vendor/firmware/` (or `/vendor/firmware_mnt/`)
+      in your dump — files named like `a540_zap.mdt`/`.mbn` plus `.bNN`
+      segment files, or a single `.mbn`. Copy the whole set, not just the
+      header file.
+    - **How the kernel finds it:** the GPU's `zap-shader` DT node names the
+      firmware via `firmware-name`, and the `.mdt`/segments must be in the
+      linux-firmware search path (`/lib/firmware/...`) at the path the DT
+      expects. postmarketOS packages this per-device as firmware.
+    - **If it's missing or mismatched:** the GPU either won't come out of
+      secure mode (driver probe fails / hangs) or renders garbage — this
+      is exactly the §11.3 "Freedreno loads but GPU-hangs" symptom.
+    - **Newer parts (roughly Adreno 6xx+):** some use a differently
+      packaged blob or fold the equivalent step into other GMU/GPU
+      firmware; check the mainline `drm/msm` requirements for your exact
+      Adreno revision rather than assuming the 5xx `zap.mdt` shape.
 - **Modem**: separate `remoteproc` core (`qcom,mss`, "modem subsystem"),
   talked to over shared memory (`SMD`/`GLINK`) using **QMI**. Userspace:
   `qrtr`, `rmtfs`, ModemManager's QMI backend. Firmware stays untouched —
