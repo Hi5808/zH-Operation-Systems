@@ -88,8 +88,9 @@ it in `vendor/etc`. Pull it directly if the device is bootable:
 adb shell "zcat /proc/config.gz" > kernel.config
 
 # If unavailable, extract from the raw kernel binary (works even unbooted):
-git clone https://github.com/torvalds/linux && cd linux
+git clone --depth 1 https://github.com/torvalds/linux && cd linux
 scripts/extract-ikconfig ../kernel > ../kernel.config
+# (scripts/extract-kernel-config.sh does this clone for you, cached)
 ```
 
 This `.config` is one of the most valuable artifacts: it tells you exactly

@@ -77,7 +77,7 @@ time — don't block the whole project on 100% mainline from day one.
 
 ```bash
 export ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
-make O=out <device>_defconfig     # seed from vendor defconfig, then merge
+make O=out CODENAME_defconfig     # your device defconfig; seed from vendor, then merge
                                    # kernel.config fragments recovered in §1.4
 make O=out -j$(nproc) Image.gz dtbs modules
 ```
@@ -86,6 +86,86 @@ Keep the defconfig under version control in this repo (text, not binary),
 diffed against the vendor's original — this diff *is* the documentation of
 what you changed and why, and is exactly what you'd submit upstream to
 mainline a driver later.
+
+### Merging config fragments
+
+Don't hand-edit the vendor defconfig. Keep your Linux-specific changes
+in a separate fragment and merge them, so the diff stays readable:
+
+```bash
+# vendor.config = recovered kernel.config (§1.4); linux.fragment = your additions
+./scripts/kconfig/merge_config.sh -m vendor.config linux.fragment
+make O=out olddefconfig                       # resolve new/changed dependencies
+./scripts/diffconfig vendor.config out/.config  # review exactly what changed
+```
+
+`merge_config.sh` warns when a requested option didn't make it into the
+final config (usually because a dependency is off). Read those warnings
+rather than assuming the fragment applied.
+
+## 4.6 Options a Linux userspace needs that Android kernels often lack
+
+Android kernels are configured for Android's init and userspace, not a
+general Linux distro. Common gaps:
+
+| Option(s) | Why it matters |
+|---|---|
+| `CONFIG_DEVTMPFS`, `CONFIG_DEVTMPFS_MOUNT` | systemd and most initramfs tools expect the kernel to populate `/dev`. |
+| `CONFIG_CGROUPS` (+ controllers), `CONFIG_NAMESPACES` | Required by systemd; also by LXC, which Halium-based systems use to run the Android container. |
+| `CONFIG_FHANDLE`, `CONFIG_INOTIFY_USER`, `CONFIG_SIGNALFD`, `CONFIG_TIMERFD`, `CONFIG_EPOLL` | systemd hard requirements. |
+| `CONFIG_SYSVIPC` | Android disables System V IPC; some Linux software still needs it. |
+| `CONFIG_ANDROID_PARANOID_NETWORK` (downstream kernels only) | When **enabled**, restricts socket creation to Android's network group IDs, so ordinary Linux processes can't open network sockets. Disable it for a Linux userspace. |
+| `CONFIG_VT`, `CONFIG_FRAMEBUFFER_CONSOLE` (or `CONFIG_DRM_FBDEV_EMULATION`) | Get a text console on the screen during bring-up, before a compositor works. |
+| USB gadget configfs (`CONFIG_USB_CONFIGFS*`, RNDIS/NCM functions) | USB networking to the device — the most useful early debug channel after serial (§5.5). |
+
+Don't rely on this table alone. Use the checker your target project
+maintains: `pmbootstrap kconfig check` for postmarketOS, or the Halium
+kernel config check script described in Halium's porting docs. Both
+encode the current requirements for their userspace.
+
+## 4.7 GKI and vendor modules (Android 12+ devices)
+
+Devices launched with Android 12 or later on kernel 5.10+ typically use
+Google's **Generic Kernel Image (GKI)**: a common kernel in `boot`, with
+vendor drivers shipped as loadable modules in `vendor_boot` and/or a
+`vendor_dlkm` partition.
+
+- Those vendor `.ko` files are built against GKI's stable **Kernel Module
+  Interface (KMI)** for that exact kernel branch. They will generally
+  **not** load into a different kernel (yours or mainline), so a GKI
+  device doesn't let you "reuse the vendor modules" by swapping kernels.
+- Practical consequence: on GKI devices, either stay on the same GKI
+  branch (Android common kernel source is public at
+  android.googlesource.com/kernel/common) and keep using vendor modules
+  as-is, or replace each vendor module with a mainline driver. There's
+  no reliable middle ground.
+- Dump `vendor_boot` and `vendor_dlkm` along with `boot` (§1). On GKI
+  devices that's where the device-specific driver list lives, not in
+  `boot`.
+
+## 4.8 Toolchain pitfalls
+
+- **Match the vendor's compiler.** Downstream kernels frequently fail to
+  build with a modern GCC or clang (new warnings promoted to errors,
+  removed flags). Android kernels from roughly 4.14 onward are built with
+  clang. Use the clang version from the matching AOSP prebuilts or the
+  kernel's build config rather than your distro's latest.
+- Prefer `make LLVM=1` for clang builds on kernels that support it, and
+  set `CROSS_COMPILE` only when using GCC.
+- Avoid globally disabling `-Werror` as a first move. Fix or locally
+  silence the specific warning so real bugs still surface.
+
+## 4.9 The iteration loop
+
+1. Change one thing (config, DT node, driver).
+2. Build `Image.gz` + DTB only (skip `modules` when you can).
+3. Repack with the stock header values (§6.2) and `fastboot boot`, which
+   RAM-boots without flashing (§6.4).
+4. Read the serial console or `dmesg` (§15, §5.4).
+5. Record what changed and what happened in the device's `re-notes.md`.
+
+Keeping each iteration to one change is what makes a black-screen boot
+debuggable (§11.6).
 
 ## Next
 

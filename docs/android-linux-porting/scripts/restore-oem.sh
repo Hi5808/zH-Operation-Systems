@@ -110,7 +110,7 @@ declare -a ROWS=()
 echo "== Restore plan (method: $METHOD) =="
 ANY=0
 for line in "${ROWS[@]}"; do
-  IFS=$'\t' read -r partition file sha256 size source_method timestamp <<< "$line"
+  IFS=$'\t' read -r partition file sha256 _size source_method timestamp <<< "$line"
   [[ -z "$partition" ]] && continue
   in_only_list "$partition" || continue
   ANY=1
@@ -153,7 +153,7 @@ case "$METHOD" in
     command -v fastboot >/dev/null 2>&1 || { echo "error: fastboot not found" >&2; exit 1; }
     check_single_device fastboot
     for line in "${ROWS[@]}"; do
-      IFS=$'\t' read -r partition file sha256 size source_method timestamp <<< "$line"
+      IFS=$'\t' read -r partition file sha256 _size source_method timestamp <<< "$line"
       [[ -z "$partition" ]] && continue
       in_only_list "$partition" || continue
       echo "==> fastboot flash $partition $MANIFEST_DIR/$file"
@@ -167,7 +167,7 @@ case "$METHOD" in
     command -v adb >/dev/null 2>&1 || { echo "error: adb not found" >&2; exit 1; }
     check_single_device adb
     for line in "${ROWS[@]}"; do
-      IFS=$'\t' read -r partition file sha256 size source_method timestamp <<< "$line"
+      IFS=$'\t' read -r partition file sha256 _size source_method timestamp <<< "$line"
       [[ -z "$partition" ]] && continue
       in_only_list "$partition" || continue
       REMOTE_PATH="/sdcard/restore_${partition}.img"
