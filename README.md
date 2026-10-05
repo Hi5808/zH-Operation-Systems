@@ -12,6 +12,7 @@ vendor abandoned it into one running a real, maintained Linux userspace.
 ![scripts](https://img.shields.io/badge/scripts-9-7c5cff)
 ![shellcheck](https://img.shields.io/badge/shellcheck-clean-36d399)
 ![status](https://img.shields.io/badge/status-first%20edition-blue)
+[![license: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 **[Start the guide →](docs/android-linux-porting/00-overview.md)**
 
