@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="240" viewBox="0 0 960 240" role="img" aria-label="Porting Mainline Linux to Any Android Device">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#161b2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4f8cff"/>
+      <stop offset="0.5" stop-color="#7c5cff"/>
+      <stop offset="1" stop-color="#36d399"/>
+    </linearGradient>
+    <style>
+      .t  { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+      .title { font-weight: 800; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="240" rx="16" fill="url(#bg)"/>
+  <rect x="0" y="0" width="960" height="6" rx="3" fill="url(#accent)"/>
+
+  <!-- chip motif, top-right, subtle -->
+  <g stroke="#2a3350" stroke-width="2" fill="none" opacity="0.55">
+    <rect x="812" y="40" width="96" height="96" rx="10" fill="#141a2e"/>
+    <rect x="836" y="64" width="48" height="48" rx="6" fill="#1d2640" stroke="#3a4668" />
+    <line x1="812" y1="60" x2="792" y2="60"/><line x1="812" y1="88" x2="792" y2="88"/><line x1="812" y1="116" x2="792" y2="116"/>
+    <line x1="908" y1="60" x2="928" y2="60"/><line x1="908" y1="88" x2="928" y2="88"/><line x1="908" y1="116" x2="928" y2="116"/>
+    <line x1="840" y1="40" x2="840" y2="20"/><line x1="868" y1="40" x2="868" y2="20"/>
+    <line x1="840" y1="136" x2="840" y2="156"/><line x1="868" y1="136" x2="868" y2="156"/>
+  </g>
+
+  <text class="t title" x="48" y="96" font-size="40" fill="#f0f3fb">Porting Mainline Linux</text>
+  <text class="t title" x="48" y="140" font-size="40" fill="#cdd6f4">to <tspan fill="#7c9bff">Any</tspan> Android Device</text>
+
+  <text class="t" x="48" y="180" font-size="18" fill="#8b93a7">Dump &#183; reverse engineer &#183; rebuild the kernel &#183; boot a real Linux userspace</text>
+
+  <g class="mono" font-size="13" fill="#5f6b85">
+    <text x="48" y="212">Qualcomm &#183; MediaTek &#183; Exynos &#183; UNISOC &#183; Allwinner &#183; Rockchip &#183; Tegra</text>
+  </g>
+</svg>
