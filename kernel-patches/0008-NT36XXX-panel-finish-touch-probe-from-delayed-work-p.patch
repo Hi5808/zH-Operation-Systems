@@ -1,0 +1,100 @@
+From 50420356eb884f7df3e0d1ff3558f5fd6d9103cf Mon Sep 17 00:00:00 2001
+From: kino <<EMAIL>>
+Date: Sun, 4 Oct 2026 11:26:39 -1000
+Subject: [PATCH 08/10] NT36XXX/panel: finish touch probe from delayed work;
+ panel->touch power hook
+
+MTK delivers no msm drm_panel/fb blank events, so late_probe never ran.
+Run it 1.5 s after probe and call nvt_panel_power_notify() from the
+NT36675 panel prepare/unprepare. Verified on device: display + touch OK.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../gpu/drm/panel/panel-truly-nt36675-vdo.c   |  7 +++++
+ drivers/input/touchscreen/NT36XXX/nt36xxx.c   | 31 +++++++++++++++++++
+ 2 files changed, 38 insertions(+)
+
+diff --git a/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c b/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c
+index 6fd1169df..f482eb105 100644
+--- a/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c
++++ b/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c
+@@ -344,6 +344,9 @@ static int lcm_gpio_set(struct lcm *ctx, const char *name, unsigned int idx, int
+ 	return 0;
+ }
+ 
++/* NT36675 is a TDDI: tell the touch driver when the panel powers up/down */
++void __weak nvt_panel_power_notify(int on) { }
++
+ static void lcm_panel_power_on(struct lcm *ctx)
+ {
+ 	/* bias IC: VPOS/VNEG = 0x12 (stock) */
+@@ -654,6 +657,7 @@ static int lcm_unprepare(struct drm_panel *panel)
+ 	if (!ctx->prepared)
+ 		return 0;
+ 
++	nvt_panel_power_notify(0);
+ 	lcm_dcs_write_seq_static(ctx, 0x28);
+ 	lcm_dcs_write_seq_static(ctx, 0x10);
+ 	msleep(120);
+@@ -688,6 +692,9 @@ static int lcm_prepare(struct drm_panel *panel)
+ 
+ #if defined(CONFIG_MTK_PANEL_EXT)
+ 	mtk_panel_tch_rst(panel);
++#endif
++	nvt_panel_power_notify(1);
++#if 0
+ #endif
+ #ifdef PANEL_SUPPORT_READBACK
+ 	lcm_panel_get_data(ctx);
+diff --git a/drivers/input/touchscreen/NT36XXX/nt36xxx.c b/drivers/input/touchscreen/NT36XXX/nt36xxx.c
+index e0fa2ce46..ba0f75338 100644
+--- a/drivers/input/touchscreen/NT36XXX/nt36xxx.c
++++ b/drivers/input/touchscreen/NT36XXX/nt36xxx.c
+@@ -1503,6 +1503,34 @@ err_gpio_config_failed:
+  * return:
+  *     Executive outcomes. 0---succeed. negative---failed
+  *******************************************************/
++/*
++ * BL6000Pro (MTK): no msm drm_panel / fb blank notifier is delivered, so
++ * finish probing from a delayed work once the panel (TDDI) is up, and take
++ * suspend/resume from the panel driver via nvt_panel_power_notify().
++ */
++static struct delayed_work nvt_late_probe_work;
++static int32_t nvt_ts_suspend(struct device *dev);
++static int32_t nvt_ts_resume(struct device *dev);
++
++static void nvt_late_probe_func(struct work_struct *work)
++{
++	if (ts && ts->fw_ver == 0) {
++		NVT_LOG("late probe from work\n");
++		nvt_ts_late_probe(ts->client, ts->id);
++	}
++}
++
++void nvt_panel_power_notify(int on)
++{
++	if (!ts)
++		return;
++	if (on)
++		nvt_ts_resume(&ts->client->dev);
++	else
++		nvt_ts_suspend(&ts->client->dev);
++}
++EXPORT_SYMBOL(nvt_panel_power_notify);
++
+ static int32_t nvt_ts_probe(struct i2c_client *client,
+ 	const struct i2c_device_id *id)
+ {
+@@ -1567,6 +1595,9 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
+ 	}
+ #endif
+ 
++	INIT_DELAYED_WORK(&nvt_late_probe_work, nvt_late_probe_func);
++	schedule_delayed_work(&nvt_late_probe_work, msecs_to_jiffies(1500));
++
+ 	NVT_LOG("end\n");
+ 	return 0;
+ 
+-- 
+2.53.0
+

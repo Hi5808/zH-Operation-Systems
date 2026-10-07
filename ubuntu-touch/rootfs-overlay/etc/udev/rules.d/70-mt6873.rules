@@ -1,0 +1,69 @@
+# 70-mt6873.rules - Ubuntu-side udev rules for the BL6000 Pro (mt6873).
+#
+# In Halium the kernel device nodes are created by the hybris (Android) init and
+# bind-mounted into the Ubuntu Touch LXC container. These rules add the
+# symlinks, permissions, and tags the Ubuntu userspace (libhybris wrappers,
+# PulseAudio, NetworkManager, ofono) expects.
+#
+# Node names + owners mirror the stock vendor ueventd.rc
+# (artifacts/kernel-analysis/ueventd.rc.stock).
+
+# --- Display / GPU (Mali-G57 Valhall, DRM, ION) -----------------------------
+KERNEL=="mali",        MODE="0666", GROUP="video", TAG+="uaccess"
+KERNEL=="ion",         MODE="0666", GROUP="video"
+KERNEL=="card0",       SUBSYSTEM=="drm", MODE="0660", GROUP="video", TAG+="uaccess"
+# Mali fence / sync
+KERNEL=="mali0_*",     MODE="0666", GROUP="video"
+
+# --- Touch (NT36XXX / GT9886) -----------------------------------------------
+# The GT9886 presents as a standard evdev input device; tag it so the
+# compositor (lomiri / qtubuntu) picks it up.
+KERNEL=="event*",      SUBSYSTEM=="input", TAG+="uaccess"
+KERNEL=="touch",       MODE="0660", GROUP="input"
+SUBSYSTEM=="input",    ENV{ID_INPUT_TOUCHSCREEN}=="1", TAG+="uaccess"
+
+# --- CONSYS connectivity (WiFi / BT / GPS / FM) -----------------------------
+KERNEL=="stpwmt",      MODE="0660", GROUP="system"
+KERNEL=="wmtdetect",   MODE="0660", GROUP="system"
+KERNEL=="conninfra_dev", MODE="0660", GROUP="system"
+KERNEL=="wmtWifi",     MODE="0660", GROUP="net"
+KERNEL=="fw_log_wifi", MODE="0660", GROUP="net"
+KERNEL=="stpbt",       MODE="0660", GROUP="bluetooth"
+KERNEL=="fw_log_bt",   MODE="0660", GROUP="bluetooth"
+KERNEL=="stpgps",      MODE="0660", GROUP="gps"
+KERNEL=="gps",         MODE="0660", GROUP="gps"
+KERNEL=="gpsdl0",      MODE="0660", GROUP="gps"
+KERNEL=="gpsdl1",      MODE="0660", GROUP="gps"
+KERNEL=="fm",          MODE="0660", GROUP="audio"
+
+# --- Camera (V4L2) ----------------------------------------------------------
+KERNEL=="video*",      SUBSYSTEM=="video4linux", MODE="0660", GROUP="camera"
+KERNEL=="media*",      SUBSYSTEM=="media",       MODE="0660", GROUP="camera"
+KERNEL=="v4l-subdev*", MODE="0660", GROUP="camera"
+KERNEL=="vcu",         MODE="0660", GROUP="camera"
+KERNEL=="mtk_hcp",     MODE="0660", GROUP="camera"
+
+# --- Audio (CCCI audio path to the modem/DSP) -------------------------------
+KERNEL=="ccci_aud",      MODE="0660", GROUP="audio"
+KERNEL=="ccci_raw_audio",MODE="0660", GROUP="audio"
+
+# --- Modem / RIL (CCCI + ttyUSB AT channels) --------------------------------
+KERNEL=="ccci*",       MODE="0660", GROUP="radio"
+KERNEL=="ttyUSB0",     MODE="0660", GROUP="radio"
+KERNEL=="ttyUSB1",     MODE="0660", GROUP="radio"
+KERNEL=="ttyUSB2",     MODE="0660", GROUP="radio"
+KERNEL=="ttyUSB3",     MODE="0660", GROUP="radio"
+
+# --- TEE (Trustkernel / Trustonic / Trusty) ---------------------------------
+KERNEL=="tkcoredrv",     MODE="0660", GROUP="system"
+KERNEL=="trusty-ipc-dev0", MODE="0660", GROUP="system"
+KERNEL=="mobicore",      MODE="0600", GROUP="system"
+KERNEL=="mobicore-user", MODE="0666", GROUP="system"
+
+# --- NFC (ST21NFC) ----------------------------------------------------------
+KERNEL=="st21nfc",     MODE="0660", GROUP="nfc"
+
+# --- Block partitions the HALs touch directly -------------------------------
+KERNEL=="nvram",       MODE="0660", GROUP="system"
+KERNEL=="proinfo",     MODE="0660", GROUP="system"
+KERNEL=="otp",         MODE="0660", GROUP="system"

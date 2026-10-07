@@ -1,0 +1,11 @@
+[Unit]
+Description=BL6000 Pro dev image: home ownership, skip wizard, dev SSH key
+After=local-fs.target
+Before=lightdm.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/bl6000pro-firstboot.sh
+
+[Install]
+WantedBy=multi-user.target

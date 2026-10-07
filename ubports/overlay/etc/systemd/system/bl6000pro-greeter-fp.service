@@ -1,0 +1,12 @@
+[Unit]
+Description=BL6000 Pro: single-touch fingerprint Greeter.qml bind
+DefaultDependencies=no
+After=local-fs.target
+Before=lightdm.service lomiri.service display-manager.service
+ConditionPathExists=/usr/share/lomiri/Greeter/Greeter.qml
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c 'G=/usr/share/lomiri/Greeter/Greeter.qml; F=/usr/lib/bl6000pro/greeter/Greeter.qml; [ -f /userdata/bl6000pro-greeter/Greeter.qml ] && F=/userdata/bl6000pro-greeter/Greeter.qml; [ -f /userdata/bl6000pro-greeter/greeter-fp.off ] || mount --bind "$F" "$G"'
+[Install]
+WantedBy=multi-user.target

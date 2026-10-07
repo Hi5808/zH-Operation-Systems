@@ -1,0 +1,1188 @@
+openjdk version "21.0.12.1" 2026-08-18
+OpenJDK Runtime Environment (build 21.0.12.1+1-1-26.04.4-Ubuntu)
+OpenJDK 64-Bit Server VM (build 21.0.12.1+1-1-26.04.4-Ubuntu, mixed mode)
+INFO  Using log config file: jar:file:$HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Framework/Generic/lib/Generic.jar!/generic.log4j.xml (LoggingInitialization)  
+INFO  Using log file: $HOME/.config/ghidra/ghidra_12.1.2_PUBLIC/application.log (LoggingInitialization)  
+INFO  Loading user preferences: $HOME/.config/ghidra/ghidra_12.1.2_PUBLIC/preferences (Preferences)  
+INFO  Loading previous preferences: $HOME/.config/ghidra/ghidra_12.1_PUBLIC/preferences (Preferences)  
+INFO  Searching for classes... (ClassSearcher)  
+INFO  Class search complete (607 ms) (ClassSearcher)  
+INFO  Initializing SSL Context (DefaultSSLContextInitializer)  
+INFO  Initializing Random Number Generator... (SecureRandomFactory)  
+INFO  Random Number Generator initialization complete: NativePRNGNonBlocking (SecureRandomFactory)  
+INFO  Trust manager disabled, cacerts have not been set (DefaultTrustManagerFactory)  
+INFO  Headless startup complete (1295 ms) (AnalyzeHeadless)  
+INFO  Class searcher loaded 59 extension points (20 false positives) (ClassSearcher)  
+INFO  HEADLESS Script Paths:
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Processors/Atmel/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/PDB/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Debug/Debugger/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/MicrosoftCodeAnalyzer/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/GnuDemangler/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/SystemEmulation/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Processors/8051/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/WildcardAssembler/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/FileFormats/ghidra_scripts
+    $HOME/bl6000pro-work/ghidra
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/BytePatterns/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/FunctionID/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/PyGhidra/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/BSim/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Processors/DATA/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/Decompiler/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Processors/PIC/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/DecompilerDependent/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Processors/JVM/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/Base/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Debug/Debugger-rmi-trace/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/SwiftDemangler/ghidra_scripts
+    $HOME/ghidra_12.1.2_PUBLIC_20260605/ghidra_12.1.2_PUBLIC/Ghidra/Features/VersionTracking/ghidra_scripts (HeadlessAnalyzer)  
+INFO  HEADLESS: execution starts (HeadlessAnalyzer)  
+INFO  Opening existing project: $HOME/bl6000pro-work/metastore-re/ghidra-proj/metastore (HeadlessAnalyzer)  
+INFO  Opening project: $HOME/bl6000pro-work/metastore-re/ghidra-proj/metastore (HeadlessProject)  
+INFO  REPORT: Processing project file: /libmtkcam_metastore.so (HeadlessAnalyzer)  
+INFO  REPORT: Execute script: Decomp.java '0x164024=imx582_scaler'  (HeadlessAnalyzer)  
+INFO  SCRIPT: $HOME/bl6000pro-work/ghidra/Decomp.java (HeadlessAnalyzer)  
+INFO  Decomp.java> === 0x164024=imx582_scaler
+
+undefined8 imx582_scaler(uint param_1)
+
+{
+  long lVar1;
+  undefined *puVar2;
+  uint uVar3;
+  undefined4 uVar4;
+  int iVar5;
+  ulong uVar6;
+  ulong uVar7;
+  char *pcVar8;
+  undefined8 uVar9;
+  ulong uVar10;
+  uint uVar11;
+  undefined1 auVar12 [16];
+  undefined8 local_4b0;
+  undefined1 local_b1;
+  undefined8 local_b0;
+  undefined8 uStack_a8;
+  undefined8 uStack_a0;
+  undefined8 uStack_98;
+  undefined8 local_90;
+  undefined8 uStack_88;
+  undefined8 uStack_80;
+  undefined8 uStack_78;
+  long local_70;
+  
+  lVar1 = tpidr_el0;
+  local_70 = *(long *)(lVar1 + 0x28);
+  uStack_88 = 0;
+  local_90 = 0;
+  uStack_78 = 0;
+  uStack_80 = 0;
+  uStack_a8 = 0;
+  local_b0 = 0;
+  uStack_98 = 0;
+  uStack_a0 = 0;
+  NSCam::IMetadata::IEntry::IEntry((IEntry *)&local_b0,0xd0003);
+  local_4b0 = DAT_0010eb90;
+  NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+  local_4b0 = DAT_0010eb98;
+  NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+  local_4b0 = DAT_0010ebc0;
+  NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+  uVar6 = NSCam::IMetadata::IEntry::tag();
+  uVar3 = NSCam::IMetadata::update(param_1,(IEntry *)(uVar6 & 0xffffffff));
+  puVar2 = PTR_sMode_00206a88;
+  if (uVar3 == 0) {
+    NSCam::IMetadata::IEntry::~IEntry((IEntry *)&local_b0);
+    uStack_88 = 0;
+    local_90 = 0;
+    uStack_78 = 0;
+    uStack_80 = 0;
+    uStack_a8 = 0;
+    local_b0 = 0;
+    uStack_98 = 0;
+    uStack_a0 = 0;
+    NSCam::IMetadata::IEntry::IEntry((IEntry *)&local_b0,0xd000a);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 4000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 3000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0xcc0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x990;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0xa00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x640;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x4b0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x5a0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x400;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x300;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x3c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 600;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x280;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x1e0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x140;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0xf0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0xf00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x870;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0xc00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x6c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x480;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x440;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x500;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 4000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 3000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0xcc0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x990;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0xa00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x640;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x4b0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x5a0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x400;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x300;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x3c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 600;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x280;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x1e0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x160;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x120;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x140;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0xf0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0xb0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x90;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0xf00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x870;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0xc00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x6c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x480;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x440;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x500;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0._0_4_ = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = (ulong)local_4b0._4_4_ << 0x20;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    uVar6 = NSCam::IMetadata::IEntry::tag();
+    uVar3 = NSCam::IMetadata::update(param_1,(IEntry *)(uVar6 & 0xffffffff));
+    puVar2 = PTR_sMode_00206a88;
+    if (uVar3 != 0) {
+      uVar6 = (ulong)uVar3;
+      uVar3 = *(uint *)PTR_sMode_00206a88;
+      if ((uVar3 & 1) != 0) {
+        uVar4 = NSCam::IMetadata::IEntry::tag();
+        __android_log_print(6,"MtkCam/MetadataProvider.Custom",
+                            "%s(%d):IMetadata::update(), tag:%d err:%d (%s){#%d:%s}",
+                            "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                            ,399,uVar4,uVar6,
+                            "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                            ,399,
+                            "vendor/mediatek/proprietary/custom/mt6873/hal/imgsensor_metadata/imx582cts_mipi_raw/config_static_metadata_scaler.h"
+                           );
+        uVar3 = *(uint *)puVar2;
+      }
+      if ((uVar3 & 10) == 0) goto LAB_00166328;
+      pcVar8 = (char *)0x400;
+      memset(&local_4b0,0,0x400);
+      auVar12 = NSCam::IMetadata::IEntry::tag();
+      uVar7 = auVar12._8_8_;
+      uVar10 = auVar12._0_8_ & 0xffffffff;
+      uVar9 = 399;
+      goto LAB_001662e0;
+    }
+    NSCam::IMetadata::IEntry::~IEntry((IEntry *)&local_b0);
+    uStack_88 = 0;
+    local_90 = 0;
+    uStack_78 = 0;
+    uStack_80 = 0;
+    uStack_a8 = 0;
+    local_b0 = 0;
+    uStack_98 = 0;
+    uStack_a0 = 0;
+    NSCam::IMetadata::IEntry::IEntry((IEntry *)&local_b0,0xd000b);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 4000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 3000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x3f940aa;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xcc0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x990;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 50000000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xa00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x640;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x4b0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x5a0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x400;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x300;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x3c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 600;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x280;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1e0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x140;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xf0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xf00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x870;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xc00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x6c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x480;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x440;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xfe502a;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xfe502a;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x500;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 4000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 3000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x3f940aa;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xcc0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x990;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 50000000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xa00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x640;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x4b0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x5a0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x400;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x300;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x3c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 600;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x280;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1e0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x160;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x120;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x140;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xf0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xb0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x90;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xf00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x870;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xc00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x6c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x480;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x440;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xfe502a;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xfe502a;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x500;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    uVar6 = NSCam::IMetadata::IEntry::tag();
+    uVar3 = NSCam::IMetadata::update(param_1,(IEntry *)(uVar6 & 0xffffffff));
+    puVar2 = PTR_sMode_00206a88;
+    if (uVar3 != 0) {
+      uVar6 = (ulong)uVar3;
+      uVar3 = *(uint *)PTR_sMode_00206a88;
+      if ((uVar3 & 1) != 0) {
+        uVar4 = NSCam::IMetadata::IEntry::tag();
+        __android_log_print(6,"MtkCam/MetadataProvider.Custom",
+                            "%s(%d):IMetadata::update(), tag:%d err:%d (%s){#%d:%s}",
+                            "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                            ,0x2ec,uVar4,uVar6,
+                            "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                            ,0x2ec,
+                            "vendor/mediatek/proprietary/custom/mt6873/hal/imgsensor_metadata/imx582cts_mipi_raw/config_static_metadata_scaler.h"
+                           );
+        uVar3 = *(uint *)puVar2;
+      }
+      if ((uVar3 & 10) == 0) goto LAB_00166328;
+      pcVar8 = (char *)0x400;
+      memset(&local_4b0,0,0x400);
+      auVar12 = NSCam::IMetadata::IEntry::tag();
+      uVar7 = auVar12._8_8_;
+      uVar10 = auVar12._0_8_ & 0xffffffff;
+      uVar9 = 0x2ec;
+      goto LAB_001662e0;
+    }
+    NSCam::IMetadata::IEntry::~IEntry((IEntry *)&local_b0);
+    uStack_88 = 0;
+    local_90 = 0;
+    uStack_78 = 0;
+    uStack_80 = 0;
+    uStack_a8 = 0;
+    local_b0 = 0;
+    uStack_98 = 0;
+    uStack_a0 = 0;
+    NSCam::IMetadata::IEntry::IEntry((IEntry *)&local_b0,0xd000c);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 4000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 3000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xcc0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x990;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xa00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x640;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x4b0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x5a0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x400;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x300;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x3c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 600;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x280;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1e0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x140;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xf0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xf00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x870;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xc00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x6c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x480;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x440;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x21;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x500;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1fca055;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 4000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 3000;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xcc0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x990;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xa00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x640;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x4b0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x5a0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x400;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x300;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x3c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 600;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x280;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x1e0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x160;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x120;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x140;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xf0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xb0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x90;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xf00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x870;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0xc00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x6c0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x800;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x480;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x440;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x780;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x438;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x23;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x500;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0x2d0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    uVar6 = NSCam::IMetadata::IEntry::tag();
+    uVar3 = NSCam::IMetadata::update(param_1,(IEntry *)(uVar6 & 0xffffffff));
+    puVar2 = PTR_sMode_00206a88;
+    if (uVar3 != 0) {
+      uVar6 = (ulong)uVar3;
+      uVar3 = *(uint *)PTR_sMode_00206a88;
+      if ((uVar3 & 1) != 0) {
+        uVar4 = NSCam::IMetadata::IEntry::tag();
+        __android_log_print(6,"MtkCam/MetadataProvider.Custom",
+                            "%s(%d):IMetadata::update(), tag:%d err:%d (%s){#%d:%s}",
+                            "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                            ,0x449,uVar4,uVar6,
+                            "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                            ,0x449,
+                            "vendor/mediatek/proprietary/custom/mt6873/hal/imgsensor_metadata/imx582cts_mipi_raw/config_static_metadata_scaler.h"
+                           );
+        uVar3 = *(uint *)puVar2;
+      }
+      if ((uVar3 & 10) == 0) goto LAB_00166328;
+      pcVar8 = (char *)0x400;
+      memset(&local_4b0,0,0x400);
+      auVar12 = NSCam::IMetadata::IEntry::tag();
+      uVar7 = auVar12._8_8_;
+      uVar10 = auVar12._0_8_ & 0xffffffff;
+      uVar9 = 0x449;
+      goto LAB_001662e0;
+    }
+    NSCam::IMetadata::IEntry::~IEntry((IEntry *)&local_b0);
+    uStack_88 = 0;
+    local_90 = 0;
+    uStack_78 = 0;
+    uStack_80 = 0;
+    uStack_a8 = 0;
+    local_b0 = 0;
+    uStack_98 = 0;
+    uStack_a0 = 0;
+    NSCam::IMetadata::IEntry::IEntry((IEntry *)&local_b0,0xd000d);
+    local_4b0 = local_4b0 & 0xffffffffffffff00;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    uVar6 = NSCam::IMetadata::IEntry::tag();
+    uVar3 = NSCam::IMetadata::update(param_1,(IEntry *)(uVar6 & 0xffffffff));
+    puVar2 = PTR_sMode_00206a88;
+    if (uVar3 != 0) {
+      uVar6 = (ulong)uVar3;
+      uVar3 = *(uint *)PTR_sMode_00206a88;
+      if ((uVar3 & 1) != 0) {
+        uVar4 = NSCam::IMetadata::IEntry::tag();
+        __android_log_print(6,"MtkCam/MetadataProvider.Custom",
+                            "%s(%d):IMetadata::update(), tag:%d err:%d (%s){#%d:%s}",
+                            "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                            ,0x451,uVar4,uVar6,
+                            "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                            ,0x451,
+                            "vendor/mediatek/proprietary/custom/mt6873/hal/imgsensor_metadata/imx582cts_mipi_raw/config_static_metadata_scaler.h"
+                           );
+        uVar3 = *(uint *)puVar2;
+      }
+      if ((uVar3 & 10) == 0) goto LAB_00166328;
+      pcVar8 = (char *)0x400;
+      memset(&local_4b0,0,0x400);
+      auVar12 = NSCam::IMetadata::IEntry::tag();
+      uVar7 = auVar12._8_8_;
+      uVar10 = auVar12._0_8_ & 0xffffffff;
+      uVar9 = 0x451;
+      goto LAB_001662e0;
+    }
+    NSCam::IMetadata::IEntry::~IEntry((IEntry *)&local_b0);
+    uStack_88 = 0;
+    local_90 = 0;
+    uStack_78 = 0;
+    uStack_80 = 0;
+    uStack_a8 = 0;
+    local_b0 = 0;
+    uStack_98 = 0;
+    uStack_a0 = 0;
+    NSCam::IMetadata::IEntry::IEntry((IEntry *)&local_b0,0x70007);
+    local_4b0 = 0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = DAT_0010ebb0;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = DAT_0010eb80;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    local_4b0 = DAT_0010eba8;
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    uVar6 = NSCam::IMetadata::IEntry::tag();
+    uVar3 = NSCam::IMetadata::update(param_1,(IEntry *)(uVar6 & 0xffffffff));
+    puVar2 = PTR_sMode_00206a88;
+    if (uVar3 != 0) {
+      uVar6 = (ulong)uVar3;
+      uVar3 = *(uint *)PTR_sMode_00206a88;
+      if ((uVar3 & 1) != 0) {
+        uVar4 = NSCam::IMetadata::IEntry::tag();
+        __android_log_print(6,"MtkCam/MetadataProvider.Custom",
+                            "%s(%d):IMetadata::update(), tag:%d err:%d (%s){#%d:%s}",
+                            "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                            ,0x45b,uVar4,uVar6,
+                            "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                            ,0x45b,
+                            "vendor/mediatek/proprietary/custom/mt6873/hal/imgsensor_metadata/imx582cts_mipi_raw/config_static_metadata_scaler.h"
+                           );
+        uVar3 = *(uint *)puVar2;
+      }
+      if ((uVar3 & 10) == 0) goto LAB_00166328;
+      pcVar8 = (char *)0x400;
+      memset(&local_4b0,0,0x400);
+      auVar12 = NSCam::IMetadata::IEntry::tag();
+      uVar7 = auVar12._8_8_;
+      uVar10 = auVar12._0_8_ & 0xffffffff;
+      uVar9 = 0x45b;
+      goto LAB_001662e0;
+    }
+    NSCam::IMetadata::IEntry::~IEntry((IEntry *)&local_b0);
+    uStack_88 = 0;
+    local_90 = 0;
+    uStack_78 = 0;
+    uStack_80 = 0;
+    uStack_a8 = 0;
+    local_b0 = 0;
+    uStack_98 = 0;
+    uStack_a0 = 0;
+    NSCam::IMetadata::IEntry::IEntry((IEntry *)&local_b0,0x70008);
+    local_4b0 = CONCAT44(local_4b0._4_4_,57600000);
+    NSCam::IMetadata::IEntry::push_back(&local_b0,&local_4b0);
+    uVar6 = NSCam::IMetadata::IEntry::tag();
+    uVar3 = NSCam::IMetadata::update(param_1,(IEntry *)(uVar6 & 0xffffffff));
+    puVar2 = PTR_sMode_00206a88;
+    if (uVar3 == 0) goto LAB_00166328;
+    uVar11 = *(uint *)PTR_sMode_00206a88;
+    if ((uVar11 & 1) != 0) {
+      uVar4 = NSCam::IMetadata::IEntry::tag();
+      __android_log_print(6,"MtkCam/MetadataProvider.Custom",
+                          "%s(%d):IMetadata::update(), tag:%d err:%d (%s){#%d:%s}",
+                          "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                          ,0x45f,uVar4,(ulong)uVar3,
+                          "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                          ,0x45f,
+                          "vendor/mediatek/proprietary/custom/mt6873/hal/imgsensor_metadata/imx582cts_mipi_raw/config_static_metadata_scaler.h"
+                         );
+      uVar11 = *(uint *)puVar2;
+    }
+    if ((uVar11 & 10) == 0) goto LAB_00166328;
+    pcVar8 = (char *)0x400;
+    memset(&local_4b0,0,0x400);
+    auVar12 = NSCam::IMetadata::IEntry::tag();
+    iVar5 = snprintf((char *)&local_4b0,auVar12._8_8_,pcVar8,
+                     "%s(%d):IMetadata::update(), tag:%d err:%d",
+                     "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW",
+                     0x45f,auVar12._0_8_ & 0xffffffff,(ulong)uVar3);
+  }
+  else {
+    uVar6 = (ulong)uVar3;
+    uVar3 = *(uint *)PTR_sMode_00206a88;
+    if ((uVar3 & 1) != 0) {
+      uVar4 = NSCam::IMetadata::IEntry::tag();
+      __android_log_print(6,"MtkCam/MetadataProvider.Custom",
+                          "%s(%d):IMetadata::update(), tag:%d err:%d (%s){#%d:%s}",
+                          "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                          ,0x32,uVar4,uVar6,
+                          "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW"
+                          ,0x32,
+                          "vendor/mediatek/proprietary/custom/mt6873/hal/imgsensor_metadata/imx582cts_mipi_raw/config_static_metadata_scaler.h"
+                         );
+      uVar3 = *(uint *)puVar2;
+    }
+    if ((uVar3 & 10) == 0) goto LAB_00166328;
+    pcVar8 = (char *)0x400;
+    memset(&local_4b0,0,0x400);
+    auVar12 = NSCam::IMetadata::IEntry::tag();
+    uVar7 = auVar12._8_8_;
+    uVar10 = auVar12._0_8_ & 0xffffffff;
+    uVar9 = 0x32;
+LAB_001662e0:
+    iVar5 = snprintf((char *)&local_4b0,uVar7,pcVar8,"%s(%d):IMetadata::update(), tag:%d err:%d",
+                     "constructCustStaticMetadata_DEVICE_SCALER_SENSOR_DRVNAME_IMX582CTS_MIPI_RAW",
+                     uVar9,uVar10,uVar6);
+  }
+  if (-1 < iVar5) {
+    local_b1 = 0;
+    (**(code **)(**(long **)PTR_sULogger_00206a90 + 0x18))
+              (*(long **)PTR_sULogger_00206a90,0x40007003,"MtkCam/MetadataProvider.Custom",1,
+               &local_4b0,iVar5);
+  }
+LAB_00166328:
+  NSCam::IMetadata::IEntry::~IEntry((IEntry *)&local_b0);
+  if (*(long *)(lVar1 + 0x28) == local_70) {
+    return 0;
+  }
+                    /* WARNING: Subroutine does not return */
+  __stack_chk_fail();
+}
+
+ (GhidraScript)  
+INFO  REPORT: Save succeeded for processed file: /libmtkcam_metastore.so (HeadlessAnalyzer)  

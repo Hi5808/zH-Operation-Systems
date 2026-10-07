@@ -1,0 +1,4 @@
+#!/system/bin/sh
+# BL6000 Pro: vendor vndservicemanager aborts without SELinux; run Halium's patched
+# servicemanager (same Android 11 source) on the vndbinder device instead.
+exec /system/bin/servicemanager "$@"

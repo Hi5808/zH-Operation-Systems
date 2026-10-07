@@ -1,0 +1,12 @@
+# Blackview BL6000 Pro (MT6873). device-info matches ro.product.vendor.device (BL6000Pro).
+BL6000Pro:
+  Vendor: Blackview
+  PrettyName: Blackview BL6000 Pro
+  DeviceType: phone
+  GridUnit: 21
+  SupportedOrientations:
+    - Portrait
+    - Landscape
+    - InvertedLandscape
+  OfonoPlugin: binder
+  OfonoImplementsIms: true

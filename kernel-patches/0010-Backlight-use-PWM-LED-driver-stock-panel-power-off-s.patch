@@ -1,0 +1,76 @@
+From 006013693983d2ac8e50e7803c903bbf7bb0b0e0 Mon Sep 17 00:00:00 2001
+From: kino <<EMAIL>>
+Date: Sun, 4 Oct 2026 13:32:32 -1000
+Subject: [PATCH 10/10] Backlight: use PWM LED driver; stock panel power-off
+ sequence
+
+- leds: Xiaomi mapped LEDS_MTK_PWM to leds-mtk-disp.o (DSI backlight);
+  BL6000 Pro drives lcd-backlight via mediatek,pwm-leds/disp_pwm0, so build
+  leds-mtk-pwm.o (as stock). Fixes backlight staying lit with screen off.
+- panel: unprepare now follows stock (28/50ms/10/50ms/4F01, reset high,
+  bias[1], bias[0] off, powerdm high).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../gpu/drm/panel/panel-truly-nt36675-vdo.c   | 19 +++++++++++++------
+ drivers/misc/mediatek/leds/Makefile           |  2 +-
+ 2 files changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c b/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c
+index f482eb105..cc5d13102 100644
+--- a/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c
++++ b/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c
+@@ -361,12 +361,18 @@ static void lcm_panel_power_on(struct lcm *ctx)
+ 
+ static void lcm_panel_power_off(struct lcm *ctx)
+ {
+-	lcm_gpio_set(ctx, "reset", 0, 0);
+-	msleep(5);
++	/*
++	 * Stock sequence: keep reset high and the panel logic rail (powerdm)
++	 * on, drop only the bias rails. Cutting panel logic lets the backlight
++	 * PWM pin float and the external backlight driver stays lit.
++	 */
++	lcm_gpio_set(ctx, "reset", 0, 1);
++	msleep(10);
+ 	lcm_gpio_set(ctx, "bias", 1, 0);
++	msleep(10);
+ 	lcm_gpio_set(ctx, "bias", 0, 0);
+-	msleep(5);
+-	lcm_gpio_set(ctx, "powerdm", 0, 0);
++	msleep(20);
++	lcm_gpio_set(ctx, "powerdm", 0, 1);
+ }
+ 
+ static void lcm_panel_init(struct lcm *ctx)
+@@ -658,11 +664,12 @@ static int lcm_unprepare(struct drm_panel *panel)
+ 		return 0;
+ 
+ 	nvt_panel_power_notify(0);
++	/* stock: 28, 50 ms, 10, 50 ms, 4F 01 (deep standby) */
+ 	lcm_dcs_write_seq_static(ctx, 0x28);
++	msleep(50);
+ 	lcm_dcs_write_seq_static(ctx, 0x10);
+-	msleep(120);
++	msleep(50);
+ 	lcm_dcs_write_seq_static(ctx, 0x4F, 0x01);
+-	msleep(120);
+ 
+ 	ctx->error = 0;
+ 	ctx->prepared = false;
+diff --git a/drivers/misc/mediatek/leds/Makefile b/drivers/misc/mediatek/leds/Makefile
+index e350f527c..681d5db72 100644
+--- a/drivers/misc/mediatek/leds/Makefile
++++ b/drivers/misc/mediatek/leds/Makefile
+@@ -17,7 +17,7 @@ ifdef CONFIG_LEDS_MTK_DISP
+ obj-$(CONFIG_LEDS_MTK_DISP)		+= leds-mtk-disp.o
+ obj-$(CONFIG_BACKLIGHT_SUPPORT_LM36273) += leds-lm36273.o
+ else ifdef CONFIG_LEDS_MTK_PWM
+-obj-$(CONFIG_LEDS_MTK_PWM)		+= leds-mtk-disp.o
++obj-$(CONFIG_LEDS_MTK_PWM)		+= leds-mtk-pwm.o
+ obj-$(CONFIG_BACKLIGHT_SUPPORT_LM36273) += leds-lm36273.o
+ else
+ ifeq (y, $(filter y, $(CONFIG_MACH_MT6765) $(CONFIG_MACH_MT6761)))
+-- 
+2.53.0
+

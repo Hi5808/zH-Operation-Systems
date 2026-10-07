@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Halium-11.0 local manifest for the Blackview BL6000 Pro 5G (mt6873).
+
+  Usage (inside a Halium-11.0 source tree):
+      mkdir -p .repo/local_manifests
+      cp blackview_BL6000Pro.xml .repo/local_manifests/
+      repo sync -c
+
+  Replace YOURNAME with your GitHub/GitLab account once you have forked and
+  pushed the three repos below.
+-->
+<manifest>
+  <remote name="github" fetch="https://github.com" revision="halium-11.0" />
+
+  <!-- Device tree (this directory, published as a repo) -->
+  <project path="device/blackview/BL6000Pro"
+           name="YOURNAME/android_device_blackview_BL6000Pro"
+           remote="github" />
+
+  <!-- Vendor blobs, extracted from the stock firmware dumps -->
+  <project path="vendor/blackview/BL6000Pro"
+           name="YOURNAME/proprietary_vendor_blackview_BL6000Pro"
+           remote="github" />
+
+  <!--
+    Kernel source (OPTIONAL).
+    No public kernel source exists for the BL6000 Pro, so by default we build
+    halium-boot.img against the STOCK PREBUILT kernel (see BoardConfig.mk,
+    TARGET_PREBUILT_KERNEL). If a MediaTek BSP / Blackview GPL drop is found
+    later, drop it here and switch BoardConfig over to the source build.
+  -->
+  <!--
+  <project path="kernel/blackview/BL6000Pro"
+           name="YOURNAME/android_kernel_blackview_BL6000Pro"
+           remote="github" />
+  -->
+</manifest>

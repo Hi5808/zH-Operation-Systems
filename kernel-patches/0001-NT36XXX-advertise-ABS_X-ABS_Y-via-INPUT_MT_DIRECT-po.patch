@@ -1,0 +1,57 @@
+From c0a23e34b3408437114ddc65c4e2b49559bdbfad Mon Sep 17 00:00:00 2001
+From: kino <<EMAIL>>
+Date: Sun, 4 Oct 2026 18:21:40 -1000
+Subject: [PATCH] NT36XXX: advertise ABS_X/ABS_Y via INPUT_MT_DIRECT + pointer
+ emulation
+
+libinput (Mir/Lomiri on Ubuntu Touch) only passed EV_SYN through: the
+device had MT axes but no ABS_X/ABS_Y. Init MT slots after the MT axes with
+INPUT_MT_DIRECT and emit pointer emulation each frame.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ drivers/input/touchscreen/NT36XXX/nt36xxx.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/input/touchscreen/NT36XXX/nt36xxx.c b/drivers/input/touchscreen/NT36XXX/nt36xxx.c
+index ba0f75338..5bdcdbc89 100644
+--- a/drivers/input/touchscreen/NT36XXX/nt36xxx.c
++++ b/drivers/input/touchscreen/NT36XXX/nt36xxx.c
+@@ -1044,6 +1044,9 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ 	}
+ #endif
+ 
++#if MT_PROTOCOL_B
++	input_mt_report_pointer_emulation(ts->input_dev, true);
++#endif
+ 	input_sync(ts->input_dev);
+ 
+ XFER_ERROR:
+@@ -1329,10 +1332,6 @@ static int32_t nvt_ts_late_probe(struct i2c_client *client,
+ 	ts->input_dev->keybit[BIT_WORD(BTN_TOUCH)] = BIT_MASK(BTN_TOUCH);
+ 	ts->input_dev->propbit[0] = BIT(INPUT_PROP_DIRECT);
+ 
+-#if MT_PROTOCOL_B
+-	input_mt_init_slots(ts->input_dev, ts->max_touch_num, 0);
+-#endif
+-
+ 	input_set_abs_params(ts->input_dev, ABS_MT_PRESSURE, 0, TOUCH_FORCE_NUM, 0, 0);    //pressure = TOUCH_FORCE_NUM
+ 
+ #if TOUCH_MAX_FINGER_NUM > 1
+@@ -1341,7 +1340,12 @@ static int32_t nvt_ts_late_probe(struct i2c_client *client,
+ 	input_set_abs_params(ts->input_dev, ABS_MT_POSITION_X, 0, ts->abs_x_max, 0, 0);
+ 	input_set_abs_params(ts->input_dev, ABS_MT_POSITION_Y, 0, ts->abs_y_max, 0, 0);
+ #if MT_PROTOCOL_B
+-	// no need to set ABS_MT_TRACKING_ID, input_mt_init_slots() already set it
++	/*
++	 * BL6000Pro: init slots AFTER the MT axes, with INPUT_MT_DIRECT, so the
++	 * core also advertises ABS_X/ABS_Y/ABS_PRESSURE. libinput (Mir/Lomiri)
++	 * ignores touchscreens without ABS_X/ABS_Y; Android did not care.
++	 */
++	input_mt_init_slots(ts->input_dev, ts->max_touch_num, INPUT_MT_DIRECT);
+ #else
+ 	input_set_abs_params(ts->input_dev, ABS_MT_TRACKING_ID, 0, ts->max_touch_num, 0, 0);
+ #endif //MT_PROTOCOL_B
+-- 
+2.53.0
+

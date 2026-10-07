@@ -1,0 +1,15 @@
+[Unit]
+Description=BL6000 Pro: Halium-11 libaudioclient fix (no AudioFlinger waits in the recording path; 32+64 bit)
+DefaultDependencies=no
+After=var-lib-lxc-android-rootfs-system.mount local-fs.target
+Requires=var-lib-lxc-android-rootfs-system.mount
+Before=lxc-android-config.service lxc@android.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Dev builds may carry a newer copy in /userdata; the image ships /usr/lib/bl6000pro/halium.
+ExecStart=/bin/sh -c 'for a in lib lib64; do L=/usr/lib/bl6000pro/halium/$a/libaudioclient.so; [ -f /userdata/bl6000pro-halium/$a/libaudioclient.so ] && L=/userdata/bl6000pro-halium/$a/libaudioclient.so; mount --bind "$L" /var/lib/lxc/android/rootfs/system/$a/libaudioclient.so || exit 1; done; V=/usr/lib/bl6000pro/halium/vndservicemanager; [ -f /userdata/bl6000pro-halium/vndservicemanager ] && V=/userdata/bl6000pro-halium/vndservicemanager; mount --bind "$V" /var/lib/lxc/android/rootfs/vendor/bin/vndservicemanager || exit 1'
+
+[Install]
+WantedBy=lxc-android-config.service

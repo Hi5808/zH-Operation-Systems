@@ -1,0 +1,11 @@
+[Unit]
+Description=BL6000 Pro: camera app 3-camera cycle (ViewFinderView only; no WB)
+After=local-fs.target
+Before=lightdm.service lomiri.service
+ConditionPathExists=/usr/share/click/preinstalled/camera.ubports/4.1.1/qml/Viewfinder/ViewFinderView.qml
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c 'D=/usr/share/click/preinstalled/camera.ubports/4.1.1/qml/Viewfinder; U=/userdata/bl6000pro-camera-app; L=/usr/lib/bl6000pro/camera-app; q=ViewFinderView.qml; f=$L/$q; [ -f $U/$q ] && f=$U/$q; [ -f $U/camapp.off ] || mount --bind "$f" "$D/$q"'
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,26 @@
+From c6654a0cf9dad9e5499f5cc4f48c2fddb2d7bddd Mon Sep 17 00:00:00 2001
+From: kino <<EMAIL>>
+Date: Sun, 4 Oct 2026 11:04:17 -1000
+Subject: [PATCH 06/10] NT36XXX: use fb_notif member on MTK
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ drivers/input/touchscreen/NT36XXX/nt36xxx.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/input/touchscreen/NT36XXX/nt36xxx.h b/drivers/input/touchscreen/NT36XXX/nt36xxx.h
+index 26912309e..bd7a89d46 100644
+--- a/drivers/input/touchscreen/NT36XXX/nt36xxx.h
++++ b/drivers/input/touchscreen/NT36XXX/nt36xxx.h
+@@ -96,7 +96,7 @@ struct nvt_ts_data {
+ 	uint16_t addr;
+ 	int8_t phys[32];
+ 	const struct i2c_device_id *id;
+-#if defined(CONFIG_DRM_PANEL)
++#if 0 /* BL6000Pro: msm-only drm_panel notifier */
+ 	struct notifier_block drm_notif;
+ #elif defined(CONFIG_FB)
+ 	struct notifier_block fb_notif;
+-- 
+2.53.0
+

@@ -1,0 +1,26 @@
+From 881af697a35b1e0ba0c8116c61162d6d60f29004 Mon Sep 17 00:00:00 2001
+From: kino <<EMAIL>>
+Date: Sun, 4 Oct 2026 11:04:02 -1000
+Subject: [PATCH 05/10] media: mtk-vcu: don't link mtk_vcodec_mem.o twice when
+ built-in
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ drivers/media/platform/mtk-vcu/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/mtk-vcu/Makefile b/drivers/media/platform/mtk-vcu/Makefile
+index f858cfe97..31dd04c87 100644
+--- a/drivers/media/platform/mtk-vcu/Makefile
++++ b/drivers/media/platform/mtk-vcu/Makefile
+@@ -4,6 +4,6 @@ ccflags-y += -I$(srctree)/drivers/misc/mediatek/cmdq
+ mtk-vcu-y += mtk_vcu.o \
+ 	mtk_vcodec_mem.o \
+ 
+-obj-$(CONFIG_VIDEO_MEDIATEK_VCU) += mtk-vcu.o mtk_vcodec_mem.o
++obj-$(CONFIG_VIDEO_MEDIATEK_VCU) += mtk-vcu.o
+ ccflags-y += -I$(srctree)/arch/arm
+ ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat
+-- 
+2.53.0
+

@@ -1,0 +1,17 @@
+ccci_ccb_read_flush @ 00108bd4  <- called from 3 site(s): Entry Point, 00105d4c, 001060b0
+ccci_ccb_write_alloc @ 00108e64  <- called from 3 site(s): Entry Point, 00105d64, 00106110
+ccci_ccb_write_done @ 00108f7c  <- called from 3 site(s): Entry Point, 00105d6c, 00106130
+ccci_ccb_read_get @ 001094d8  <- called from 3 site(s): Entry Point, 00105d7c, 00106178
+ccci_ccb_read_done @ 0010960c  <- called from 3 site(s): Entry Point, 00105d84, 00106198
+read @ 00109f60  <- called from 6 site(s): 00107144, 00107188, 001079c8, 00109768, 00107d10, 00107dc0
+__open_2 @ 00109fb0  <- called from 9 site(s): 00107384, 00107428, 00107704, 001079a0, 00107e50, 00108978, 00109754, 00107cfc, 00107dac
+__read_chk @ 0010a030  <- called from 1 site(s): 00107778
+__write_chk @ 0010a040  <- called from 1 site(s): 00107798
+ioctl @ 0010a060  <- called from 9 site(s): 00107e70, 00107ed8, 00108998, 001089fc, 00108a2c, 00108a54, 00108544, 00109264, 001092e0
+__system_property_read_callback @ 0010a150  <- called from 1 site(s): 00109ee4
+__open_2 @ 0010d018  <- called from 2 site(s): 0010b260, 00109fbc
+__read_chk @ 0010d020  <- called from 2 site(s): 0010b2a0, 0010a03c
+__write_chk @ 0010d038  <- called from 2 site(s): 0010b2a8, 0010a04c
+ioctl @ 0010d058  <- called from 2 site(s): 0010b2b8, 0010a06c
+read @ 0010d088  <- called from 2 site(s): 0010b238, 00109f6c
+__system_property_read_callback @ 0010d0b8  <- called from 2 site(s): 0010b330, 0010a15c

@@ -1,0 +1,66 @@
+From 7f1ac5677a0ca76ae6fca9759dd688d304a39581 Mon Sep 17 00:00:00 2001
+From: kino <<EMAIL>>
+Date: Sun, 4 Oct 2026 18:51:50 -1000
+Subject: [PATCH 2/2] wmt_detect: run implicit SoC HW init on the first ioctl
+ (loader may skip GET_SOC_CHIP_ID with cached chipid)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ common_detect/wmt_detect.c | 34 ++++++++++++++++++----------------
+ 1 file changed, 18 insertions(+), 16 deletions(-)
+
+diff --git a/common_detect/wmt_detect.c b/common_detect/wmt_detect.c
+index fc86b6a..9dd05b9 100644
+--- a/common_detect/wmt_detect.c
++++ b/common_detect/wmt_detect.c
+@@ -79,6 +79,24 @@ static long wmt_detect_unlocked_ioctl(struct file *filp, unsigned int cmd, unsig
+ 
+ 	WMT_DETECT_PR_INFO("cmd (%d),arg(%ld)\n", cmd, arg);
+ 
++	/*
++	 * BL6000Pro: the Android 11 vendor wmt_loader never issues
++	 * COMBO_IOCTL_CONNSYS_SOC_HW_INIT (added in newer WMT), and with a
++	 * cached chipid it skips GET_SOC_CHIP_ID too. Without the SoC HW init
++	 * the CONSYS platform driver is never registered (g_pdev NULL ->
++	 * NULL ic_ops oops at power-on). Do it once, on the first ioctl, as
++	 * the older WMT did implicitly.
++	 */
++	{
++		static int soc_hw_inited;
++
++		if (!soc_hw_inited && cmd != COMBO_IOCTL_CONNSYS_SOC_HW_INIT) {
++			soc_hw_inited = 1;
++			WMT_DETECT_PR_INFO("implicit CONNSYS SoC HW init\n");
++			wmt_plat_consys_hw_init();
++		}
++	}
++
+ 	switch (cmd) {
+ 	case COMBO_IOCTL_GET_CHIP_ID:
+ 		/*just get chipid from sdio-detect module */
+@@ -115,22 +133,6 @@ static long wmt_detect_unlocked_ioctl(struct file *filp, unsigned int cmd, unsig
+ 		break;
+ 
+ 	case COMBO_IOCTL_GET_SOC_CHIP_ID:
+-		/*
+-		 * BL6000Pro: the Android 11 vendor wmt_loader never issues
+-		 * COMBO_IOCTL_CONNSYS_SOC_HW_INIT (added later), so the CONSYS
+-		 * platform driver was never registered (g_pdev NULL -> chipid 0 ->
+-		 * NULL ic_ops oops at power-on). Do the SoC HW init once here, as
+-		 * the older WMT did implicitly.
+-		 */
+-		{
+-			static int soc_hw_inited;
+-
+-			if (!soc_hw_inited) {
+-				soc_hw_inited = 1;
+-				WMT_DETECT_PR_INFO("implicit CONNSYS SoC HW init\n");
+-				wmt_plat_consys_hw_init();
+-			}
+-		}
+ 		retval = wmt_plat_get_soc_chipid();
+ 		/*get soc chipid by HAL interface */
+ 		break;
+-- 
+2.53.0
+

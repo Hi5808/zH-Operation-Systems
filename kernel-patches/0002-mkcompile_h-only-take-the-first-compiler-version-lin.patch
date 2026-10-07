@@ -1,0 +1,26 @@
+From 98d6138a1710e2d196b95c3d752ca41230362de7 Mon Sep 17 00:00:00 2001
+From: kino <<EMAIL>>
+Date: Sun, 4 Oct 2026 11:00:59 -1000
+Subject: [PATCH 02/10] mkcompile_h: only take the first compiler version line
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ scripts/mkcompile_h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
+index 29a1589e2..41e71be09 100755
+--- a/scripts/mkcompile_h
++++ b/scripts/mkcompile_h
+@@ -78,7 +78,7 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
+   echo \#define LINUX_COMPILE_BY \"`echo $LINUX_COMPILE_BY | $UTS_TRUNCATE`\"
+   echo \#define LINUX_COMPILE_HOST \"`echo $LINUX_COMPILE_HOST | $UTS_TRUNCATE`\"
+ 
+-  CC_VERSION=$($CC -v 2>&1 | grep ' version ' | sed 's/[[:space:]]*$//')
++  CC_VERSION=$($CC -v 2>&1 | grep -m1 ' version ' | sed 's/[[:space:]]*$//')
+   LD_VERSION=$($LD -v | head -n1 | sed 's/(compatible with [^)]*)//' \
+ 		      | sed 's/[[:space:]]*$//')
+   printf '#define LINUX_COMPILER "%s"\n' "$CC_VERSION, $LD_VERSION"
+-- 
+2.53.0
+

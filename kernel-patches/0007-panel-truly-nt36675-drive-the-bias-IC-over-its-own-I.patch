@@ -1,0 +1,163 @@
+From 31f1edf8e12109bd046dee38569c6bf4cb14c567 Mon Sep 17 00:00:00 2001
+From: kino <<EMAIL>>
+Date: Sun, 4 Oct 2026 11:08:09 -1000
+Subject: [PATCH 07/10] panel-truly-nt36675: drive the bias IC over its own I2C
+ client
+
+Stock kernel used a Blackview lcm_i2c_set_data() that is not in this tree;
+embed the mediatek,i2c_lcd_bias@0x3e client (as other MTK panel drivers do).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../gpu/drm/panel/panel-truly-nt36675-vdo.c   | 123 ++++++++++++++++--
+ 1 file changed, 112 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c b/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c
+index 82ca3ba19..6fd1169df 100644
+--- a/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c
++++ b/drivers/gpu/drm/panel/panel-truly-nt36675-vdo.c
+@@ -28,13 +28,117 @@
+ #include <linux/of_graph.h>
+ #include <linux/platform_device.h>
+ 
+-/* from drivers/misc/mediatek/lcm/inc/lcm_drv.h (bias IC over I2C) */
+-struct LCM_DATA_T2 {
+-	char cmd;
+-	char data;
+-	char padding[130];
++#include <linux/i2c.h>
++
++/* Bias IC (mediatek,i2c_lcd_bias @0x3e); stock wrote 0x00=0x12, 0x01=0x12 */
++/* i2c control start */
++#define LCM_I2C_ID_NAME "I2C_LCD_BIAS"
++static struct i2c_client *_lcm_i2c_client;
++static char bl_tb0[] = { 0x51, 0xff };
++
++/*****************************************************************************
++ * Function Prototype
++ *****************************************************************************/
++static int _lcm_i2c_probe(struct i2c_client *client,
++			  const struct i2c_device_id *id);
++static int _lcm_i2c_remove(struct i2c_client *client);
++
++/*****************************************************************************
++ * Data Structure
++ *****************************************************************************/
++struct _lcm_i2c_dev {
++	struct i2c_client *client;
+ };
+-extern int lcm_i2c_set_data(char type, const struct LCM_DATA_T2 *t2);
++
++static const struct of_device_id _lcm_i2c_of_match[] = {
++	{
++	    .compatible = "mediatek,i2c_lcd_bias",
++	},
++	{},
++};
++
++static const struct i2c_device_id _lcm_i2c_id[] = { { LCM_I2C_ID_NAME, 0 },
++						    {} };
++
++static struct i2c_driver _lcm_i2c_driver = {
++	.id_table = _lcm_i2c_id,
++	.probe = _lcm_i2c_probe,
++	.remove = _lcm_i2c_remove,
++	/* .detect		   = _lcm_i2c_detect, */
++	.driver = {
++		.owner = THIS_MODULE,
++		.name = LCM_I2C_ID_NAME,
++		.of_match_table = _lcm_i2c_of_match,
++	},
++};
++
++/*****************************************************************************
++ * Function
++ *****************************************************************************/
++
++#ifdef VENDOR_EDIT
++// shifan@bsp.tp 20191226 add for loading tp fw when screen lighting on
++extern void lcd_queue_load_tp_fw(void);
++#endif /*VENDOR_EDIT*/
++
++static int _lcm_i2c_probe(struct i2c_client *client,
++			  const struct i2c_device_id *id)
++{
++	pr_debug("[LCM][I2C] %s\n", __func__);
++	pr_debug("[LCM][I2C] NT: info==>name=%s addr=0x%x\n", client->name,
++		 client->addr);
++	_lcm_i2c_client = client;
++	return 0;
++}
++
++static int _lcm_i2c_remove(struct i2c_client *client)
++{
++	pr_debug("[LCM][I2C] %s\n", __func__);
++	_lcm_i2c_client = NULL;
++	i2c_unregister_device(client);
++	return 0;
++}
++
++static int _lcm_i2c_write_bytes(unsigned char addr, unsigned char value)
++{
++	int ret = 0;
++	struct i2c_client *client = _lcm_i2c_client;
++	char write_data[2] = { 0 };
++
++	if (client == NULL) {
++		pr_debug("ERROR!! _lcm_i2c_client is null\n");
++		return 0;
++	}
++
++	write_data[0] = addr;
++	write_data[1] = value;
++	ret = i2c_master_send(client, write_data, 2);
++	if (ret < 0)
++		pr_info("[LCM][ERROR] _lcm_i2c write data fail !!\n");
++
++	return ret;
++}
++
++/*
++ * module load/unload record keeping
++ */
++static int __init _lcm_i2c_init(void)
++{
++	pr_debug("[LCM][I2C] %s\n", __func__);
++	i2c_add_driver(&_lcm_i2c_driver);
++	pr_debug("[LCM][I2C] %s success\n", __func__);
++	return 0;
++}
++
++static void __exit _lcm_i2c_exit(void)
++{
++	pr_debug("[LCM][I2C] %s\n", __func__);
++	i2c_del_driver(&_lcm_i2c_driver);
++}
++
++module_init(_lcm_i2c_init);
++module_exit(_lcm_i2c_exit);
++
+ 
+ #define CONFIG_MTK_PANEL_EXT
+ #if defined(CONFIG_MTK_PANEL_EXT)
+@@ -243,15 +347,12 @@ static int lcm_gpio_set(struct lcm *ctx, const char *name, unsigned int idx, int
+ static void lcm_panel_power_on(struct lcm *ctx)
+ {
+ 	/* bias IC: VPOS/VNEG = 0x12 (stock) */
+-	struct LCM_DATA_T2 vpos = { .cmd = 0x00, .data = 0x12 };
+-	struct LCM_DATA_T2 vneg = { .cmd = 0x01, .data = 0x12 };
+-
+ 	lcm_gpio_set(ctx, "powerdm", 0, 1);
+ 	msleep(10);
+ 	lcm_gpio_set(ctx, "bias", 0, 1);
+ 	lcm_gpio_set(ctx, "bias", 1, 1);
+-	lcm_i2c_set_data(1, &vpos);
+-	lcm_i2c_set_data(1, &vneg);
++	_lcm_i2c_write_bytes(0x00, 0x12);
++	_lcm_i2c_write_bytes(0x01, 0x12);
+ 	msleep(10);
+ }
+ 
+-- 
+2.53.0
+

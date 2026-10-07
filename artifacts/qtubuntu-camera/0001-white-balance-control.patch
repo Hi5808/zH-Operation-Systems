@@ -1,0 +1,85 @@
+diff --git a/src/aalcameraservice.cpp b/src/aalcameraservice.cpp
+index 5480855..38d356a 100644
+--- a/src/aalcameraservice.cpp
++++ b/src/aalcameraservice.cpp
+@@ -30,6 +30,7 @@
+ #include "aalcamerainfocontrol.h"
+ #include "storagemanager.h"
+ #include "aalcameraexposurecontrol.h"
++#include "aalimageprocessingcontrol.h"
+ #include "rotationhandler.h"
+ 
+ #include <hybris/camera/camera_compatibility_layer.h>
+@@ -60,6 +61,7 @@ AalCameraService::AalCameraService(QObject *parent):
+     m_videoOutput = new AalVideoRendererControl(this);
+     m_viewfinderControl = new AalViewfinderSettingsControl(this);
+     m_exposureControl = new AalCameraExposureControl(this);
++    m_imageProcessingControl = new AalImageProcessingControl(this);
+     m_infoControl = new AalCameraInfoControl(this);
+     m_rotationHandler = new RotationHandler(this);
+ }
+@@ -81,6 +83,7 @@ AalCameraService::~AalCameraService()
+     delete m_videoOutput;
+     delete m_viewfinderControl;
+     delete m_exposureControl;
++    delete m_imageProcessingControl;
+     delete m_infoControl;
+     if (m_androidControl)
+         android_camera_delete(m_androidControl);
+@@ -129,6 +132,9 @@ QMediaControl *AalCameraService::requestControl(const char *name)
+     if (qstrcmp(name, QCameraExposureControl_iid) == 0)
+         return m_exposureControl;
+ 
++    if (qstrcmp(name, QCameraImageProcessingControl_iid) == 0)
++        return m_imageProcessingControl;
++
+     if (qstrcmp(name, QCameraInfoControl_iid) == 0)
+         return m_infoControl;
+ 
+@@ -319,6 +325,7 @@ void AalCameraService::initControls(CameraControl *camControl, CameraControlList
+     m_zoomControl->init(camControl, listener);
+     m_videoEncoderControl->init(camControl, listener);
+     m_exposureControl->init(camControl, listener);
++    m_imageProcessingControl->init(camControl);
+ }
+ 
+ QSize AalCameraService::selectSizeWithAspectRatio(const QList<QSize> &sizes, float targetAspectRatio) const
+diff --git a/src/aalcameraservice.h b/src/aalcameraservice.h
+index 2409be2..4baca5f 100644
+--- a/src/aalcameraservice.h
++++ b/src/aalcameraservice.h
+@@ -34,6 +34,7 @@ class AalVideoEncoderSettingsControl;
+ class AalVideoRendererControl;
+ class AalViewfinderSettingsControl;
+ class AalCameraExposureControl;
++class AalImageProcessingControl;
+ class AalCameraInfoControl;
+ class QCameraControl;
+ 
+@@ -111,6 +112,7 @@ private:
+     AalVideoRendererControl *m_videoOutput;
+     AalViewfinderSettingsControl *m_viewfinderControl;
+     AalCameraExposureControl *m_exposureControl;
++    AalImageProcessingControl *m_imageProcessingControl;
+     AalCameraInfoControl *m_infoControl;
+ 
+     CameraControl *m_androidControl;
+diff --git a/src/src.pro b/src/src.pro
+index 8e8b7b9..40e5359 100644
+--- a/src/src.pro
++++ b/src/src.pro
+@@ -33,6 +33,7 @@ HEADERS += \
+     aalcamerainfocontrol.h \
+     audiocapture.h \
+     aalcameraexposurecontrol.h \
++    aalimageprocessingcontrol.h \
+     storagemanager.h \
+     rotationhandler.h
+ 
+@@ -54,5 +55,6 @@ SOURCES += \
+     aalcamerainfocontrol.cpp \
+     audiocapture.cpp \
+     aalcameraexposurecontrol.cpp \
++    aalimageprocessingcontrol.cpp \
+     storagemanager.cpp \
+     rotationhandler.cpp

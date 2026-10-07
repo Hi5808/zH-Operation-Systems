@@ -1,0 +1,12 @@
+[Unit]
+Description=BL6000 Pro: 48MP metastore patch (bind modified android lxc config; injects patched metastore into container)
+DefaultDependencies=no
+After=local-fs.target
+Before=lxc-android-config.service
+ConditionPathExists=/userdata/bl6000pro-48mp/android-config
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c '[ -f /userdata/bl6000pro-48mp/48mp.off ] || mount --bind /userdata/bl6000pro-48mp/android-config /var/lib/lxc/android/config'
+[Install]
+WantedBy=multi-user.target

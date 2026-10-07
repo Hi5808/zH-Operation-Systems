@@ -1,0 +1,83 @@
+# Proprietary files for the Blackview BL6000 Pro (mt6873), Android 11.
+#
+# Consumed by extract-files.sh (pulls from images/logical/vendor.img) and
+# setup-makefiles.sh (generates vendor/blackview/BL6000Pro/Android.mk +
+# BL6000Pro-vendor.mk). Paths are relative to the firmware root; the
+# `vendor/` prefix is stripped automatically by the LineageOS blob tooling.
+#
+# Inventory sourced from docs/HARDWARE-HAL-MAP.md. Trim anything you replace
+# with an open implementation before shipping.
+
+# --- Display / Graphics ------------------------------------------------------
+vendor/lib64/hw/hwcomposer.mt6873.so
+vendor/lib64/hw/android.hardware.graphics.composer@2.1-impl.so
+vendor/lib64/hw/android.hardware.graphics.allocator@4.0-impl-mediatek.so
+vendor/lib64/hw/android.hardware.graphics.mapper@4.0-impl-mediatek.so
+vendor/lib64/hw/gralloc.default.so
+vendor/lib64/hw/vulkan.mt6873.so
+vendor/lib/hw/gralloc.default.so
+vendor/lib/hw/vulkan.mt6873.so
+
+# --- Camera ------------------------------------------------------------------
+vendor/lib64/hw/android.hardware.camera.provider@2.6-impl-mediatek.so
+vendor/lib64/hw/vendor.mediatek.hardware.camera.isphal@1.0-impl.so
+vendor/lib64/hw/vendor.mediatek.hardware.camera.atms@1.0-impl.so
+vendor/lib64/hw/vendor.mediatek.hardware.camera.bgservice@1.1-impl.so
+vendor/lib64/hw/vendor.mediatek.hardware.camera.ccap@1.0-impl.so
+vendor/lib64/hw/vendor.mediatek.hardware.camera.lomoeffect@1.0-impl.so
+
+# --- Audio -------------------------------------------------------------------
+vendor/lib64/hw/audio.primary.mt6873.so
+vendor/lib64/hw/audio.r_submix.mt6873.so
+vendor/lib64/hw/audio.usb.mt6873.so
+vendor/lib64/hw/audio.bluetooth.default.so
+vendor/lib64/hw/android.hardware.audio@6.0-impl-mediatek.so
+vendor/lib64/hw/android.hardware.audio.effect@6.0-impl.so
+vendor/lib64/hw/sound_trigger.primary.mt6873.so
+
+# --- Connectivity (WiFi / BT / GNSS / modem) ---------------------------------
+vendor/lib64/hw/android.hardware.bluetooth@1.0-impl-mediatek.so
+vendor/lib64/hw/android.hardware.bluetooth.audio@2.0-impl.so
+vendor/lib64/hw/vendor.mediatek.hardware.bluetooth.audio@2.1-impl.so
+vendor/lib64/hw/android.hardware.gnss@2.1-impl-mediatek.so
+vendor/lib64/hw/gps.default.so
+vendor/lib64/hw/vendor.mediatek.hardware.mms@1.5-impl.so
+vendor/lib64/hw/vendor.mediatek.hardware.videotelephony@1.0-impl.so
+
+# --- Sensors / Lights / Power / Thermal --------------------------------------
+vendor/lib64/hw/sensors.mt6873.so
+vendor/lib64/hw/lights.mt6873.so
+vendor/lib64/hw/power.mt6873.so
+vendor/lib64/hw/thermal.mt6873.so
+vendor/lib64/hw/memtrack.mt6873.so
+vendor/lib64/hw/vibrator.default.so
+
+# --- Biometrics --------------------------------------------------------------
+vendor/lib64/hw/sunwave.fingerprint.default.so
+vendor/lib64/hw/fsfingerprint.default.so
+vendor/lib64/hw/face.default.so
+
+# --- Security / TEE ----------------------------------------------------------
+vendor/lib64/hw/gatekeeper.trustkernel.so
+vendor/lib64/hw/gatekeeper.default.so
+vendor/lib64/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-impl.so
+vendor/lib64/hw/kmsetkey.trustkernel.so
+vendor/lib64/hw/vendor.mediatek.hardware.nvram@1.1-impl.so
+
+# --- Firmware ----------------------------------------------------------------
+vendor/firmware/WIFI_RAM_CODE_soc2_0_3b_1.bin
+vendor/firmware/BT_FW.cfg
+vendor/firmware/WMT_SOC.cfg
+vendor/firmware/fm_cust.cfg
+vendor/firmware/fs1603s.fsm
+vendor/firmware/gt9886_cfg_6873v01.bin
+
+# --- Kernel modules (loaded from the ramdisk / vendor) -----------------------
+vendor/lib/modules/wlan_drv_gen4m.ko
+vendor/lib/modules/wmt_drv.ko
+vendor/lib/modules/wmt_chrdev_wifi.ko
+vendor/lib/modules/bt_drv.ko
+vendor/lib/modules/gps_drv.ko
+vendor/lib/modules/fmradio_drv.ko
+vendor/lib/modules/fpsgo.ko
+vendor/lib/modules/met.ko

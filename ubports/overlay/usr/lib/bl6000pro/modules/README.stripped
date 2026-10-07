@@ -1,0 +1,1 @@
+Binaries stripped from the public tree. Rebuild via build.sh (kernel modules) / cross-build (plugins). Vendor blobs are never redistributed.

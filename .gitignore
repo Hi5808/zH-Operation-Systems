@@ -1,0 +1,5 @@
+images/
+*.img
+ubuntu-touch/halium-boot/work/
+ubuntu-touch/device/blackview/BL6000Pro/prebuilt/
+ubuntu-touch/vendor/blackview/BL6000Pro/proprietary/

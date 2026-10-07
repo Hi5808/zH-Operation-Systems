@@ -1,0 +1,86 @@
+From aef46900f48af2304e368e00120ae3916709fd79 Mon Sep 17 00:00:00 2001
+From: kino <<EMAIL>>
+Date: Sun, 4 Oct 2026 11:03:10 -1000
+Subject: [PATCH 03/10] Fix build with stock BL6000 Pro config: hwconf stubs,
+ battery/nanohub decls
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ arch/arm64/include/asm/hwconf_manager.h                  | 9 +++++++++
+ .../mediatek/sensor/2.0/mtk_nanohub/mtk_nanohub_ipi.c    | 2 ++
+ drivers/power/supply/mediatek/battery/mtk_battery_core.c | 2 ++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/arch/arm64/include/asm/hwconf_manager.h b/arch/arm64/include/asm/hwconf_manager.h
+index 3bff78973..67fd8f5fc 100644
+--- a/arch/arm64/include/asm/hwconf_manager.h
++++ b/arch/arm64/include/asm/hwconf_manager.h
+@@ -22,30 +22,39 @@ extern int unregister_hw_monitor_info(char *component_name);
+ #else
+ static inline int register_hw_component_info(char *component_name)
+ {
++	return 0;
+ }
+ static inline int add_hw_component_info(char *component_name, char *key, char *value)
+ {
++	return 0;
+ }
+ static inline int unregister_hw_component_info(char *component_name)
+ {
++	return 0;
+ }
+ static inline int register_hw_monitor_info(char *component_name)
+ {
++	return 0;
+ }
+ static inline int add_hw_monitor_info(char *component_name, char *mon_key, char *mon_value)
+ {
++	return 0;
+ }
+ static inline int update_hw_monitor_info(char *component_name, char *mon_key, char *mon_value)
+ {
++	return 0;
+ }
+ static inline int hw_monitor_notifier_register(struct notifier_block *nb)
+ {
++	return 0;
+ }
+ static inline int hw_monitor_notifier_unregister(struct notifier_block *nb)
+ {
++	return 0;
+ }
+ static inline int unregister_hw_monitor_info(char *component_name)
+ {
++	return 0;
+ }
+ #endif
+ 
+diff --git a/drivers/misc/mediatek/sensor/2.0/mtk_nanohub/mtk_nanohub_ipi.c b/drivers/misc/mediatek/sensor/2.0/mtk_nanohub/mtk_nanohub_ipi.c
+index 8a6387a66..4c94a565c 100644
+--- a/drivers/misc/mediatek/sensor/2.0/mtk_nanohub/mtk_nanohub_ipi.c
++++ b/drivers/misc/mediatek/sensor/2.0/mtk_nanohub/mtk_nanohub_ipi.c
+@@ -14,6 +14,8 @@
+ 
+ #define pr_fmt(fmt) "[mtk_nanohub_ipi] " fmt
+ 
++/* implemented in drivers/misc/mediatek/scp/v0x/scp_helper.c */
++extern void scp_wdt_reset(int cpu_id);
+ #include <linux/module.h>
+ #include <linux/workqueue.h>
+ #include <linux/spinlock.h>
+diff --git a/drivers/power/supply/mediatek/battery/mtk_battery_core.c b/drivers/power/supply/mediatek/battery/mtk_battery_core.c
+index 863d69ebd..2f4cb9e50 100644
+--- a/drivers/power/supply/mediatek/battery/mtk_battery_core.c
++++ b/drivers/power/supply/mediatek/battery/mtk_battery_core.c
+@@ -52,6 +52,8 @@
+ #include <linux/proc_fs.h>
+ #include <linux/of_fdt.h>	/*of_dt API*/
+ #include <linux/of.h>
++#include <linux/of_platform.h>
++#include <linux/iio/consumer.h>
+ #include <linux/vmalloc.h>
+ #include <linux/math64.h>
+ #include <linux/alarmtimer.h>
+-- 
+2.53.0
+

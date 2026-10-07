@@ -1,0 +1,55 @@
+From b963980e2b729b25893b245a4b63f646f2c9e916 Mon Sep 17 00:00:00 2001
+From: kino <<EMAIL>>
+Date: Sun, 4 Oct 2026 13:00:53 -1000
+Subject: [PATCH 09/10] battery: add FG_DAEMON_CMD_SET_BATTERY_CAPACITY for
+ Blackview fuelgauged
+
+Blackview's libfgauge_gm30 GM3 version check requires versionID1 = 87
+daemon commands (stock fg_custom_init_from_header: 87/664/14/10/1016).
+Xiaomi's tree had 86, so fuelgauged refused to start and SOC stayed -1.
+Verified on device: level 89%, charge counter valid.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ drivers/power/supply/mediatek/battery/mtk_battery_core.c | 9 +++++++++
+ .../power/supply/mediatek/battery/mtk_battery_internal.h | 4 ++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/drivers/power/supply/mediatek/battery/mtk_battery_core.c b/drivers/power/supply/mediatek/battery/mtk_battery_core.c
+index 2f4cb9e50..d6dda27b9 100644
+--- a/drivers/power/supply/mediatek/battery/mtk_battery_core.c
++++ b/drivers/power/supply/mediatek/battery/mtk_battery_core.c
+@@ -3034,6 +3034,15 @@ void bmd_ctrl_cmd_from_user(void *nl_data, struct fgd_nl_msg_t *ret_msg)
+ 		}
+ 		break;
+ 
++	case FG_DAEMON_CMD_SET_BATTERY_CAPACITY:
++		{
++			int capacity = 0;
++
++			memcpy(&capacity, &msg->fgd_data[0], sizeof(capacity));
++			bm_debug("[fr] SET_BATTERY_CAPACITY = %d\n", capacity);
++		}
++		break;
++
+ 	case FG_DAEMON_CMD_CHECK_FG_DAEMON_VERSION:
+ 		{
+ 			unsigned int fgd_version;
+diff --git a/drivers/power/supply/mediatek/battery/mtk_battery_internal.h b/drivers/power/supply/mediatek/battery/mtk_battery_internal.h
+index 18e4f9515..ed0d4289e 100644
+--- a/drivers/power/supply/mediatek/battery/mtk_battery_internal.h
++++ b/drivers/power/supply/mediatek/battery/mtk_battery_internal.h
+@@ -210,6 +210,10 @@ enum Fg_daemon_cmds {
+ 	FG_DAEMON_CMD_DUMP_LOG,
+ 	FG_DAEMON_CMD_SEND_DATA,
+ 	FG_DAEMON_CMD_COMMUNICATION_INT,
++	/* BL6000Pro: Blackview's fuelgauged speaks an 87-command protocol
++	 * (GM3 version check uses this count as versionID1).
++	 */
++	FG_DAEMON_CMD_SET_BATTERY_CAPACITY,
+ 
+ 	FG_DAEMON_CMD_FROM_USER_NUMBER
+ };
+-- 
+2.53.0
+

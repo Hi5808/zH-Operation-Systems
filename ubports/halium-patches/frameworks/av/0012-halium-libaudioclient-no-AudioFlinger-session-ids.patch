@@ -1,0 +1,49 @@
+From: BL6000 Pro Ubuntu Touch port
+Subject: [PATCH] (halium) libaudioclient: don't wait for AudioFlinger for audio session ids
+
+Halium 11 runs without AudioFlinger ("get rid of using AudioFlinger for
+recording"): recording audio comes from /dev/socket/micshm through
+CameraRecordService. AudioSystem::acquireAudioSessionId() and
+releaseAudioSessionId() still call get_audio_flinger(), which loops forever
+("AudioFlinger not published, waiting...") when the service does not exist.
+~AudioRecord() calls releaseAudioSessionId(), so stopping a camera video
+recording hangs camera_service: MPEG4Writer never writes the moov atom and
+the app freezes.
+
+AudioSource::dataCallback() also calls AudioRecord::getInputFramesLost()
+-> AudioSystem::getInputFramesLost() -> get_audio_flinger() *while holding
+AudioSource::mLock*; stop() then deadlocks in AudioSource::setStopTimeUs()
+(native stack captured with debuggerd on the BL6000 Pro, camera_service is
+32-bit).
+
+Treat the session-id calls as no-ops and report 0 lost input frames when
+media.audio_flinger is not registered.
+
+---
+ media/libaudioclient/AudioSystem.cpp | 13 +++++++++++++
+ 1 file changed, 10 insertions(+)
+
+--- a/media/libaudioclient/AudioSystem.cpp
++++ b/media/libaudioclient/AudioSystem.cpp
+@@ uint32_t AudioSystem::getInputFramesLost(audio_io_handle_t ioHandle)
+ {
++    // Halium: no AudioFlinger (mic data comes from micshm); nothing is lost here.
++    if (defaultServiceManager()->checkService(String16("media.audio_flinger")) == 0)
++        return 0;
+     const sp<IAudioFlinger>& af = AudioSystem::get_audio_flinger();
+@@ void AudioSystem::acquireAudioSessionId(audio_session_t audioSession, pid_t pid, uid_t uid)
+ {
++    // Halium: there is no AudioFlinger; never block waiting for it here.
++    if (defaultServiceManager()->checkService(String16("media.audio_flinger")) == 0)
++        return;
+     const sp<IAudioFlinger>& af = AudioSystem::get_audio_flinger();
+     if (af != 0) {
+         af->acquireAudioSessionId(audioSession, pid, uid);
+@@ void AudioSystem::releaseAudioSessionId(audio_session_t audioSession, pid_t pid)
+ {
++    // Halium: there is no AudioFlinger; never block waiting for it here.
++    if (defaultServiceManager()->checkService(String16("media.audio_flinger")) == 0)
++        return;
+     const sp<IAudioFlinger>& af = AudioSystem::get_audio_flinger();
+     if (af != 0) {
+         af->releaseAudioSessionId(audioSession, pid);

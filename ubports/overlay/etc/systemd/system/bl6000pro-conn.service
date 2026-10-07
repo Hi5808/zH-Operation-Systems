@@ -1,0 +1,12 @@
+[Unit]
+Description=BL6000 Pro: load MTK WiFi modules and power WiFi on
+After=lxc@android.service bl6000pro-wmt.service
+Wants=bl6000pro-wmt.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/bl6000pro-load-conn.sh wifi
+
+[Install]
+WantedBy=multi-user.target

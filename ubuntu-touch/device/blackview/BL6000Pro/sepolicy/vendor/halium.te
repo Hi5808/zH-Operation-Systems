@@ -1,0 +1,32 @@
+# Halium SELinux policy for the Blackview BL6000 Pro.
+#
+# During bring-up, run permissive so a missing allow-rule never bricks boot.
+# Tighten to enforcing once each subsystem is up and `dmesg | grep avc` is
+# clean. UBports images boot with androidboot.selinux=permissive by default
+# anyway; this file documents the intended end state.
+
+# The hybris/HAL bridge domain talks to every vendor HAL.
+type halium, domain;
+permissive halium;
+
+# Let hybris reach the vendor HALs, sockets, and device nodes labeled above.
+allow halium gpu_device:chr_file rw_file_perms;
+allow halium bt_device:chr_file rw_file_perms;
+allow halium gps_device:chr_file rw_file_perms;
+allow halium wmt_device:chr_file rw_file_perms;
+allow halium fm_device:chr_file rw_file_perms;
+allow halium fingerprint_device:chr_file rw_file_perms;
+allow halium block_device:dir search;
+allow halium userdata_block_device:blk_file r_file_perms;
+
+# Vendor HAL service domains inherit the stock MediaTek labels; keep them
+# permissive during bring-up as well.
+permissive hal_audio_default;
+permissive hal_graphics_composer_default;
+permissive hal_camera_default;
+permissive hal_sensors_default;
+permissive hal_bluetooth_default;
+permissive hal_gnss_default;
+permissive hal_power_default;
+permissive hal_thermal_default;
+permissive hal_fingerprint_default;

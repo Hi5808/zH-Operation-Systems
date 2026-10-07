@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Framework resource overlay for the Blackview BL6000 Pro.
+
+  Only override what the stock framework-res gets wrong for this hardware.
+  Values are based on the BL6000 Pro spec sheet (6.3" 1080x2400 notch display,
+  rear fingerprint reader) and the stock build.prop overlays.
+-->
+<resources>
+    <!-- Hardware navigation: on-screen buttons only (no capacitive keys). -->
+    <integer name="config_deviceHardwareKeys">0</integer>
+    <integer name="config_deviceHardwareWakeKeys">0</integer>
+
+    <!-- Notch / display cutout (punch-hole top-left). Leave the framework to
+         read the cutout path from the device tree if it differs. -->
+    <bool name="config_fillMainBuiltInDisplayCutout">false</bool>
+
+    <!-- Doze / AOD: supported by the stock NT36675 panel. -->
+    <bool name="config_dozeAlwaysOnDisplayAvailable">true</bool>
+    <bool name="config_dozeAfterScreenOff">true</bool>
+
+    <!-- Fingerprint: rear-mounted, single sensor. -->
+    <bool name="config_hasFingerprintSensor">true</bool>
+
+    <!-- Auto-brightness: ALS present behind the panel. -->
+    <bool name="config_automatic_brightness_available">true</bool>
+
+    <!-- Vibrator / haptics -->
+    <bool name="config_vibrateOnRing">true</bool>
+
+    <!-- Telephony: this is a phone (dual-SIM 5G). -->
+    <bool name="config_dynamic_bind_ims">true</bool>
+    <integer name="config_volte_replacement_rat">0</integer>
+
+    <!-- Screen: rotation and safe-headset volume defaults are fine as-is. -->
+    <bool name="config_enableAutoRotation">true</bool>
+</resources>

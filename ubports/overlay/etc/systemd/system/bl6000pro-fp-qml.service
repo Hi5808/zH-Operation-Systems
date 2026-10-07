@@ -1,0 +1,12 @@
+[Unit]
+Description=BL6000 Pro: biometryd QML plugin that tracks the biometryd bus name (single-touch FP)
+DefaultDependencies=no
+After=local-fs.target
+Before=lightdm.service lomiri.service
+ConditionPathExists=/usr/lib/aarch64-linux-gnu/qt5/qml/Biometryd/libbiometryd-qml.so
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c 'T=/usr/lib/aarch64-linux-gnu/qt5/qml/Biometryd/libbiometryd-qml.so; F=/usr/lib/bl6000pro/fp/libbiometryd-qml.so; [ -f /userdata/bl6000pro-fp/libbiometryd-qml.so ] && F=/userdata/bl6000pro-fp/libbiometryd-qml.so; [ -f /userdata/bl6000pro-fp/fpqml.off ] || mount --bind "$F" "$T"'
+[Install]
+WantedBy=multi-user.target

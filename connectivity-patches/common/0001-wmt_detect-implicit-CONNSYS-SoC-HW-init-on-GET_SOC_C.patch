@@ -1,0 +1,41 @@
+From d54ccbda8227e832487af2f70bf227e4ab1a37ea Mon Sep 17 00:00:00 2001
+From: kino <<EMAIL>>
+Date: Sun, 4 Oct 2026 18:46:19 -1000
+Subject: [PATCH 1/2] wmt_detect: implicit CONNSYS SoC HW init on
+ GET_SOC_CHIP_ID (Android 11 wmt_loader compat)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ common_detect/wmt_detect.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/common_detect/wmt_detect.c b/common_detect/wmt_detect.c
+index 7a17aa0..fc86b6a 100644
+--- a/common_detect/wmt_detect.c
++++ b/common_detect/wmt_detect.c
+@@ -115,6 +115,22 @@ static long wmt_detect_unlocked_ioctl(struct file *filp, unsigned int cmd, unsig
+ 		break;
+ 
+ 	case COMBO_IOCTL_GET_SOC_CHIP_ID:
++		/*
++		 * BL6000Pro: the Android 11 vendor wmt_loader never issues
++		 * COMBO_IOCTL_CONNSYS_SOC_HW_INIT (added later), so the CONSYS
++		 * platform driver was never registered (g_pdev NULL -> chipid 0 ->
++		 * NULL ic_ops oops at power-on). Do the SoC HW init once here, as
++		 * the older WMT did implicitly.
++		 */
++		{
++			static int soc_hw_inited;
++
++			if (!soc_hw_inited) {
++				soc_hw_inited = 1;
++				WMT_DETECT_PR_INFO("implicit CONNSYS SoC HW init\n");
++				wmt_plat_consys_hw_init();
++			}
++		}
+ 		retval = wmt_plat_get_soc_chipid();
+ 		/*get soc chipid by HAL interface */
+ 		break;
+-- 
+2.53.0
+

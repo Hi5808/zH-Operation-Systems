@@ -1,0 +1,63 @@
+# init.halium.mt6873.rc - device-specific Halium init hook (BL6000 Pro / mt6873).
+#
+# Placed in the halium-boot ramdisk by assemble-boot.sh. The hybris init imports
+# this after mounting the Android partitions. It reproduces the ESSENTIAL device
+# bring-up from the stock init.mt6873.rc (artifacts/kernel-analysis/
+# init.mt6873.rc.stock) that the vendor HALs depend on, without the Android
+# framework parts that Halium replaces.
+#
+# The full stock sequence is preserved on the vendor partition; this hook only
+# guarantees the nodes/permissions the HALs need early, and chains into the
+# vendor init scripts.
+
+import /vendor/etc/init/hw/init.mt6873.rc
+import /vendor/etc/init/hw/init.connectivity.rc
+import /vendor/etc/init/hw/init.mt6873.usb.rc
+import /vendor/etc/init/hw/init.project.rc
+
+on early-init
+    write /proc/bootprof "HALIUM:early-init"
+    mount debugfs debugfs /sys/kernel/debug
+    chmod 0755 /sys/kernel/debug
+
+on init
+    write /proc/bootprof "HALIUM:init"
+    # Legacy storage symlink expected by some vendor HALs.
+    symlink /sdcard /mnt/sdcard
+    # lk_env (bootloader env) - some HALs read this.
+    chown root system /proc/lk_env
+    chmod 0660 /proc/lk_env
+
+on post-fs
+    write /proc/bootprof "HALIUM:post-fs"
+    # --- Display / GPU nodes (Mali-G57 + DRM + ION) -------------------------
+    # Permissions mirrored from the stock ueventd.rc so the hybris gralloc /
+    # HWC / EGL wrappers (running in the Ubuntu LXC container) can open them.
+    chmod 0666 /dev/mali
+    chown system graphics /dev/mali
+    chmod 0666 /dev/ion
+    chown system graphics /dev/ion
+    chmod 0660 /dev/dri/card0
+    chown system system /dev/dri/card0
+
+    # --- Backlight (panel NT36675) ------------------------------------------
+    chmod 0664 /sys/class/leds/lcd-backlight/brightness
+    chown system system /sys/class/leds/lcd-backlight/brightness
+
+on boot
+    write /proc/bootprof "HALIUM:boot"
+    # --- CONSYS connectivity nodes (WiFi/BT/GPS/FM) -------------------------
+    # These are created by the consys driver; ensure the HAL users can access
+    # them. The Ubuntu side reaches them through the LXC device bind mounts.
+    chmod 0660 /dev/stpwmt
+    chown system system /dev/stpwmt
+    chmod 0660 /dev/wmtWifi
+    chown wifi wifi /dev/wmtWifi
+    chmod 0660 /dev/stpbt
+    chown bluetooth bluetooth /dev/stpbt
+    chmod 0660 /dev/stpgps
+    chown gps gps /dev/stpgps
+
+    # --- Touch (NT36XXX / GT9886) -------------------------------------------
+    chmod 0660 /dev/touch
+    chown root system /dev/touch

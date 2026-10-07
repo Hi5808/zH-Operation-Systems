@@ -1,0 +1,67 @@
+# UBports / Halium device metadata for the Blackview BL6000 Pro.
+#
+# This is the device descriptor used when registering the port with the
+# UBports system-image / OTA infrastructure (Phase 8). Values come from the
+# stock firmware analysis (artifacts/, docs/HARDWARE-HAL-MAP.md).
+
+device:
+  name: "Blackview BL6000 Pro"
+  codename: "BL6000Pro"          # must match PRODUCT_DEVICE / BoardConfig
+  manufacturer: "Blackview"
+  platform: "mt6873"             # MediaTek Dimensity 800
+  arch: "arm64"
+
+android:
+  base: "11.0"                   # Android 11 / R
+  halium: "halium-11.0"
+  kernel: "4.14.186+"            # stock prebuilt; no mainline support
+  security_patch: "2021-12-05"
+  build_id: "RP1A.200720.011"
+
+# Partitions that must be flashed for a full install (see flash.sh /
+# scripts/restore-all.sh). `boot` carries halium-boot.img.
+partitions:
+  boot: "halium-boot.img"
+  dtbo: "dtbo.img"               # stock dtbo (panel/touch overlay)
+  vbmeta: "vbmeta.img"           # must be the disabled-verification variant
+  system: "halium-system.img"    # the Ubuntu Touch rootfs (or super rewrite)
+
+# Hardware summary (drives which HALs the port must wire up).
+hardware:
+  display:
+    panel: "Truly NT36675 (video mode)"
+    resolution: "1080x2340"
+    kernel_config: "CONFIG_DRM_PANEL_TRULY_NT36675_VDO"
+  touch:
+    controller: "Novatek NT36XXX (GT9886 family)"
+  gpu:
+    model: "Mali-G57 MC4 (Valhall r25p0)"
+    driver: "proprietary Mali blob via libhybris (no mainline panfrost)"
+  connectivity:
+    wifi_bt_gps_fm: "MediaTek CONSYS_6873 combo"
+  audio:
+    smartpa: "Fortior FS1603S x2"
+    codec: "MediaTek AFE"
+  camera:
+    isp: "MediaTek IMGX ISP"
+    sensors: "IMX582 (main), 2x SP2509 (aux/front), 1x GC2375H (front)"
+    hal: "MtkCam3 + MtkCamX (closed)"
+  modem:
+    base: "MediaTek CCCI / MT6873"
+  sensors:
+    fifo: "MtkHWMF + nanohub CHRE (Context Hub)"
+  nfc:
+    controller: "ST21NFC"
+  fingerprint:
+    note: "vendor fingerprint HAL present"
+
+# OTA / system-image channel info (filled in when the port is published).
+ota:
+  channel: ""                    # e.g. "20.04/arm64/bl6000pro/stable" once live
+  system_tarball: ""             # produced by build-device-tarball.sh
+  boot_image: "halium-boot.img"
+
+status:
+  phase: "3 - first halium-boot.img (panel bring-up)"
+  bootloader: "unlocked"
+  backup: "BROM full backup via scripts/backup-all.sh (run before flashing)"

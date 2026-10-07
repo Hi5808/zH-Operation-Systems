@@ -1,0 +1,13 @@
+[Unit]
+Description=BL6000 Pro: load WMT (before the Android container)
+DefaultDependencies=no
+After=local-fs.target
+Before=lxc@android.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/bl6000pro-load-conn.sh wmt
+
+[Install]
+WantedBy=multi-user.target

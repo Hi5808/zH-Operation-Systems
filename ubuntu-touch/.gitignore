@@ -1,0 +1,6 @@
+work/
+halium-boot.img
+__pycache__/
+*.pyc
+staging/
+*.tar.xz
