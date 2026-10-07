@@ -1,8 +1,7 @@
 ---
 # Submit under data/devices/<codename>/data.md in
 # gitlab.com/ubports/infrastructure/devices.ubuntu-touch.io
-# Confirm the codename first (device reports ro.product.device=BL6000Pro;
-# Blackview build strings also show S1000A / dk022). Use one consistently.
+# Codename: HI001 (folder: data/devices/hi001/). device ro.product.device=BL6000Pro.
 name: Blackview BL6000 Pro 5G
 deviceType: phone
 description: >
@@ -11,7 +10,7 @@ description: >
   cameras, and fingerprint unlock work. Camera is 12 MP (no 48 MP) and has no
   manual white-balance; see the feature matrix.
 tag: unmaintained          # community "as-is" port; remove if you commit to maintaining
-subforum: "<FORUM_ID>/blackview-bl6000-pro"   # create a forum thread, put its id here
+subforum: "<FORUM_ID>/ubuntu-touch-for-blackview-bl6000-pro-hi001"   # create a forum thread, put its id here
 deviceInfo:
   - { id: "Release", value: "2020" }
   - { id: "SoC", value: "MediaTek Dimensity 800 (MT6873)" }
