@@ -179,3 +179,39 @@ With the above recovered, this device can host:
   `super` partition, UT lives as loop-mounted images on `userdata`, and the
   data filesystem is far smaller than its partition (lots of free space for a
   second data area). See §06 "Dual-boot" for the selector-ramdisk mechanism.
+
+## Build & deployment outcomes (reproducible)
+
+Full build pipeline: **[build.sh](build.sh)** (kernel → boot image → cross-built plugins → overlay).
+
+### What shipped working
+- All 3 cameras (main/front/ultra-wide) — via a ~6-line camera-cycle patch to
+  `ViewFinderView.qml` that cycles `QtMultimedia.availableCameras`. Bound at boot; no
+  dependency on anything else.
+- Fingerprint enrol + unlock, single-touch (biometryd QML bus-name watcher).
+- TEE reboot crash fixed (tkcore CFI), telephony/VoLTE, WiFi/BT/GPS/audio, NFC, vibrator.
+
+### Deployment rules that proved essential (follow them)
+1. **Apply overlays at BOOT**, before the target app/HAL starts. Live `mount --bind` over a
+   running app + force-kills corrupts its state → black screen. This caused the single worst
+   time-sink of the port; a clean boot with boot-time binding fixed it instantly.
+2. **Version-match**: build/patch against the commit the device package actually ships (commit
+   is in the dpkg version string). Diff your overlay against *current* stock; only your intended
+   delta should appear. Extra lines = drift = breakage.
+3. **Consistent sets**: a QML change that references a custom plugin property must ship WITH that
+   plugin. Binding the white-balance QML without its rebuilt `libaalcamera.so` broke camera init.
+
+### Dead ends (documented so they aren't re-attempted blindly)
+- **48 MP**: the metadata (libmtkcam_metastore) can be patched to *advertise* 8000×6000 and the
+  HAL accepts it, but the **Camera1/libhybris capture path crashes** configuring that stream —
+  true 48 MP needs MTK's Camera2 `remosaicenable` feature path, which the UT camera app can't
+  drive. Left at 12 MP.
+- **White balance**: even built against the exact app commit as a consistent set, registering the
+  `AalImageProcessingControl` **breaks the camera preview init** (black viewfinder). It is a
+  control-init bug, not a version mismatch. Deferred.
+
+### Known-harmless (Android-11-on-old-vendor-blob)
+- SunWave FP HAL destructor SIGABRTs at boot: `'Pointer tag ... was truncated'` in
+  `free` ← `~SunwaveFingerprintService` — an Android-11 heap pointer-tagging (TBI) incompatibility
+  in the vendor blob, hit in the init race; self-recovers, fingerprint works. Fix options: disable
+  heap tagging for that HAL (ELF memtag note), or stop the redundant FP HAL instances.
