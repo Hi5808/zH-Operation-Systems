@@ -220,3 +220,6 @@ firsthand); a third-party SP Flash Tool guide for this device; and
 GitHub kernel-source repos for other Blackview MediaTek devices as
 precedent. Treat anything not marked "confirmed" above as still needing
 direct verification against the physical device.
+
+## Build
+Reproducible build: [build.sh](build.sh); RE + deployment in [re-notes.md](re-notes.md).
