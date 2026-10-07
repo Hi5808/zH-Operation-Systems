@@ -56,7 +56,7 @@ flowchart LR
 | **Build** | Kernel &amp; userspace | [04 Kernel](docs/android-linux-porting/04-kernel-porting.md) &#183; [05 Rootfs / userspace](docs/android-linux-porting/05-rootfs-and-userspace.md) |
 | **Boot** | Flash &amp; recover safely | [06 Bootloader / flashing](docs/android-linux-porting/06-bootloader-and-flashing.md) &#183; [17 Reversible dev](docs/android-linux-porting/17-reversible-development.md) &#183; [12 OEM restore](docs/android-linux-porting/12-oem-restore.md) |
 | **Finish** | Prove it, give it back | [18 Validation](docs/android-linux-porting/18-validation-and-testing.md) &#183; [19 Hard subsystems](docs/android-linux-porting/19-hard-subsystems.md) &#183; [14 Upstreaming](docs/android-linux-porting/14-upstreaming.md) |
-| **Reference** | Look it up | [07 Tools](docs/android-linux-porting/07-tools-reference.md) &#183; [08 Case studies](docs/android-linux-porting/08-case-studies.md) &#183; [10 Device template](docs/android-linux-porting/10-device-profile-template.md) &#183; [11 Troubleshooting](docs/android-linux-porting/11-troubleshooting-and-debugging.md) &#183; [13 Glossary](docs/android-linux-porting/13-glossary.md) &#183; [15 Hardware lab](docs/android-linux-porting/15-hardware-lab.md) |
+| **Reference** | Look it up | [07 Tools](docs/android-linux-porting/07-tools-reference.md) &#183; [08 Case studies](docs/android-linux-porting/08-case-studies.md) &#183; [10 Device template](docs/android-linux-porting/10-device-profile-template.md) &#183; [11 Troubleshooting](docs/android-linux-porting/11-troubleshooting-and-debugging.md) &#183; [13 Glossary](docs/android-linux-porting/13-glossary.md) &#183; [15 Hardware lab](docs/android-linux-porting/15-hardware-lab.md) &#183; [20 Credits](docs/android-linux-porting/20-credits-and-resources.md) |
 
 ## Devices tracked
 
@@ -72,7 +72,8 @@ flowchart LR
 
 - **`scripts/`** — scaffold a device profile, unpack a boot image, recover
   the kernel config, extract vendor partitions, back up and restore stock
-  firmware, and a [`check-docs.sh`](docs/android-linux-porting/scripts/check-docs.sh)
+  firmware, a [`gen-checklist.py`](docs/android-linux-porting/scripts/gen-checklist.py)
+  per-device readiness generator, and a [`check-docs.sh`](docs/android-linux-porting/scripts/check-docs.sh)
   consistency checker run in CI.
 - **`templates/`** — the source templates `new-device.sh` renders from.
 - **`devices/`** — per-device profiles tracking a specific port end-to-end.
