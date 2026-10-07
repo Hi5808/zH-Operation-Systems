@@ -9,7 +9,7 @@ vendor abandoned it into one running a real, maintained Linux userspace.
 
 [![docs check](https://github.com/Hi5808/Operation-Systems/actions/workflows/check-docs.yml/badge.svg)](https://github.com/Hi5808/Operation-Systems/actions/workflows/check-docs.yml)
 ![chapters](https://img.shields.io/badge/chapters-20-4f8cff)
-![scripts](https://img.shields.io/badge/scripts-9-7c5cff)
+![scripts](https://img.shields.io/badge/scripts-10-7c5cff)
 ![shellcheck](https://img.shields.io/badge/shellcheck-clean-36d399)
 ![status](https://img.shields.io/badge/status-first%20edition-blue)
 [![license: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -63,7 +63,7 @@ flowchart LR
 | Device | SoC | Status |
 |---|---|---|
 | [Anbernic RG405M](docs/android-linux-porting/devices/anbernic-rg405m/profile.md) | UNISOC T618 | Hardware-proven native Yocto port (RGOS) — see the [case study](docs/android-linux-porting/08-case-studies.md) |
-| [Blackview BL6000 Pro 5G](docs/android-linux-porting/devices/blackview-bl6000-pro-5g/profile.md) | MediaTek Dimensity 800 | Profile from research; awaiting a cataloged dump |
+| [Blackview BL6000 Pro 5G](docs/android-linux-porting/devices/blackview-bl6000-pro-5g/profile.md) | MediaTek Dimensity 800 | Port in progress: reproducible [build.sh](docs/android-linux-porting/devices/blackview-bl6000-pro-5g/build.sh), verified RE notes, dual-boot & fingerprint subsystems, UBports device page |
 
 <details>
 <summary><b>Tooling &amp; conventions</b></summary>
