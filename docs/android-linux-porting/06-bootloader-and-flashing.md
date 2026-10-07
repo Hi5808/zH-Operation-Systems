@@ -202,6 +202,59 @@ it is not, by itself, your unbrick path if it can't write. The round-trip
 test in [12-oem-restore.md](12-oem-restore.md) §12.5 is how you confirm
 this *before* you're relying on it.
 
+## Dual-boot: keeping stock Android alongside the Linux OS
+
+On many of these devices you can keep stock Android bootable next to the
+ported Linux OS — not because the partition table was designed for it, but
+because of **how a Halium-style install stores its system**. This is often
+the safest way to develop, too: a known-good Android is one boot selection
+away while the Linux side is unstable.
+
+### Is it feasible? (all read-only checks)
+| Check | Command (on device) | What it tells you |
+|---|---|---|
+| A/B slots? | `ls /dev/disk/by-partlabel/ \| grep -E '_a$\|_b$'` | A/B gives a spare slot; most budget MTK devices are **not** A/B |
+| How the Linux OS is stored | `cat /proc/cmdline` (look for `root=/dev/ram`), `ls -la /userdata/*.img` | Halium typically boots a ramdisk that **loop-mounts image files** (`rootfs.img` + an android system image) on the data partition — i.e. its system lives in files, not its own partitions |
+| Is stock Android still present | `ls -l /dev/disk/by-partlabel/super` (+ size) | If `super` (Android dynamic partitions) is intact, stock system was never wiped |
+| Free space for a 2nd data area | partition size vs filesystem used (`lsblk -b` vs `df -h`) | Halium installs frequently leave the data *filesystem* far smaller than the *partition* — plenty of room for an Android data image |
+| External SD slot | `ls /dev/block/mmcblk1*` | An SD card is the lowest-risk home for a second OS — you never touch internal Android |
+
+**Why it works:** when the Linux OS runs from loop-mounted images on the
+data partition and stock Android's system (`super`) is untouched, the two
+systems' *system* storage never collides. The only genuinely shared pieces
+are the single **boot** partition (one ramdisk) and the **data** partition.
+
+### Mechanism on a non-A/B device (shared boot partition)
+1. **A boot-time selector in the ramdisk.** Repack the boot image so its
+   `init` reads an input at power-on — a held volume key is the usual
+   choice — and branches: switch-root into stock Android (`super`) on one
+   choice, or continue into the Linux OS (loop-mount its `rootfs`)
+   otherwise. This is ramdisk init scripting on a boot image you already
+   know how to repack (this chapter) — **not** partition surgery.
+2. **Separate the data.** Give Android its own `/data` — a dedicated image
+   file carved from the free space on the data partition — so it can't
+   corrupt the Linux OS's files, and vice-versa.
+
+### Risks and limits
+- One shared boot partition means **no A/B fallback**: a broken selector
+  ramdisk = no boot until you reflash the boot image. With a backup
+  (§[backup script]) this is recoverable from download/fastboot mode — a
+  nuisance, not a brick.
+- Verify stock `super` still boots *before* wiring the selector.
+- Preserve the stock Android ramdisk logic for its branch (don't replace it
+  with the Linux ramdisk and expect Android to boot).
+- **Lowest-risk variant:** where an SD-card slot exists, put the second OS
+  entirely on the SD card and never write the internal Android partitions at
+  all. (This is the approach taken by the RGOS handheld effort — Android on
+  eMMC, the Linux OS on microSD only.)
+
+Dual-boot and bootloader **relock** interact: relocking enforces verified
+boot, which a custom selector ramdisk / unsigned Linux boot image will fail
+unless you also handle the AVB key story above. In practice, devices kept
+for dual-boot development are usually left **unlocked** (orange), and the
+relock/no-warning work (above) is a separate, later goal.
+
+
 ## Next
 
 → [07-tools-reference.md](07-tools-reference.md) for the consolidated
