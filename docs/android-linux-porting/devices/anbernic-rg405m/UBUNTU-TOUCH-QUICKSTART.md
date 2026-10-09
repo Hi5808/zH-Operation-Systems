@@ -6,12 +6,15 @@
 
 ## 🎯 What You're Building
 
-A **handheld Linux gaming device** running **Ubuntu Touch** with the **Lomiri** shell (basically a phone OS on a gaming handheld).
+A **Linux smartphone** running **Ubuntu Touch** with the **Lomiri** shell (a real phone OS, just without cellular).
 
-- **Hardware:** Anbernic RG405M (UNISOC T618, gamepad, 4" screen, 4GB RAM)
+- **Hardware:** Anbernic RG405M (UNISOC T618 SoC — same as a budget phone, but in a gaming form factor)
+- **Core device:** Phone without modem (Wi-Fi only, no cellular)
 - **OS:** Ubuntu Touch (UBports community edition)
-- **UI:** Lomiri (touch-optimized, runs fullscreen)
-- **Approach:** Halium (mixed native kernel + Android HAL container)
+- **UI:** Lomiri (standard phone shell, touch-optimized)
+- **Display:** 4" IPS 640×480 (landscape, rotate-270°)
+- **Input:** Touch + gamepad (d-pad/ABXY/L/R/sticks)
+- **Approach:** Halium (standard phone porting path: native kernel + Android HAL container)
 - **Boot path:** Dual-boot from microSD (eMMC untouched, safe)
 
 ---
@@ -120,19 +123,21 @@ Time: ~4-6 hours (with device)
 
 ---
 
-## 🎮 What's Different: Handheld vs. Phone
+## 🎮 Core Customizations: Phone Without Modem
 
-Ubuntu Touch was designed for **phones**, not **gaming handhelds**. Adaptations needed:
+The RG405M is a **standard phone SoC (T618) without a modem chip**. Most phone porting applies directly; customizations are minimal:
 
-| Aspect | Phone | RG405M Handheld | Impact |
-|--------|-------|---------|--------|
-| **Display** | Portrait (1080×2400) | Landscape (640×480, rotated 270°) | UI reflow, button mapping |
-| **Input** | Touch only | Touch + gamepad (d-pad, ABXY, L/R, sticks) | Map buttons to Lomiri actions |
-| **Modem** | Cellular (GSM/LTE) | None | Hide SIM/cellular UI, keep Wi-Fi |
-| **Audio** | Call mic required | Optional mic (speaker + headset jack) | Mic capture can wait |
-| **Storage** | Large (128-256GB) | Medium (128GB eMMC) | microSD for rootfs OK |
+| Aspect | Standard Phone | RG405M (Phone without modem) | Customization Needed |
+|--------|---|---|---|
+| **OS/Kernel** | Ubuntu Touch + kernel | Identical | None — standard phone path |
+| **Halium path** | Native-kernel + HAL container | Identical | None — Halium works as-is |
+| **Display** | Portrait (1080×2400) | Landscape (640×480, rotated 270°) | Rotate-270° DRM config (1 line) |
+| **Cellular modem** | Modems, SIM, voice/SMS | Absent | Don't load modem HAL; UI hides cellular |
+| **Input** | Touch only | Touch + gamepad (d-pad/ABXY/L/R/sticks) | Map gamepad to Lomiri shortcuts |
+| **Audio** | Microphone (calls) | Speaker + headset jack only | Mic capture can wait (not critical) |
+| **Storage** | Variable | 128GB eMMC | Standard phone size; no special handling |
 
-**Effort:** Low-medium. Gamepad mapping is the main customization.
+**The porting effort is identical to a standard phone. Gamepad input mapping is the only real work (isolated to input layer, ~few hours).**
 
 ---
 

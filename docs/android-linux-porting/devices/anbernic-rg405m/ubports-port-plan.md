@@ -2,13 +2,17 @@
 
 ## Overview
 
-Port the **Anbernic RG405M** handheld gaming device to **Ubuntu Touch** with the **Lomiri** shell (formerly Unity 8). This document outlines the Halium (5.1A) path using Android HAL containers for proprietary subsystems while running a full Ubuntu/Debian userspace.
+Port the **Anbernic RG405M** to **Ubuntu Touch** with **Lomiri** shell. This is a **standard phone port** — the device is a phone SoC (UNISOC T618) without a modem. Approach: Halium (5.1A) with native kernel + Android HAL container, same as any other UBports phone.
 
-**Device:** Anbernic RG405M (UNISOC T618, 4GB RAM, 128GB eMMC, 4" IPS touchscreen, gamepad)  
+**Device:** Anbernic RG405M — UNISOC T618 phone SoC (no cellular modem), 4GB RAM, 128GB eMMC, 4" landscape IPS touchscreen, gamepad  
+**Port type:** Phone without modem (Wi-Fi only)  
 **Target OS:** Ubuntu Touch (via UBports)  
-**UI Shell:** Lomiri  
-**Approach:** Halium (mixed native kernel + Android HAL container)  
+**UI Shell:** Lomiri (standard phone shell)  
+**Approach:** Halium (5.1A: native kernel + Android HAL container) — identical to standard phone porting  
+**Customizations:** Display rotation (1 line) + gamepad input mapping (isolated to input layer)  
 **Safety:** Dual-boot from microSD (eMMC untouched during development)  
+
+**Key insight:** 95% of this port is identical to any UNISOC phone. Modem absence + gamepad are isolated changes.  
 
 ---
 
@@ -265,24 +269,44 @@ Port the **Anbernic RG405M** handheld gaming device to **Ubuntu Touch** with the
   Session=halium
   ```
 
-### 5.2 Input Mapping & Gamepad
-- [ ] **Map hardware buttons to Lomiri controls:**
-  - d-pad → arrow keys / navigation
-  - ABXY buttons → app launcher, back, home, menu
-  - L/R → window switching (Alt+Tab equivalent)
-  - Analog sticks → mouse cursor (for older Lomiri) or gamepad input
+### 5.2 Input Mapping & Gamepad (RG405M Specific)
+This is the **only truly RG405M-specific customization**. Standard Ubuntu Touch handles touch input; gamepad mapping is isolated.
 
-- [ ] **Create `/etc/udev/rules.d/99-gamepad.rules`:**
+- [ ] **Expose gamepad as input device** (likely automatic via GPIO-keys driver):
+  ```bash
+  evtest /dev/input/event0  # confirm gamepad events appear
   ```
-  # Map GPIO-keys to event codes
+
+- [ ] **Create `/etc/udev/rules.d/99-gamepad.rules` (device-specific mappings):**
+  ```
+  # Retrogame joystick (analog sticks) and GPIO buttons (d-pad/ABXY/L/R)
   ATTRS{name}=="retrogame_joypad*", ENV{ID_INPUT_JOYSTICK}="1"
   ATTRS{name}=="singleadcjoy*", ENV{ID_INPUT_JOYSTICK}="1"
+  ATTRS{name}=="gpio-keys", ENV{ID_INPUT_KEY}="1"
   ```
 
-- [ ] **Test input:**
+- [ ] **Map buttons in Lomiri** (phone shell already supports gamepad):
+  - **d-pad** → Arrow keys (navigation in menus)
+  - **ABXY** → App launcher, back button, home, menu
+  - **L/R** → Alt+Tab / window switching
+  - **Analog sticks** → Mouse cursor (if needed) or app-specific controls
+  
+  Mapping can be done in:
+  - `/etc/xkb/symbols/` (xkb keyboard layout)
+  - App-specific configs (emulator or game app)
+  - Lomiri settings → Input (if UI supports it)
+
+- [ ] **Test interactivity:**
   ```bash
-  evtest /dev/input/event0  # confirm button presses show up
+  # In Lomiri shell:
+  # 1. Press d-pad → focus navigation works
+  # 2. Press ABXY → menu navigation works
+  # 3. Press L/R → window switcher works
+  # 4. Analog sticks → optional (not critical for phone use)
+  evtest /dev/input/event*  # confirm all events appear
   ```
+
+**This is a small, isolated change.** Phone porting handles the rest.
 
 ### 5.3 Audio & Codec Integration
 - [ ] **Verify ASoC routing** in Halium container:
@@ -401,37 +425,48 @@ Update [profile.md](profile.md) § Status with real test results:
 
 ## Hardware Considerations (from Profile)
 
-### ✅ Proven in RGOS (Use As-Is)
-- **Display (MIPI-DSI):** DRM/sprd driver, Weston on pixman
-- **Touch (I2C Goodix):** IRQ/GPIO-mux fix (RGOS patch 0029)
-- **Wi-Fi/BT (SDIO):** sprdwcn + firmware
-- **Audio (ASoC):** sc2730 codec + routing patches
-- **Gamepad:** gpio-keys + Hall-effect ADC
-- **Battery/Charging:** sc27xx PMIC + fuel-gauge
-- **USB-C:** musb gadget + sc27xx_pd for role handling
+### ✅ Proven in RGOS — Use Exactly As-Is
+Everything below is proven working on hardware. This is a **standard phone** with these exact subsystems; no special handheld work needed.
 
-### ⚠️ Known Issues to Manage
+- **Display (MIPI-DSI):** DRM/sprd driver, rotate-270° in Weston config (1 line change)
+- **Touch (I2C Goodix):** IRQ/GPIO-mux fix (RGOS patch 0029 — already in place)
+- **Wi-Fi/BT (SDIO):** sprdwcn + firmware (standard phone subsystem)
+- **Audio (ASoC):** sc2730 codec + routing patches (same as other UNISOC phones)
+- **Gamepad:** gpio-keys + Hall-effect ADC (optional enhancement; phone works with touch alone)
+- **Battery/Charging:** sc27xx PMIC + fuel-gauge (standard phone power management)
+- **USB-C:** musb gadget + sc27xx_pd for role handling (standard phone connector)
+- **No modem:** Device has no cellular radio — simply don't load modem HAL in Halium
+
+### ⚠️ Known Hardware Quirks (Manage Per RGOS)
+These are SoC/device-specific issues, not phone-port issues. All workarounds proven in RGOS.
+
 | Issue | Impact | Workaround |
 |-------|--------|-----------|
-| **eMMC ADMA fault** on 8-bit HS400ES | Unrecoverable writes | Run rootfs from microSD (proven in RGOS) |
-| **GPU**: Pixman (software) not Mali GL | Performance | Target Mali-G52 + Panfrost; fallback acceptable |
-| **Headset mic capture** | Missing input | Parked in RGOS; requires Android USB debug dump to finalize |
-| **Suspend poweroff race** | Power stays on with VBUS | Known VBUS detection bug; workaround: pull battery |
+| **eMMC ADMA fault** on 8-bit HS400ES writes | Corrupted eMMC writes (UNISOC T618 DMA bug) | Run rootfs from microSD (proven safe in RGOS) |
+| **GPU**: Pixman (software) not Mali GL | Display OK via software; acceleration unavailable | Mali-G52 + Panfrost untested; not critical for phone |
+| **Headset mic capture** | No audio recording (parked in RGOS) | Workaround: not critical for phone use (speaker output works) |
+| **Suspend poweroff race** | Power doesn't off with USB connected | Known T618 VBUS detection bug; workaround: pull battery |
+
+**None are blockers.** All can be addressed post-release. Phone core (display, touch, Wi-Fi, battery) is fully functional.
 
 ---
 
 ## Timeline & Resource Estimate
 
+**Since this is standard phone porting (not special handheld work), the timeline is similar to porting any UNISOC phone to Ubuntu Touch.**
+
 | Phase | Duration | Owner | Notes |
 |-------|----------|-------|-------|
 | 1: Setup | 1-2w | Device holder | Bootloader unlock, microSD test |
-| 2: Device Tree | 2-3w | Port lead | Halium adaptation, HAL inventory |
-| 3: Kernel | 2-3w | Kernel hacker | Halium config, U-Boot, DT validation |
-| 4: Build & Flash | 3-4w | Build engineer | Halium build, rootfs, microSD card |
-| 5: Lomiri Integration | 3-4w | UI/UX lead | Input mapping, audio, display, gamepad |
-| 6: Testing | 2-3w | QA + port lead | Subsystem validation, soak test, thermal |
+| 2: Device Tree | 2-3w | Port lead | Standard Halium device tree (modem HAL skipped) |
+| 3: Kernel | 2-3w | Kernel hacker | Standard Halium config (no modem drivers) |
+| 4: Build & Flash | 2-3w | Build engineer | Halium build, rootfs, microSD card |
+| 5: Phone Integration | 2-3w | UI lead | **Gamepad mapping only** (display rotation = 1 line config); audio/touch/storage standard |
+| 6: Testing | 2-3w | QA + port lead | Subsystem validation, soak test |
 | 7: Publication | 1-2w | Port lead | UBports submission, documentation |
-| **Total** | **15-21 weeks** | Team of 2-3 | ~4-5 months for first release |
+| **Total** | **12-17 weeks** | Team of 1-2 | ~3-4 months for first release (faster than general handheld port) |
+
+**Simplification:** No special "handheld" UI work needed. Gamepad is optional (phone works fine with touch). Lifecycle is standard phone porting.
 
 ---
 
