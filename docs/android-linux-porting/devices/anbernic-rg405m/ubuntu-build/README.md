@@ -14,6 +14,11 @@ the same driver set (RGOS `meta-anbernic`).
 - [`display-regs-capture.txt`](display-regs-capture.txt) — live DSI host / DPU /
   D-PHY register dump captured on the running device; useful for validating the
   ST7701S panel timings.
+- [`proprietary-files.txt`](proprietary-files.txt) — manifest (paths + sha256,
+  **no binaries**) of the closed vendor files the port references, extracted from
+  the OEM OS (GammaOS v1.5.1 vendor partition): Wi-Fi/BT RF config, sprd audio
+  params, and the optional Mali-G52 GPU blobs. Includes the extraction recipe so
+  you can pull your own copies.
 
 ## Not included here (deliberately)
 
@@ -22,7 +27,9 @@ public repo:
 
 - **Secrets:** the AVB signing key (`*.pem`) — excluded.
 - **Copyrighted blobs:** extracted GammaOS/Android `vendor` + APKs + Mali
-  userspace blobs — excluded (redistribution not permitted).
+  userspace blobs — excluded (redistribution not permitted). Their paths +
+  hashes + extraction recipe are in [`proprietary-files.txt`](proprietary-files.txt)
+  instead, so the port is reproducible without republishing vendor binaries.
 - **Binaries:** SD/eMMC disk images, bootloader/SPL/U-Boot images, `pac`
   extracts — excluded (size + not source).
 - **Raw logs & stock DT dump:** multi-hundred-MB USB console logs and the raw

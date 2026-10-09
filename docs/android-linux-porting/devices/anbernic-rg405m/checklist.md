@@ -68,7 +68,7 @@ start from the same drivers.
 |---|---|---|
 | Display | **Native** | `sprd-drm` DRM/KMS, MIPI-DSI. ST7701S panel (init seq from stock `sprd,initial-command`), 640×480 rotate-270. Kernel patches `0026` (reserve logobuffer), `0034` (vblank-on-flush); Mesa gets display via `0001-kmsro-add-sprd-drm-drv`. |
 | Touch / input | **Native** | Goodix `gt911` on I²C. Patches `0020`/`0029` (touch IRQ + GPIO-mux), `0036` (optional-cfg nowarn). |
-| GPU | **Native** | Mali-G52 (Bifrost) driven by open **Mesa Panfrost** + `kmsro` paired to `sprd-drm` — **no `libmali` recipe in the BSP**, so no GPU blob. (Confirm Panfrost vs. blob on first boot.) |
+| GPU | **Native** | Mali-G52 (Bifrost) driven by open **Mesa Panfrost** + `kmsro` paired to `sprd-drm` (`/dev/dri/renderD128`) — no GPU blob. Optional upgrade path: the stock Arm DDK r27p0 Mali blobs (bionic, need `mali_kbase` + libhybris) for GLES 3.2/VK/CL — see [`ubuntu-build/proprietary-files.txt`](ubuntu-build/proprietary-files.txt). |
 | Audio | **Native** | `sprd` VBC + `sc2730` analog codec ASoC (`sound@0` / `sprd-pcm`). Many patches: `0006`,`0008`,`0009`,`0012`,`0013`,`0027`,`0032`,`0033`,`0038`,`0041`. No discrete amp — internal codec path. |
 | Wi-Fi / BT | **Native driver + Firmware-blob** | UNISOC `sprdwcn` / Marlin3 `sc2355` over SDIO (`sprd,sc2355-sdio-wifi`, `ttyBT` mtty). Patches `0001`,`0019`,`0039`. Firmware from `linux-firmware-unisoc` recipe (the only blob). |
 | Gamepad / controls | **Native** | `rocknix-singleadc-joypad` (ADC sticks) + `gpio-keys`, ported from ROCKNIX (patch `0002`); `CONFIG_JOYSTICK_ROCKNIX_SINGLEADC=y`. |
