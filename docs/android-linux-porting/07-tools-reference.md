@@ -4,6 +4,76 @@ Run [scripts/check-tools.sh](scripts/check-tools.sh) to see which of the
 tools below are already installed on this machine, with install hints
 for anything missing.
 
+## 7.0 One-command environment setup (Debian / Ubuntu)
+
+The fastest way to make sure none of §1–§6 ever hits a "command not found".
+Package names below are **verified on Ubuntu 26.04 LTS** (adjust for older
+releases — e.g. `7zip` was `p7zip-full`, `qemu-user-binfmt` was
+`qemu-user-static`). Three tiers: distro packages (`apt`), Python libraries
+(`pip`), and a short list that isn't packaged and must be fetched manually.
+
+### apt — distro packages (one line, paste as-is)
+
+```sh
+sudo apt update && sudo apt install -y erofs-utils android-sdk-libsparse-utils f2fs-tools e2fsprogs dosfstools mtools squashfs-tools cramfsswap cpio cabextract libguestfs-tools adb fastboot android-sdk-platform-tools android-sdk-platform-tools-common mkbootimg abootimg lz4 zstd brotli unzip 7zip device-tree-compiler u-boot-tools build-essential bison flex libssl-dev bc kmod libncurses-dev gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu gcc-arm-linux-gnueabi gcc-arm-none-eabi binutils-multiarch binwalk foremost sleuthkit radare2 gdb gdb-multiarch strace ltrace file xxd hexedit bsdextrautils ripgrep git openssl default-jdk qemu-user qemu-user-binfmt qemu-system-arm python3-pip python3-dev pipx libusb-1.0-0-dev python3-serial minicom screen
+```
+
+> Keep it **one physical line**. Backslash-continued multi-line `apt` commands
+> frequently break on copy-paste (the tail package names get run as standalone
+> shell commands and silently skipped) — if you must split it, end every line
+> with a real ` \` and a newline, or just use the single line above.
+
+Which package provides the binary each step calls:
+
+| Binary | Package |
+|---|---|
+| `simg2img`, `img2simg` | `android-sdk-libsparse-utils` |
+| `fsck.erofs --extract`, `dump.erofs` | `erofs-utils` |
+| `debugfs`, `mke2fs`, `dumpe2fs` | `e2fsprogs` |
+| `unpack_bootimg`, `mkbootimg` | `mkbootimg` |
+| `guestfish`, `virt-*` (read any FS without root/loop mount) | `libguestfs-tools` |
+| `unsquashfs` / `mksquashfs` | `squashfs-tools` |
+| `dtc` | `device-tree-compiler` |
+| `mkimage`, `dumpimage` | `u-boot-tools` |
+| `aarch64-linux-gnu-gcc` / `arm-linux-gnueabi-gcc` | `gcc-aarch64-linux-gnu` / `gcc-arm-linux-gnueabi` |
+| `qemu-aarch64` (run arm64 binaries via `binfmt_misc`) | `qemu-user` + `qemu-user-binfmt` |
+| `objdump`, `readelf` for non-native targets | `binutils-multiarch`, `binutils-aarch64-linux-gnu` |
+
+### pip — Python RE libraries (userspace, no sudo)
+
+```sh
+pip3 install --user --break-system-packages capstone keystone-engine unicorn lief pwntools zstandard python-lzo ubi_reader jefferson uefi_firmware
+pipx install ropper
+```
+
+`ubi_reader` + `jefferson` give `binwalk` its UBIFS/JFFS2 extractors;
+`capstone`/`keystone`/`unicorn`/`lief` are the scripting backbone for
+disasm/asm/emulation and ELF surgery.
+
+### Not in apt — fetch manually (verify checksums before running)
+
+| Tool | Purpose | Source |
+|---|---|---|
+| **Ghidra** | Primary decompiler (§2); uses the `default-jdk` installed above | github.com/NationalSecurityAgency/ghidra (releases) |
+| **`lpunpack` / `lpdump`** | Split a dynamic `super.img` into `vendor`/`system`/`product`/`odm` | AOSP `system/extras/partition_tools` (prebuilt in Android "otatools") |
+| **`avbtool`** | AVB/`vbmeta` inspect + re-sign (§6, §12) | AOSP `external/avb/avbtool.py` (single file) |
+| **`payload-dumper-go`** | Fast `payload.bin` (OTA) extraction | github.com/ssut/payload-dumper-go (releases) |
+| **`sasquatch`** | Vendor-mangled SquashFS that stock `unsquashfs` rejects | github.com/devttys0/sasquatch (build) |
+
+> **No `lpunpack`? You don't strictly need it.** A dynamic `super.img` is a
+> documented liblp container: 4096-byte reserved region, then the geometry
+> (magic `0x616c4467`) at offset 4096, the metadata header (magic
+> `0x414C5030`) at 12288, then packed partition + extent tables. It's ~40 lines
+> of Python to parse: sector size is 512, each partition's extents give a
+> `target_data`×512 byte offset and `num_sectors`×512 length, so you can `dd`
+> out `vendor.img` directly and then `fsck.erofs --extract` it. This also
+> recovers partitions from a **partial/retrofit** super dump that `lpunpack`
+> refuses to open. See [10-device-profile-template.md](10-device-profile-template.md)
+> and the Anbernic RG405M device notes for a worked example.
+
+After installing, re-run [scripts/check-tools.sh](scripts/check-tools.sh) to
+confirm the kit is complete.
+
 ## Dumping & unpacking (§1)
 | Tool | Purpose | Source |
 |---|---|---|
