@@ -65,27 +65,40 @@ the SPL" step.) Watch for the `preboot=role` USB-gadget-wait gotcha (patch to
 
 ---
 
-## Phase 1 — Kernel (the real work): one kernel, three config sets (1–2 wks)
+## Phase 1 — Kernel: pick the mainline tree (Panfrost build already done) (0–2 wks)
 
-Start from the **RGOS `linux-unisoc-t618`** tree + its ~40 patches (not a fresh
-RE — the drivers are done). Build **one** kernel that satisfies all three config
-groups:
+**Two candidate kernels — pick the mainline one for the native-GPU goal:**
 
-- [ ] **Base:** RGOS `meta-anbernic/recipes-kernel/linux` tree + patch series
-      (touch IRQ/mux `0020`/`0029`, ASoC routing, charger, `singleadcjoy` `0002`,
-      eMMC ADMA workarounds, `sprd-drm` vblank `0034`, etc.).
-- [ ] **No Android-container configs needed** — since there's no Halium, the
-      stock `ANDROID_BINDER_IPC`/`BINDERFS`/`ASHMEM`/`STAGING` can be dropped.
-      Keep `DMABUF_HEAPS`/`ION` and `MEMFD_CREATE` for GPU/display buffer sharing.
-- [ ] **systemd / glibc userspace configs — MISSING in stock, must add:**
-      `CONFIG_SYSVIPC`, `DEVTMPFS` (+`_MOUNT`), `FHANDLE`, `TMPFS_POSIX_ACL`,
-      `TMPFS_XATTR`, `AUTOFS_FS` ([stock-boot-analysis.md](ubuntu-build/stock-boot-analysis.md)).
-- [ ] **GPU driver (native):** `CONFIG_DRM_PANFROST=y` + panfrost DT binding; or,
-      if Panfrost is insufficient, build our RE'd/custom Mali-G52 DRM driver
-      against this tree. Keep `DRM_SPRD` for the display controller. No `mali_kbase`
-      / Android HAL.
-- [ ] Validate with `pmbootstrap`'s `kconfig_check` (mainline/systemd profile — not
-      the Halium profile; §4.6).
+| Tree | Pros | Cons |
+|---|---|---|
+| **mainline 7.1 `rg-rotate` (the "Ubuntu build" base)** | **already built** with `DRM_PANFROST=y`, `DRM_SPRD`, the `arm,mali-bifrost` GPU DT node, and all systemd configs — Panfrost works here | sprd Wi-Fi (`sprdwcn`) + sc2730 audio are vendor-only and may not be mainlined — verify/port |
+| RGOS vendor `linux-unisoc-t618` | audio/Wi-Fi/power proven (vendor drivers + ~40 patches) | too old for Panfrost (uses `mali_kbase`) |
+
+**Chosen base = the mainline 7.1 tree** (native GPU needs a modern kernel). Status
+and remaining work:
+
+- [x] **GPU + userspace config — DONE:** `CONFIG_DRM_PANFROST=y` (built-in),
+      `DRM_SPRD`, GEM_SHMEM/SCHED/IOMMU, and all systemd configs (`SYSVIPC`,
+      `DEVTMPFS`, `FHANDLE`, `TMPFS_XATTR`, `AUTOFS_FS`) are set; `Image` (Sep 11)
+      + `ums512-rg405m.dtb` built; GPU DT node `arm,mali-bifrost` so Panfrost binds.
+- [ ] **Driver-coverage gate (on-device, §Phase 2/first-boot):** confirm Wi-Fi
+      (`sprdwcn`) and audio (`sc2730` ASoC) actually work on mainline 7.1. If a
+      subsystem is missing, **port the vendor driver from the RGOS tree into the
+      7.1 tree** — this is the real remaining kernel work, not Panfrost.
+- [ ] Deploy the Sep-11 Panfrost `Image`+`dtb` onto the test card
+      ([ubuntu-build/FIRST-BOOT-AND-GPU-CHECK.md](ubuntu-build/FIRST-BOOT-AND-GPU-CHECK.md) §1b).
+
+Config notes (reference — mostly already satisfied on the 7.1 tree):
+- No Android-container configs (no Halium): `ANDROID_BINDER*`/`ASHMEM`/`STAGING`
+  not needed; keep `DMABUF_HEAPS`/`ION`/`MEMFD_CREATE` for buffer sharing.
+- systemd/glibc configs (`SYSVIPC`, `DEVTMPFS`(+`_MOUNT`), `FHANDLE`,
+  `TMPFS_POSIX_ACL/XATTR`, `AUTOFS_FS`): the **stock Android** kernel lacked these
+  (see [stock-boot-analysis.md](ubuntu-build/stock-boot-analysis.md)); the
+  **mainline 7.1 tree already has them set** — nothing to do.
+- GPU: `CONFIG_DRM_PANFROST=y` + the `arm,mali-bifrost` DT node — done. Our
+  RE'd/custom Mali driver is the fallback only if Panfrost GL is insufficient.
+- If vendor drivers are backported from RGOS, re-check with `pmbootstrap`'s
+  `kconfig_check` (mainline profile).
 
 ## Phase 2 — GPU bring-up (native) (1–3 wks)
 
@@ -140,8 +153,9 @@ groups:
 
 - Feasibility/unlock/write/restore proven; stock firmware in hand; SPL on eMMC;
   SD-boot working (RGOS). Native drivers for all non-GPU subsystems proven (RGOS).
-  Stock kernel `.config` recovered + systemd config gaps identified. OEM vendor
-  extracted + hashed.
+  **Mainline 7.1 port kernel already built with `DRM_PANFROST=y` + the
+  `arm,mali-bifrost` GPU DT node + all systemd configs** (`Image` Sep 11). OEM
+  vendor extracted + hashed.
   Gamepad DT already wired. See [profile.md](profile.md), [re-notes.md](re-notes.md),
   and the [ubuntu-build/](ubuntu-build/) analysis docs.
 

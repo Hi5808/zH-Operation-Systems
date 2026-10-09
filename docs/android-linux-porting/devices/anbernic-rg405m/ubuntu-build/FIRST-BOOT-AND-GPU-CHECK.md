@@ -9,6 +9,15 @@ Panfrost vs. our own Mali driver) — **before** building the Ubuntu Touch rootf
 > full Ubuntu userspace is ideal for probing DRM/Mesa/Panfrost. Use a **spare**
 > microSD; the RGOS card and eMMC/Android stay untouched. No SPL reflash (the
 > open SPL is already on eMMC and boots U-Boot from the SD `uboot` partition).
+>
+> **Kernel status (already built):** the port kernel is a **mainline 7.1** tree
+> with **`CONFIG_DRM_PANFROST=y`** (built-in), `DRM_SPRD`, and every systemd
+> config already set; the GPU DT node `gpu@60000000` is `compatible =
+> "sprd,ums512-mali","arm,mali-bifrost"` (Panfrost binds). An `Image` (Sep 11)
+> + `ums512-rg405m.dtb` are built on vivo at
+> `…/build/rg-rotate-linux/src/linux-7-1-sprd/arch/arm64/boot/`. **But the Sep-4
+> `rg405m-ubuntu-sdcard.img` predates that Image** — so before testing Panfrost,
+> deploy the current kernel (step 1b).
 
 ## 0. Pre-flight (on the flashing host)
 
@@ -24,6 +33,22 @@ lsblk -o NAME,SIZE,TYPE,TRAN,MODEL
 ```sh
 sudo dd if=rg405m-ubuntu-sdcard.img of=/dev/sdX bs=4M conv=fsync status=progress
 sync
+```
+
+## 1b. Put the Panfrost kernel on the card (so the GPU gate is valid)
+
+The Sep-4 image's bundled kernel predates Panfrost. Copy the current `Image` +
+`dtb` onto the card's FAT boot partition (`RGROTATE_BT`, p2) before booting:
+
+```sh
+# from the flashing host, with the card still in:
+sudo mount /dev/sdX2 /mnt            # p2 = the FAT boot partition
+# fetch the current kernel artifacts from vivo:
+B=/mnt/data/shared/Projects/RG405M/rg405m-ubuntu-port/build/rg-rotate-linux/src/linux-7-1-sprd/arch/arm64/boot
+scp vivo@192.168.86.40:$B/Image /mnt/Image
+scp vivo@192.168.86.40:$B/dts/sprd/ums512-rg405m.dtb /mnt/ums512-rg405m.dtb
+sync && sudo umount /mnt
+# (keep extlinux.conf's root=/dev/mmcblk0p3 as-is)
 ```
 
 ## 2. First boot + serial console
@@ -81,10 +106,11 @@ glmark2-es2 --off-screen       # GLES2 score; note fps
 - **`renderD128` + `panfrost` loaded + `kmscube`/`glmark2-es2` render** → Panfrost
   works on this G52. **Decision: native Panfrost; done — no custom driver needed.**
   Record the `glmark2-es2` score + `eglinfo` renderer string.
-- **No `renderD128` / no `panfrost` module** → this reference kernel wasn't built
-  with Panfrost (expected — stock/RGOS didn't enable it). **Not a failure of the
-  GPU** — it means we proceed to Phase 1: rebuild the kernel with
-  `CONFIG_DRM_PANFROST=y` + the panfrost DT binding, reflash the SD, re-run §4.
+- **No `renderD128` / no `panfrost` module** → you almost certainly booted the
+  **old Sep-4 kernel** — redo step 1b to put the Sep-11 Panfrost `Image`+`dtb` on
+  the card (the port kernel *does* have `CONFIG_DRM_PANFROST=y` and the bifrost DT
+  node). Confirm with `uname -a` (build date) and `zcat /proc/config.gz | grep
+  PANFROST` if available.
 - **`panfrost` loads but GL is broken/too slow/incomplete** (glmark2 errors,
   missing GLES3.x) → that's the trigger for **our own RE'd/custom Mali-G52
   driver** (OEM `mali_kbase`/DDK as the register/ioctl RE reference; see
