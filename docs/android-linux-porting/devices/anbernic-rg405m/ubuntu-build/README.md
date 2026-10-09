@@ -15,11 +15,12 @@ the same driver set (RGOS `meta-anbernic`).
   D-PHY register dump captured on the running device; useful for validating the
   ST7701S panel timings.
 - [`proprietary-files.txt`](proprietary-files.txt) — manifest (paths + sha256,
-  **no binaries**) of the closed vendor files the port references. OEM source is
-  the official **Anbernic RG405M V1.15 Unbricker** (stock `.pac`): Wi-Fi/BT/GNSS
-  firmware (real hashes), plus the vendor-partition RF config, sprd audio params,
-  and optional Mali-G52 GPU blobs (inside `super.img`, extraction recipe given).
-  GammaOS is a third-party ROM, not OEM, and is only cited as a cross-reference.
+  **no binaries**) of the closed vendor files the port references, all hashed
+  from the official **Anbernic RG405M V1.15 Unbricker** (`Firmware.pac`):
+  Wi-Fi/BT/GNSS firmware, vendor RF config, sprd audio params, and the optional
+  Mali-G52 GPU blobs. The `vendor` EROFS was carved from the `.pac` and extracted
+  with `fsck.erofs`; the recipe is in the manifest. GammaOS (a third-party ROM)
+  is only cited as a cross-reference — its RF/audio match stock, its Mali differs.
 
 ## Not included here (deliberately)
 

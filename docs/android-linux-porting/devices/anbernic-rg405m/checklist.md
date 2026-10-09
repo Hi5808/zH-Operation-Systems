@@ -70,7 +70,7 @@ start from the same drivers.
 | Touch / input | **Native** | Goodix `gt911` on I²C. Patches `0020`/`0029` (touch IRQ + GPIO-mux), `0036` (optional-cfg nowarn). |
 | GPU | **Native** | Mali-G52 (Bifrost) driven by open **Mesa Panfrost** + `kmsro` paired to `sprd-drm` (`/dev/dri/renderD128`) — no GPU blob. Optional upgrade path: the stock Arm DDK r27p0 Mali blobs (bionic, need `mali_kbase` + libhybris) for GLES 3.2/VK/CL — see [`ubuntu-build/proprietary-files.txt`](ubuntu-build/proprietary-files.txt). |
 | Audio | **Native** | `sprd` VBC + `sc2730` analog codec ASoC (`sound@0` / `sprd-pcm`). Many patches: `0006`,`0008`,`0009`,`0012`,`0013`,`0027`,`0032`,`0033`,`0038`,`0041`. No discrete amp — internal codec path. |
-| Wi-Fi / BT | **Native driver + Firmware-blob** | UNISOC `sprdwcn` / Marlin3 `sc2355` over SDIO (`sprd,sc2355-sdio-wifi`, `ttyBT` mtty). Patches `0001`,`0019`,`0039`. Firmware from `linux-firmware-unisoc` recipe (the only blob). |
+| Wi-Fi / BT | **Native driver + Firmware-blob** | UNISOC `sprdwcn` / Marlin3 `sc2355` over SDIO (`sprd,sc2355-sdio-wifi`, `ttyBT` mtty). Patches `0001`,`0019`,`0039`. Firmware blob: stock `vendor/firmware/wcnmodem.bin` (also packaged by the `linux-firmware-unisoc` recipe) — hashes in [`ubuntu-build/proprietary-files.txt`](ubuntu-build/proprietary-files.txt). |
 | Gamepad / controls | **Native** | `rocknix-singleadc-joypad` (ADC sticks) + `gpio-keys`, ported from ROCKNIX (patch `0002`); `CONFIG_JOYSTICK_ROCKNIX_SINGLEADC=y`. |
 | Sensors | **None / N/A** | No IMU/sensor drivers in the BSP; handheld has no accelerometer/gyro to bridge. |
 | Power / charging | **Native** | `sc27xx` fuel-gauge + `bq2415x` charger + `sc27xx` power-reset. Patches `0011`,`0014`,`0030`,`0031`,`0035`,`0037`,`0042`. |

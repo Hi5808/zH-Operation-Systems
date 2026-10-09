@@ -3,32 +3,34 @@
 # This lists the closed-source vendor files the RG405M port references, by PATH
 # ONLY. The binaries are NOT redistributed here (copyrighted Anbernic/Unisoc
 # content). Extract your own from the stock OEM firmware — see "Provenance" at
-# the bottom. sha256 + size are given so you can verify a matching extract.
+# the bottom. sha256 + size let you verify a matching extract.
 #
-# OEM SOURCE = the official **Anbernic RG405M V1.15 Unbricker** (a Unisoc `.pac`
-# stock-firmware package). GammaOS is a *third-party* LineageOS ROM, NOT the OEM;
-# where a file below also exists in GammaOS the derivative hash is noted only as a
-# cross-reference, never as the OEM value.
+# OEM SOURCE = the official **Anbernic RG405M V1.15 Unbricker** (Unisoc `.pac`
+# stock firmware, `Firmware/Firmware.pac`). All hashes below were taken from that
+# package: the top-level firmware blobs straight from the `.pac`, the vendor/
+# files from the `vendor` EROFS carved out of the `.pac` and extracted with
+# `fsck.erofs`. GammaOS is a *third-party* LineageOS ROM, NOT the OEM; where it
+# matters its hashes are noted only as a cross-reference.
 #
 # Format:  <sha256>  <size-bytes>  <path/name>
 #
 # NOTE: the native Linux port is mostly open (see ../checklist.md bridge table):
 #   - GPU runs on open Mesa Panfrost (/dev/dri/renderD128) — no blob needed.
-#   - Wi-Fi/BT/GNSS kernel firmware: the stock blobs are below; the rgos-yocto
+#   - Wi-Fi/BT/GNSS kernel firmware: stock blobs below; the rgos-yocto
 #     `meta-anbernic` `linux-firmware-unisoc` recipe packages equivalents.
 
 # ===========================================================================
-# OEM firmware blobs  — straight from the V1.15 Unbricker .pac (top-level images)
-# These are the genuine OEM parts. Real sha256 of the stock files.
+# OEM firmware — partition images, straight from the .pac top level
+# (flashed to dedicated partitions; padded to partition size)
 # ===========================================================================
-# Wi-Fi / BT / FM combo (Marlin3 / sc2355) — loaded by the native `sprdwcn` driver
+# Wi-Fi/BT/FM combo (Marlin3 / sc2355) partition image
 4874340e31ba9fe4cecffa6b3ee8f2f4e5ad3357d5f93610648998ff8871f3ba  10485760  wcnmodem.bin
-# GNSS firmware (DT sprd-marlin3 node: /vendor/firmware/gnssmodem.bin)
+# GNSS firmware partition image
 e48f81f58faaac6d649dc685152cbed580422d63797c9c62eac0d3e56642a744   1048576  gnssmodem.bin
-# Audio DSP (AGDSP) — relevant if using the DSP audio path
+# Audio DSP (AGDSP)
 abe15406ece1c2f0a179860bf605c6d82855525f68b8fcd0604f794e99bf1096   6291456  l_agdsp.bin
-# Remaining Unisoc DSP/modem firmware (cellular modem is unused on this Wi-Fi-only
-# handheld, but listed for completeness / full restore)
+# Remaining Unisoc DSP/modem firmware (cellular modem unused on this Wi-Fi-only
+# handheld; listed for completeness / full restore)
 284e67c04713b22e5a61c84d143fac7d4bc743fff514a3b38fc6cb6529194885   1048576  l_cdsp.bin
 debfcf78d21841b14b10f110e8440ae16cb815ed5e75d0e373aaeaabf6af9c3d  10485760  l_gdsp.bin
 03005a047b5ba9a4e0806cd21bdcb9f931ff7fcc2b13790baa1a269bf072d695  20971520  l_ldsp.bin
@@ -37,55 +39,75 @@ b8825087f8fe4fd6fc3fd4d1e6e5ca7ddff09f0e0db98853125b2e48ae2126e9   1048576  l_de
 2a408c4e2721bb57480bf512a8615da70153e62a663f7d3b3681fbc929a37e9d   1048576  pm_sys.bin
 
 # ===========================================================================
-# OEM vendor-partition files  — inside the .pac `super.img` dynamic super
-# (vendor EROFS). Not yet unpacked here, so OEM sha256 is pending ("TBD-OEM").
-# Extract from super.img (recipe below) to fill these in.
+# OEM vendor partition — driver-loadable firmware (vendor/firmware/)
+# These are the UNPADDED files the kernel/driver actually loads at runtime
+# (distinct from the padded partition images above). For a native Linux port
+# these are what go on the rootfs under /lib/firmware or /vendor/firmware.
 # ===========================================================================
-# -- Wi-Fi / BT / FM RF + calibration config (vendor/) --
-TBD-OEM      5442  vendor/bt_configure_pskey.ini
-TBD-OEM      3114  vendor/bt_configure_rf.ini
-TBD-OEM       994  vendor/fm_board_config.ini
-TBD-OEM      7021  vendor/wifi_board_config.ini
-TBD-OEM      3940  vendor/regulatory.db
-TBD-OEM      1182  vendor/regulatory.db.p7s
-TBD-OEM        82  vendor/etc/wifi/wpa_supplicant.conf
-# -- Audio: sprd VBC / sc2730 codec parameter sets (native ASoC loads these) --
-TBD-OEM    527356  vendor/etc/audio_params/sprd/codec.xml
-TBD-OEM   2043331  vendor/etc/audio_params/sprd/audio_structure.xml
-TBD-OEM    656332  vendor/etc/audio_params/sprd/dsp_vbc.xml
-TBD-OEM   2551116  vendor/etc/audio_params/sprd/cvs.xml
+39abf4bd216a5bec2d39219529322eb4b238856ecdd5f8c31093979ed2366bf2    947120  vendor/firmware/wcnmodem.bin
+3a44bdaaff12aec35d18d1da315d27c3ad27cae0e88cc288a7c4c512ddb174ed    595116  vendor/firmware/gnssmodem.bin
 
 # ===========================================================================
-# GPU — Mali-G52 Bifrost userspace (OPTIONAL — NOT used by the native port)
-# Lives in super.img -> vendor (vendor/lib64|lib32). OEM sha256 pending.
-# DDK: Arm Mali Bifrost r27p0-01eac0. APIs: GLES 3.2, VK ~1.1, CL 2.0.
+# OEM vendor partition — Wi-Fi/BT/FM RF + calibration config (vendor/firmware/)
+# sprdwcn is a native kernel driver; these tune the RF front-end (TX power,
+# regulatory). Byte-identical to the GammaOS copies — confirmed genuine stock.
+# ===========================================================================
+82267aedf0e3e85eb3bccde90b61e2f7ca56fecb4d9081829bb8410023538641      5442  vendor/firmware/bt_configure_pskey.ini
+0b86cd94f846f7aecdba2ee3f81313b7c9ffb14aa3041574bad85b2a4be95df2      3114  vendor/firmware/bt_configure_rf.ini
+65303ddb33c01b373bdaa53bb30dfc88f8aeeed0bf483217b5c065f5b1142f81       994  vendor/firmware/fm_board_config.ini
+a58f40c8d99e2bdee1adaac55ab72481c7823b5c386bc9b3085fb43f573f2a5c      7021  vendor/firmware/wifi_board_config.ini
+a9e7292febe9240ed46cd394f854663c685f582d17047035d21140e080d5be12      3940  vendor/firmware/regulatory.db
+604e8f75de5c988664ed2af80178cc2d1b76797fb8c74067bc84fd0fc6590a65      1182  vendor/firmware/regulatory.db.p7s
+5ec05980a18681a3567f7cb15f415bec9dcc680d997bb168a3260501fd7dce92        82  vendor/etc/wifi/wpa_supplicant.conf
+
+# ===========================================================================
+# OEM vendor partition — audio: sprd VBC / sc2730 codec parameter sets
+# (native ASoC path loads equivalents; these are the exact stock tuning)
+# Byte-identical to the GammaOS copies — confirmed genuine stock.
+# ===========================================================================
+be680cbb93fb4048363e65a95001dae98355dfa8e1695344f676c960e0d55481    527356  vendor/etc/audio_params/sprd/codec.xml
+bfb419e3cc199c116600e96b9a13f6c4a8106fabccf64004b50344db5ab41add   2043331  vendor/etc/audio_params/sprd/audio_structure.xml
+93d8113b5458aa66d5b6e93f218b8ec3ce3df39fe56a6ae5c1342ce511709b34    656332  vendor/etc/audio_params/sprd/dsp_vbc.xml
+005ae2ab4979bcf6e5a3fb119e722de03937461b30c704044dceca3422528a35   2551116  vendor/etc/audio_params/sprd/cvs.xml
+
+# ===========================================================================
+# OEM vendor partition — Mali-G52 Bifrost userspace (OPTIONAL — NOT used by the
+# native port, which runs open Mesa Panfrost on /dev/dri/renderD128).
 # Android-bionic ELFs that talk to /dev/mali via the proprietary mali_kbase ioctl
-# ABI — NOT drop-in. The native port runs open Mesa Panfrost instead. To use
-# them: build the matching Arm mali_kbase r27p0 GPL kernel driver against
-# 7.1-sprd + switch the gpu@60000000 DT node to the kbase binding, and run the
-# bionic blobs under libhybris. Mali ships one fat blob under several (byte-
-# identical) sonames: libGLES_mali / libOpenCL / vulkan.ums512.
-TBD-OEM  40000504  vendor/lib64/libGLES_mali.so
-TBD-OEM  28745808  vendor/lib32/libGLES_mali.so
+# ABI — NOT drop-in. To use: build the matching Arm mali_kbase Bifrost GPL kernel
+# driver against 7.1-sprd + switch the gpu@60000000 DT node to the kbase binding,
+# and run the bionic blobs under libhybris. Kept as the GLES 3.2 / VK / CL upgrade
+# path. NOTE: OEM ships TWO distinct blobs per ABI (a main one and an egl/vulkan
+# one) — unlike GammaOS, which shipped one. `libOpenCL.so*` are symlinks to these.
+# ===========================================================================
+9830de9a424611aa1a74464296d1936d79c1f107d683c17fdc23e48a666f7eea  39955928  vendor/lib64/libGLES_mali.so
+85feeb83a4a84a63f631b7487cd898a1dc1ee2ee5c99b9b5b4e82594b33e49f0  39955832  vendor/lib64/egl/libGLES_mali.so
+#   (vendor/lib64/hw/vulkan.ums512.so is byte-identical to the egl blob above)
+cd104af9bb673440397bd1ac74deb176feb620495c8ecf1b2457dde2fb58913d  28898100  vendor/lib/libGLES_mali.so
+c22ababb1359b886fb0aac8d675b23aea8b21505519d95331de7567b3750b0a1  28898028  vendor/lib/egl/libGLES_mali.so
 #
-# Cross-reference only (GammaOS v1.5.1 copies — DERIVATIVE, not OEM): the Mali
-# blobs extracted from GammaOS vendor_custom.img were:
-#   a36c6682a45873d043d33717f8f81ab35c7fa8aebed132d095a3fec9d238b741  40000504  (arm64)
-#   62e5f5837eb6fa3b81b9cc8d5861d5e8ef6f1792f2b204d197722624aca96c8b  28745808  (arm32)
-# GammaOS reuses the stock vendor, so these likely match OEM — verify after
-# unpacking super.img.
+# Cross-reference (GammaOS v1.5.1 Mali — DIFFERENT from OEM, do not mix):
+#   a36c6682…  40000504  arm64 ;  62e5f5837…  28745808  arm32
 
 # ===========================================================================
 # Provenance / how to extract from the OEM firmware
 # ===========================================================================
-# OEM source  : Anbernic RG405M V1.15 Unbricker (official stock firmware .pac)
+# OEM source : Anbernic RG405M V1.15 Unbricker -> Firmware/Firmware.pac (6.33 GB)
 # Top-level firmware blobs (wcnmodem.bin, gnssmodem.bin, l_*.bin, pm_sys.bin,
-#   vbmeta*, boot/vendor_boot/dtbo/super.img, uboot.bin, sml.bin, trustos.bin,
-#   fdl1-sign.bin, fdl2-sign.bin, ums512_1h10.xml) come straight out of the .pac:
-#     # unpack the .pac (e.g. with pacextractor / spd_dump / imjtool)
-#     pacextractor Anbernic-RG405M-V1.15.pac  out/
-# Vendor-partition files (the vendor/ paths above) live in the dynamic super:
-#     simg2img super.img super.raw            # if sparse; else skip
-#     lpunpack super.raw .                     # -> vendor.img (+ system/product/odm)
-#     fsck.erofs --extract=vendor_out vendor.img
-#     # then copy the vendor/ paths out of vendor_out/
+#   super, boot, vbmeta*, uboot.bin, sml.bin, trustos.bin, fdl*-sign.bin,
+#   ums512_1h10.xml): unpack the .pac, e.g.
+#     pacextractor Firmware.pac out/         # or spd_dump / imjtool
+# Vendor-partition files (the vendor/ paths above) live in the `vendor` EROFS.
+# Two ways to get it out of the .pac:
+#   (a) lpunpack the dynamic super, then extract the vendor EROFS:
+#         simg2img super.img super.raw       # if the .pac stores super sparse
+#         lpunpack super.raw .               # -> vendor.img
+#         fsck.erofs --extract=vendor_out vendor.img
+#   (b) if super is stored RAW and lpunpack/extraction give a truncated image
+#       (as the Anbernic V1.15 .pac does), carve the vendor EROFS straight out of
+#       the .pac by its superblock magic — the method used for the hashes here:
+#         # scan the .pac for EROFS superblocks (magic 0xE0F5E1E2 at part_start+1024);
+#         # vendor = the ~763 MB one (here at .pac offset 2477768688, size 800944128);
+#         dd if=Firmware.pac of=vendor.img bs=1 skip=2477768688 count=800944128
+#         fsck.erofs --extract=vendor_out vendor.img
+# See ../../07-tools-reference.md §7.0 for the toolchain and the liblp/EROFS notes.
