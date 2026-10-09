@@ -1,14 +1,18 @@
-# RG405M — first-boot + GPU-gate command sheet
+# RG405M — kernel/GPU bring-up smoke-test (disposable harness)
 
-Paste-ready steps for when the device is in hand. Goal: prove the **boot chain**
-(the eMMC SPL loads U-Boot from the SD) and resolve the **GPU gate** (native
-Panfrost vs. our own Mali driver) — **before** building the Ubuntu Touch rootfs.
+**The deliverable is Ubuntu Touch (Lomiri)** — see
+[UBUNTU-TOUCH-BUILD.md](UBUNTU-TOUCH-BUILD.md). This sheet is **not** the OS: it's
+a throwaway harness to prove the **boot chain** (eMMC SPL → SD U-Boot) and resolve
+the **GPU gate** (native Panfrost vs. our own Mali driver) quickly, *before*
+spending time assembling the UT rootfs. Everything validated here (kernel,
+Panfrost, Wi-Fi, audio, input) carries straight into the Ubuntu Touch build,
+since UT uses the **same kernel**.
 
-> The UT/Lomiri image is **not built yet**. For this validation, flash the
-> already-built **plain Ubuntu reference image** (`rg405m-ubuntu-sdcard.img`) — a
-> full Ubuntu userspace is ideal for probing DRM/Mesa/Panfrost. Use a **spare**
-> microSD; the RGOS card and eMMC/Android stay untouched. No SPL reflash (the
-> open SPL is already on eMMC and boots U-Boot from the SD `uboot` partition).
+> As the disposable rootfs, flash the already-built **plain Ubuntu reference
+> image** (`rg405m-ubuntu-sdcard.img`) — a full userspace with `apt`+Mesa is just
+> a convenient vehicle for `kmscube`/`glmark2`. It is a **test harness, not the
+> product.** Use a **spare** microSD; RGOS card and eMMC/Android stay untouched.
+> No SPL reflash (the open SPL already boots U-Boot from the SD `uboot` partition).
 >
 > **Kernel status (already built):** the port kernel is a **mainline 7.1** tree
 > with **`CONFIG_DRM_PANFROST=y`** (built-in), `DRM_SPRD`, and every systemd

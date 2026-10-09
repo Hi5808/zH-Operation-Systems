@@ -1,11 +1,17 @@
-# RG405M — mainline-Linux / Ubuntu build notes
+# RG405M — Ubuntu Touch build + references
 
-Sanitized build + flash notes from a working **Ubuntu (noble/24.04) arm64 on
-mainline-ish `sprd` kernel** bring-up of the RG405M, contributed as reference
-for the Ubuntu Touch port plan in the parent folder. This is a **native Linux**
-build (Wayland/Weston era tooling), not a Halium container — see
-[`../checklist.md`](../checklist.md) bridge-baseline table, which is derived from
-the same driver set (RGOS `meta-anbernic`).
+**The deliverable is Ubuntu Touch (Lomiri)** — build doc:
+[`UBUNTU-TOUCH-BUILD.md`](UBUNTU-TOUCH-BUILD.md). Everything else in this folder is
+**reference material or test harness** for that port, not the product:
+
+- A working **plain Ubuntu / mainline `sprd` kernel** bring-up (`BUILD.md`,
+  `FLASH.md`) — the *reference* that proved the kernel, Panfrost, DT and SD-boot.
+  It is **not** the OS we ship; it's the harness the UT build reuses.
+- The **OEM** stock-firmware analysis + vendor-file manifest.
+
+All native (no Halium container anywhere) — see
+[`../checklist.md`](../checklist.md) bridge-baseline table (driver set from RGOS
+`meta-anbernic`).
 
 - [`BUILD.md`](BUILD.md) — what was built (kernel, DTB, joypad driver, rootfs,
   custom U-Boot, SD image) and the custom-SPL situation.
@@ -14,6 +20,9 @@ the same driver set (RGOS `meta-anbernic`).
 - [`display-regs-capture.txt`](display-regs-capture.txt) — live DSI host / DPU /
   D-PHY register dump captured on the running device; useful for validating the
   ST7701S panel timings.
+- [`UBUNTU-TOUCH-BUILD.md`](UBUNTU-TOUCH-BUILD.md) — **the deliverable**: building
+  the native (no-Halium) Ubuntu Touch / Lomiri rootfs on the Panfrost kernel (Mir
+  on `gbm-kms` + Mesa). The other build docs here are references/harness, not the OS.
 - [`FIRST-BOOT-AND-GPU-CHECK.md`](FIRST-BOOT-AND-GPU-CHECK.md) — paste-ready
   on-device command sheet: flash a spare SD, boot over `/dev/ttyACM0` (SPL already
   handles it), smoke-test display/input/Wi-Fi/audio, and run the **GPU gate**
