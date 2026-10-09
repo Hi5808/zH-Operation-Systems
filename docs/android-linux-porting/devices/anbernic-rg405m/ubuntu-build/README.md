@@ -14,6 +14,11 @@ the same driver set (RGOS `meta-anbernic`).
 - [`display-regs-capture.txt`](display-regs-capture.txt) — live DSI host / DPU /
   D-PHY register dump captured on the running device; useful for validating the
   ST7701S panel timings.
+- [`FIRST-BOOT-AND-GPU-CHECK.md`](FIRST-BOOT-AND-GPU-CHECK.md) — paste-ready
+  on-device command sheet: flash a spare SD, boot over `/dev/ttyACM0` (SPL already
+  handles it), smoke-test display/input/Wi-Fi/audio, and run the **GPU gate**
+  (Panfrost vs. our own Mali driver) using the built reference Ubuntu image —
+  before the UT rootfs exists.
 - [`stock-boot-analysis.md`](stock-boot-analysis.md) — offline analysis of the
   stock V1.15 `boot`/`vendor_boot`/`dtbo`: the kernel-config gap-check (what to
   enable for a systemd userspace; the kernel is already Halium-ready), the
