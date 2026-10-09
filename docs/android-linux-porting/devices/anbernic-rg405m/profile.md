@@ -97,9 +97,11 @@ driver set don't need to be recovered from a stock dump at all — they're
 in the RGOS `meta-anbernic` BSP. The rows below distinguish "needed for a
 fresh RE effort" from "already solved in the BSP."
 
-- [ ] Stock firmware package — only needed to diff against or to restore
-      Android; check Anbernic's support site. Not on the critical path
-      given the BSP.
+- [x] **Stock firmware package — in hand**: the official **Anbernic V1.15
+      Unbricker** (`Firmware/Firmware.pac`, 6.33 GB) plus a V1.19 per-slot
+      partition dump. The `vendor` EROFS has been carved out and the exact
+      vendor file hashes recorded — see
+      [ubuntu-build/proprietary-files.txt](ubuntu-build/proprietary-files.txt).
 - [x] **Kernel source + device tree — already in the RGOS BSP**:
       `meta-anbernic/recipes-kernel/linux/` builds `linux-unisoc-t618`
       (a vendor 7.1 `sprd` tree) plus ~40 patches; the DT source is
@@ -162,6 +164,14 @@ and runs, not that it's mainlined.
 - The eMMC ADMA bug (§3 table, §8) is the single most important kernel
   issue on this SoC — read RGOS `docs/EMMC-ADMA-ERROR.md` before trusting
   eMMC writes.
+- **Config gap-check (from the recovered stock V1.15 `.config`,
+  [ubuntu-build/stock-boot-analysis.md](ubuntu-build/stock-boot-analysis.md)):**
+  the stock kernel is already Halium-ready (`ANDROID_BINDER_IPC`/`BINDERFS`,
+  `ASHMEM`, `ION`, `DMABUF_HEAPS`, `MEMFD` all `=y`), but for a glibc+systemd
+  userspace (Ubuntu Touch/pmOS/Debian) it is **missing** `CONFIG_SYSVIPC`,
+  `DEVTMPFS`(+`_MOUNT`), `FHANDLE`, `TMPFS_POSIX_ACL`, `TMPFS_XATTR`,
+  `AUTOFS_FS` — enable these. GPU: stock is `DRM_SPRD=m` with **no Panfrost**
+  (Android uses `mali_kbase`); the open port must add `CONFIG_DRM_PANFROST`.
 
 ## §5 Userspace strategy
 - Overall approach: **fully native (no Halium container)** — proven by
