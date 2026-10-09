@@ -17,12 +17,34 @@ on the **`gbm-kms`** platform and Mesa — no Android container, no libhybris, n
 - **Boot:** eMMC SPL already loads U-Boot from the SD `uboot` partition; SD layout
   per [FLASH.md](FLASH.md) (GPT `uboot` + FAT boot + ext4 root).
 
+## How the native rootfs is obtained (resolved)
+
+There is **no prebuilt generic native arm64 rootfs to download**: on
+`system-image.ubports.com`, every modern arm64 base (20.04/24.04/26.04) is
+**Halium/hybris-only**; the only *native/mainline* rootfs channels are
+**16.04/xenial** (`16.04/arm64/mainline/*`, used by PinePhone/PineTab). So the
+native UT rootfs is **built**, with UBports' **`rootfs-builder-debos`** (debos
+recipe). It is **staged on kino at `~/rg405m/rootfs-builder-debos`**; `debos` is
+apt-installable (26.04: `debos` 1.1.7).
+
+- Base rootfs: `mainline-rootfs-core.yaml` pulls the generic UT **xenial/16.04
+  mainline** rootfs from UBports CI + applies `mainline-rootfs-mods.yaml`.
+  (That base is 16.04 because it's the only native one upstream; the in-recipe CI
+  job URL drifts — let `debos` resolve it, or refresh from the current UBports CI.)
+- Our device recipe: copy the **`pine64-*`** recipe set (arm64 + mainline + Mir,
+  native) → an `rg405m` recipe. **GPU: use `scripts/enable-mesa.sh` (Mesa/Panfrost)
+  — skip pine64's `pine64-mali.yaml` Mali-400 blob path**, since our G52 runs on
+  open Panfrost.
+
 ## Build steps
 
-1. **Get the UBports rootfs** — the **halium-less / systemd** Ubuntu Touch rootfs
-   (arm64, Focal-based; the same artifact PinePhone-class ports use), from the
-   UBports system-image/CI. *(Confirm the current channel/URL before download —
-   this is the one external fetch.)*
+1. **Build the base native rootfs** (on kino, once `debos` is installed):
+   ```sh
+   sudo apt install -y debos qemu-user-static   # qemu-user-binfmt already present
+   cd ~/rg405m/rootfs-builder-debos
+   # adapt from pine64-common.yaml → rg405m.yaml (arm64, Mesa, our kernel/dtb);
+   # then run debos on it to produce the rootfs image/tarball.
+   ```
 2. **Lay it into an ext4 root** on the SD (p3), with the UBports rootfs as `/`.
 3. **Kernel + modules + firmware onto the image:**
    - `Image` + `ums512-rg405m.dtb` → the FAT boot partition (+ `extlinux.conf`,
@@ -61,6 +83,9 @@ config — never GPU/HAL userspace.
 
 ## Open items to confirm
 
-- Exact UBports halium-less rootfs channel/artifact to pull (step 1).
+- The current UBports CI URL for the xenial mainline base rootfs (job names drift;
+  `debos` run or the UBports CI dashboard gives the live one).
+- **Base is 16.04/xenial** upstream — decide whether that's acceptable or we invest
+  in a newer native base (not provided upstream; would be custom debos work).
 - Whether `sprdwcn`/`sc2730` are present in the 7.1 tree or need backporting.
 - Lomiri `gbm-kms` session wiring specifics on this Mir version.
