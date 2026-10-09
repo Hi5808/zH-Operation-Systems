@@ -2,26 +2,32 @@
 
 ## Target & strategy
 
-**Deliverable: Ubuntu Touch (Lomiri) on the RG405M**, via **Halium 5.1A**
-(native kernel + a minimal Android HAL container). We are *not* shipping the
-native Ubuntu or Yocto builds — those are **reference sources**. Three references
-feed the port:
+**Deliverable: Ubuntu Touch (Lomiri) on the RG405M**, as a **pure native port —
+no Halium, no libhybris, no Android container.** Every subsystem runs an open
+Linux driver: RGOS proves native display, touch, audio, Wi-Fi/BT, power and
+gamepad, and the **GPU is native too** — Mesa Panfrost, or our own
+reverse-engineered / custom Mali-G52 kernel driver if Panfrost proves
+insufficient. There is no modem and no camera HAL, so nothing requires an Android
+HAL; Halium is explicitly **not used**. The OEM Mali blob is kept only as an
+**RE reference** (DDK register/behaviour), never as a runtime component. We are
+*not* shipping the native Ubuntu or Yocto builds — those are **reference
+sources**. Three references feed the port:
 
 | Reference | What it provides |
 |---|---|
-| **OEM Android — stock Anbernic V1.15** (`Firmware.pac`) | The Halium side: Mali GPU HAL + blob, `hwcomposer`, vendor firmware (wcn/gnss/dsp), RF/audio config, stock DT, dynamic-super/AVB layout. See [ubuntu-build/proprietary-files.txt](ubuntu-build/proprietary-files.txt) and [ubuntu-build/stock-boot-analysis.md](ubuntu-build/stock-boot-analysis.md). |
+| **OEM Android — stock Anbernic V1.15** (`Firmware.pac`) | RE reference for the GPU (Mali DDK behaviour, kbase ABI) + runtime vendor firmware (wcn/gnss/dsp), RF/audio config, stock DT, dynamic-super/AVB layout. See [ubuntu-build/proprietary-files.txt](ubuntu-build/proprietary-files.txt) and [ubuntu-build/stock-boot-analysis.md](ubuntu-build/stock-boot-analysis.md). |
 | **Ubuntu / mainline build** (`beebono/rg-rotate-linux`) | Kernel + DT + bootchain + rootfs packaging, and the proven **SD-boot** path. See [ubuntu-build/BUILD.md](ubuntu-build/BUILD.md) / [FLASH.md](ubuntu-build/FLASH.md). |
 | **Yocto / RGOS** (`rgos-yocto` `meta-anbernic`) | Proven **native open drivers** (display, touch, audio, Wi-Fi/BT, power, gamepad) + the ~40 kernel patches. See [profile.md](profile.md). |
 
 **Device:** UNISOC T618 (ums512), 4 GB RAM, 128 GB eMMC, 4" 640×480 IPS
 (rotate-270), touch + gamepad, **no cellular modem**, Wi-Fi only.
 
-### The key insight: this is a *low-shim* Halium port
+### The key insight: fully native, zero Android container
 
-RGOS already proves every subsystem except the GPU runs on open native drivers.
-So instead of shimming the whole HAL stack through libhybris (the usual Halium
-phone port), we run **native drivers for everything except the GPU**, and use the
-Android container only for graphics:
+RGOS already proves every subsystem except the GPU runs on open native drivers,
+and the GPU is being solved natively too (own RE'd / custom driver + Mesa). So
+this is a **pure native Ubuntu Touch port** — no Halium, no libhybris, no
+hwcomposer anywhere:
 
 | Subsystem | Path | Source |
 |---|---|---|
@@ -30,22 +36,22 @@ Android container only for graphics:
 | Audio | **Native** `sc2730`/VBC ASoC | RGOS |
 | Wi-Fi / BT | **Native** `sprdwcn` + stock firmware | RGOS + OEM firmware |
 | Power / charging | **Native** `sc27xx` | RGOS |
-| **GPU (Mali-G52)** | **OEM Mali Android GL HAL via libhybris + hwcomposer** | OEM Android |
+| **GPU (Mali-G52)** | **Native** — Mesa Panfrost, or our RE'd/custom Mali kernel driver + Mesa | own RE (OEM DDK as reference) |
 | Modem / camera | N/A (not fitted / not needed) | — |
 
-### GPU decision: Mali Android HAL (primary), Panfrost (migration)
+### GPU: native, no Halium
 
-**Primary = the OEM Mali-G52 GL HAL through libhybris + hwcomposer.** This is
-Lomiri/Mir's canonical phone graphics path, gives full hardware **GLES 3.2 +
-Vulkan** from the vendor DDK, and all the pieces are already in hand (the OEM
-Mali blob is hashed; `mali_kbase` ships in the OEM Android kernel). The DT's
-`gpu@60000000` node switches to the `mali_kbase` binding for this path.
+GPU stays open — the one subsystem that could have justified an Android container
+is being handled with our own drivers instead:
 
-**Alternative / long-term = mainline + Mesa Panfrost + Mir `gbm-kms`** (the
-PinePhone-style, **zero Android container** path). Cleaner end-state, no blob —
-but Panfrost on Bifrost/G52 trails the DDK and is **unproven on this device**
-(RGOS only reached software/pixman rendering). Keep as the open-stack migration
-once Panfrost is validated on the G52; do not block first boot on it.
+- **Mesa Panfrost + Mir `gbm-kms`** (`CONFIG_DRM_PANFROST=y`, panfrost DT binding)
+  — the default native stack. Validate GL coverage/perf on this Bifrost G52
+  (unproven here — RGOS only reached software/pixman).
+- **If Panfrost is insufficient → our own RE'd / custom Mali-G52 kernel driver**
+  paired with Mesa, using the OEM DDK/`mali_kbase` purely as the RE reference for
+  register/ioctl behaviour. Still native, still `gbm-kms`, still no libhybris.
+
+No path uses Halium, hwcomposer, or the Android GL HAL at runtime.
 
 ### Boot: no SPL reflash needed
 
@@ -68,50 +74,46 @@ groups:
 - [ ] **Base:** RGOS `meta-anbernic/recipes-kernel/linux` tree + patch series
       (touch IRQ/mux `0020`/`0029`, ASoC routing, charger, `singleadcjoy` `0002`,
       eMMC ADMA workarounds, `sprd-drm` vblank `0034`, etc.).
-- [ ] **Halium container configs — already present in the stock kernel**, carry
-      them: `ANDROID_BINDER_IPC`, `ANDROID_BINDERFS`, `ASHMEM`, `ION`,
-      `DMABUF_HEAPS`, `MEMFD_CREATE`, `STAGING` (all `=y` in stock —
-      [stock-boot-analysis.md](ubuntu-build/stock-boot-analysis.md)). Add
-      `SW_SYNC` if a HAL needs legacy sync.
+- [ ] **No Android-container configs needed** — since there's no Halium, the
+      stock `ANDROID_BINDER_IPC`/`BINDERFS`/`ASHMEM`/`STAGING` can be dropped.
+      Keep `DMABUF_HEAPS`/`ION` and `MEMFD_CREATE` for GPU/display buffer sharing.
 - [ ] **systemd / glibc userspace configs — MISSING in stock, must add:**
       `CONFIG_SYSVIPC`, `DEVTMPFS` (+`_MOUNT`), `FHANDLE`, `TMPFS_POSIX_ACL`,
-      `TMPFS_XATTR`, `AUTOFS_FS`.
-- [ ] **GPU DT/driver:** switch `gpu@60000000` to the `mali_kbase` binding and
-      build the matching Arm `mali_kbase` (Bifrost) GPL module from the OEM
-      Android kernel source (keep `DRM_SPRD` for the display controller). (For the
-      Panfrost alternative instead: `CONFIG_DRM_PANFROST=y`, leave the DT on the
-      panfrost binding.)
-- [ ] Validate with the pmbootstrap/Halium kconfig checker (§4.6).
+      `TMPFS_XATTR`, `AUTOFS_FS` ([stock-boot-analysis.md](ubuntu-build/stock-boot-analysis.md)).
+- [ ] **GPU driver (native):** `CONFIG_DRM_PANFROST=y` + panfrost DT binding; or,
+      if Panfrost is insufficient, build our RE'd/custom Mali-G52 DRM driver
+      against this tree. Keep `DRM_SPRD` for the display controller. No `mali_kbase`
+      / Android HAL.
+- [ ] Validate with `pmbootstrap`'s `kconfig_check` (mainline/systemd profile — not
+      the Halium profile; §4.6).
 
-## Phase 2 — Halium HAL: GPU only (1–2 wks)
+## Phase 2 — GPU bring-up (native) (1–3 wks)
 
-Because only graphics is shimmed, the HAL surface is tiny.
+- [ ] **Try Mesa Panfrost first** — boot the native rootfs, confirm
+      `/dev/dri/renderD128`, run `glmark2-es2`/`kmscube` and a Mir `gbm-kms` smoke
+      test on the G52. Good enough → done.
+- [ ] **If Panfrost GL coverage/perf is insufficient — our own driver:** finish
+      the RE'd/custom Mali-G52 DRM driver (OEM DDK/`mali_kbase` as the register/
+      ioctl reference only), pair it with the Mesa Panfrost gallium driver (or a
+      custom Mesa backend). Still `gbm-kms`, still no Android container.
+- [ ] Confirm EGL/GLES under Mir before Lomiri.
 
-- [ ] **Extract the OEM GPU HAL set** from the stock `vendor` partition (carve
-      recipe in [proprietary-files.txt](ubuntu-build/proprietary-files.txt)):
-      `libGLES_mali.so` (+ egl/vulkan sonames), `hwcomposer`/`gralloc` for
-      ums512, `libsync`, and their `vndk`/`vendor` lib deps.
-- [ ] **libhybris** built against the bionic linker to load those blobs on glibc.
-- [ ] **A minimal `android-rootfs`/system image** (or a slimmed Halium overlay)
-      holding just the GPU HAL + its property/init needs — no full Android ROM.
-- [ ] Bring up `test_hwcomposer` / `test_glesv2` under libhybris before Lomiri.
+## Phase 3 — Rootfs & image (1–2 wks)
 
-## Phase 3 — Device repo & rootfs (1–2 wks)
-
-- [ ] Halium/UBports device tree `device/anbernic/rg405m` — but minimal: it only
-      wires the GPU HAL + the Ubuntu Touch rootfs; everything else is the native
-      kernel. Reuse the stock DT's reserved-memory/ion carveouts
+- [ ] Assemble the Ubuntu Touch rootfs (UBports `rootfs` + a thin device
+      overlay) — no Halium/`android-rootfs`, no `proprietary-files.txt` HAL
+      manifest. Reuse the stock DT's reserved-memory/ion carveouts
       ([stock-boot-analysis.md](ubuntu-build/stock-boot-analysis.md)).
-- [ ] `proprietary-files.txt` (Halium format) = the GPU HAL subset only (paths
-      in [ubuntu-build/proprietary-files.txt](ubuntu-build/proprietary-files.txt)).
-- [ ] Assemble the UT rootfs (UBports `rootfs` + the device overlay) onto an SD
-      image laid out like RGOS's (GPT `uboot` + boot + root), so the existing SPL
-      boots it. Wi-Fi/BT firmware + RF config + audio params from the OEM vendor
-      (hashes in the manifest) onto `/lib/firmware` + the right vendor paths.
+- [ ] Place the only runtime blobs — Wi-Fi/BT/GNSS **firmware** + RF config +
+      audio params from the OEM vendor (hashes in
+      [ubuntu-build/proprietary-files.txt](ubuntu-build/proprietary-files.txt)) —
+      onto `/lib/firmware` and the matching paths.
+- [ ] Lay the SD image out like RGOS's (GPT `uboot` + boot + root) so the SPL
+      already on eMMC boots it.
 
 ## Phase 4 — Lomiri bring-up (2–3 wks)
 
-- [ ] Mir on the **hwcomposer** platform (libhybris) → Lomiri greeter.
+- [ ] Mir on the **`gbm-kms`** platform (native Mesa) → Lomiri greeter.
 - [ ] **Display:** confirm 640×480 **rotate-270** (Mir/Lomiri display config) —
       the one unavoidable device-specific tweak.
 - [ ] **Input:** touch via native `goodix`; **gamepad** already a native `js0`
@@ -138,15 +140,16 @@ Because only graphics is shimmed, the HAL surface is tiny.
 
 - Feasibility/unlock/write/restore proven; stock firmware in hand; SPL on eMMC;
   SD-boot working (RGOS). Native drivers for all non-GPU subsystems proven (RGOS).
-  Stock kernel confirmed Halium-config-ready. OEM vendor extracted + hashed.
+  Stock kernel `.config` recovered + systemd config gaps identified. OEM vendor
+  extracted + hashed.
   Gamepad DT already wired. See [profile.md](profile.md), [re-notes.md](re-notes.md),
   and the [ubuntu-build/](ubuntu-build/) analysis docs.
 
 ## Realistic effort
 
 The generic "15–21 week full Halium phone port" estimate does **not** apply here:
-the kernel drivers are done (RGOS), the container configs are already in the
-stock kernel, and only the GPU is shimmed. The gating work is Phase 1 (one kernel
-with merged configs) + Phase 2 (GPU HAL under libhybris) + Phase 4 (Lomiri on
-hwcomposer). Modem, camera, and most HAL bring-up — the usual time sinks — are
-not in scope.
+there is no Halium, no HAL bring-up, and the non-GPU drivers are done (RGOS). The
+gating work is Phase 1 (one native kernel with the systemd configs merged) +
+Phase 2 (native GPU — Panfrost or our own driver) + Phase 4 (Lomiri on Mir
+`gbm-kms`). Modem, camera, and all HAL/libhybris work — the usual time sinks —
+are not in scope at all.

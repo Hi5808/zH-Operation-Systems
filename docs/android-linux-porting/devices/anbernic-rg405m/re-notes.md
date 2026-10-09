@@ -34,11 +34,16 @@ for the vendor-file hashes. Entries below are derived notes only (no binaries).
   [ubuntu-build/stock-boot-analysis.md](ubuntu-build/stock-boot-analysis.md).
   No module here required register-table recovery from a binary.
 
-## GPU (Mali-G52 Bifrost)
+## GPU (Mali-G52 Bifrost) — own driver, no Halium
 - Stock drives it with the proprietary `mali_kbase` + the bionic `libGLES_mali.so`
-  (DDK Bifrost; hashes in proprietary-files.txt). The open port uses Mesa
-  Panfrost instead, so no RE of the Mali userspace is needed unless the
-  kbase/libhybris upgrade path is pursued.
+  (DDK Bifrost; hashes in proprietary-files.txt). The native UT port uses an
+  **open stack with no Android container**: Mesa Panfrost first, and — if
+  Panfrost's GL on this G52 is insufficient — our **own RE'd/custom Mali-G52 DRM
+  driver** paired with Mesa. The OEM `mali_kbase`/DDK is used **only as the RE
+  reference** (register map, ioctl ABI), never at runtime. No `libhybris`.
+- RE target when the custom driver is needed: the `mali_kbase` ioctl interface
+  (job submission, memory management) and the G52 Bifrost job-manager register
+  block, cross-referenced against Mesa Panfrost's existing Bifrost support.
 
 ## Still open (would need a device-side dump or RE)
 - Headset boom-mic **capture** path (profile.md §3, status 🟨) — parked pending
