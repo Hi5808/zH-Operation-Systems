@@ -14,6 +14,11 @@ the same driver set (RGOS `meta-anbernic`).
 - [`display-regs-capture.txt`](display-regs-capture.txt) — live DSI host / DPU /
   D-PHY register dump captured on the running device; useful for validating the
   ST7701S panel timings.
+- [`stock-boot-analysis.md`](stock-boot-analysis.md) — offline analysis of the
+  stock V1.15 `boot`/`vendor_boot`/`dtbo`: the kernel-config gap-check (what to
+  enable for a systemd userspace; the kernel is already Halium-ready), the
+  129-module driver inventory, the dynamic-super/AVB fstab layout, and the
+  regenerate-it-yourself recipe. No vendor files republished.
 - [`proprietary-files.txt`](proprietary-files.txt) — manifest (paths + sha256,
   **no binaries**) of the closed vendor files the port references, all hashed
   from the official **Anbernic RG405M V1.15 Unbricker** (`Firmware.pac`):
