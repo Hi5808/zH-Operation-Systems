@@ -19,6 +19,13 @@ sudo debos -t ubuntu_base_version:26.04 -t ut_aptly_archive:26.04-1.x rg405m.yam
 ```
 (16.04 is a separate legacy path via the system-image rootfs — not this recipe.)
 
+> **Host-mode build:** `go.sh` runs `debos --disable-fakemachine` — the default
+> fakemachine VM crashed (OOM/scratch) mid apt-install. Host mode uses the
+> workstation's full RAM/disk and the host `qemu-user-binfmt` (flags POF, static
+> interpreter) for the arm64 chroot. If you prefer the VM, use
+> `debos --memory=8G --scratchsize=16G rg405m.yaml` instead.
+
+
 Notes:
 - `ubuntu-touch/common-base.yaml` was made version-overridable (its hardcoded
   `26.04`/`26.04-1.x` became `or .ubuntu_base_version`/`or .ut_aptly_archive`).
