@@ -1,0 +1,57 @@
+{{- $architecture := or .architecture "arm64" -}}
+{{- $debug := or .debug "off" -}}
+
+# Native Ubuntu Touch (Lomiri) rootfs for the Anbernic RG405M.
+# No Halium / libhybris / Android container. GPU = Mesa Panfrost (gbm-kms).
+# Kernel = our mainline 7.2.9-sprd-ums512 (installed as a .deb for modules).
+# Output: a rootfs tarball; the Image/dtb/extlinux go on the FAT boot partition
+# at SD-assembly time (see UBUNTU-TOUCH-BUILD.md), since this device boots
+# SPL -> U-Boot -> extlinux, not flash-kernel.
+
+architecture: {{ $architecture }}
+actions:
+  # 1) Native UT base rootfs (Lomiri + Mir + systemd). Pulls the generic UT
+  #    rootfs from UBports CI and applies mainline mods. NOTE: confirm the CI
+  #    base-rootfs URL is live (job names drift) before running.
+  - action: recipe
+    description: Setup core native UT rootfs
+    recipe: mainline-rootfs-core.yaml
+    variables:
+      architecture: {{ $architecture }}
+      debug: {{ $debug }}
+      imagesuffix: "-edge-rg405m"
+
+  # 2) GPU: make Mesa (Panfrost) the EGL provider — NOT the Mali blob.
+  - action: run
+    chroot: true
+    description: Set EGL libs to Mesa (Panfrost)
+    script: scripts/enable-mesa.sh
+
+  # 3) Our mainline 7.2.9 kernel MODULES (=m drivers). The Image+dtb are NOT
+  #    installed here — they go on the FAT boot partition at SD-assembly time,
+  #    because the device boots SPL -> U-Boot -> extlinux from FAT. Only the
+  #    loadable modules need to live in the rootfs.
+  #    rg405m/modules/ holds lib/modules/7.2.9-sprd-ums512/  (from modules_install)
+  - action: overlay
+    description: Install 7.2.9 kernel modules
+    source: rg405m/modules
+    destination: /
+  - action: run
+    chroot: true
+    script: scripts/try-depmod-installed.sh
+
+  # 4) Device overlay: display rotate-270, gamepad, misc tweaks.
+  - action: overlay
+    description: RG405M device files
+    source: rg405m/overlay
+    destination: /
+
+  # 5) Firmware (DEFERRED for first boot): Wi-Fi/BT/GNSS sprd firmware +
+  #    RF/audio config go here once sprdwcn/VBC are built into the kernel.
+  #    (hashes/paths in the device proprietary-files.txt)
+
+  # 6) Pack the rootfs for SD assembly (p3 ext4).
+  - action: pack
+    description: Pack native UT rootfs
+    file: rg405m-ut-rootfs.tar.gz
+    compression: gz
