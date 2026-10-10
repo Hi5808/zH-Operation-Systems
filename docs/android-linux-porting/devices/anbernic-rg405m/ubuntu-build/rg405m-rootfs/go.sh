@@ -1,7 +1,7 @@
 #!/bin/sh
 # One-shot: build the native RG405M Ubuntu Touch rootfs.
-# --disable-fakemachine: run on the host (no VM) so the big apt install isn't
-#   limited by fakemachine's RAM/scratch (which crashed mid-install). Uses the
-#   host's qemu-user-binfmt for the arm64 chroot.
+# Use fakemachine (the recipe assumes its /scratch mount) but give it plenty of
+# RAM + scratch — the default (~2G RAM / ~4G scratch) OOM'd during the big
+# Lomiri apt install. Bump both well above the installed-rootfs size.
 cd "$(dirname "$0")" || exit 1
-exec debos --disable-fakemachine rg405m.yaml
+exec debos --memory=6G --scratchsize=20G rg405m.yaml

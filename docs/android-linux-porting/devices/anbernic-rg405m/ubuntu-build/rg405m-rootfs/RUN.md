@@ -19,11 +19,10 @@ sudo debos -t ubuntu_base_version:26.04 -t ut_aptly_archive:26.04-1.x rg405m.yam
 ```
 (16.04 is a separate legacy path via the system-image rootfs — not this recipe.)
 
-> **Host-mode build:** `go.sh` runs `debos --disable-fakemachine` — the default
-> fakemachine VM crashed (OOM/scratch) mid apt-install. Host mode uses the
-> workstation's full RAM/disk and the host `qemu-user-binfmt` (flags POF, static
-> interpreter) for the arm64 chroot. If you prefer the VM, use
-> `debos --memory=8G --scratchsize=16G rg405m.yaml` instead.
+> **fakemachine resources:** `go.sh` runs `debos --memory=6G --scratchsize=20G`.
+> The default VM (~2G RAM / ~4G scratch) OOM'd mid Lomiri apt-install. The recipe
+> is written for fakemachine (hardcodes its `/scratch`), so `--disable-fakemachine`
+> is NOT viable here — bump the VM instead. Host has 30G RAM / 95G disk.
 
 
 Notes:
