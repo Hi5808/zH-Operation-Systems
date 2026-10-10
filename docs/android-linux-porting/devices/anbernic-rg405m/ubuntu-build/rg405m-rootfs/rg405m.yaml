@@ -26,6 +26,10 @@ actions:
       architecture: {{ $architecture }}
       ubuntu_base_version: {{ $ubuntu_base_version }}
       ut_aptly_archive: {{ $ut_aptly_archive }}
+      # Skip the "_apt user removal" — it's a Halium/Android-kernel workaround we
+      # don't need on a native kernel (and the upstream action is broken: it uses
+      # `script: userdel _apt`, which debos treats as a missing script file).
+      skip_remove_apt_user: "true"
 
   # 2) Install the NATIVE Ubuntu Touch session (variant=mainline => no Halium)
   - action: recipe
