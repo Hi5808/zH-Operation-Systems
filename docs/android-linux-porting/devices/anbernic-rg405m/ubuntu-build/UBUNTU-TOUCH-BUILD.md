@@ -24,13 +24,13 @@ Target: native (no-Halium) Ubuntu Touch on the **latest mainline kernel**, acros
 
 | Axis | Choice |
 |---|---|
-| Kernel | **mainline 7.2.9** (latest stable; forward-port the rg405m/sprd delta from the 7.1-rc1 tree). Source staged on kino: `~/rg405m/kernel-mainline/linux-7.2.9.tar.xz`. One kernel, shared by all bases. |
+| Kernel | ✅ **BUILT: mainline 7.2.9** (`Linux 7.2.9-sprd-ums512`). Forward-ported the rg405m/sprd delta from 7.1-rc1 onto clean 7.2.9; `Image` (30 MB) + `ums512-rg405m.dtb` at `~/rg405m/kernel-mainline/linux-7.2.9/arch/arm64/boot/`. Panfrost/DRM_SPRD/Goodix/systemd all on. Out-of-tree sprdwcn Wi-Fi + VBC audio deferred (not needed for first boot). One kernel, shared by all bases. |
 | UT base 16.04 | native rootfs via `rootfs-builder-debos` (the upstream-supported native base) |
 | UT base 24.04 | native rootfs — **custom** (upstream ships 24.04 arm64 only as Halium) |
 | UT base 26.04 | native rootfs — **custom** (ditto) |
 
-Status: 7.2.9 source downloaded. Next: forward-port the sprd/rg405m delta →
-cross-build `Image`+dtbs on kino → then the three debos rootfs builds (need sudo).
+Status: **7.2.9 kernel + RG405M DTB BUILT.** Next: 16.04 native rootfs via debos
+(needs your sudo on kino) → assemble SD image → boot. Then 24.04/26.04.
 24.04/26.04-native are experimental (no trodden upstream path); 16.04 is the
 proven native base and comes first.
 

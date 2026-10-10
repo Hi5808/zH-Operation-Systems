@@ -171,7 +171,7 @@ and runs, not that it's mainlined.
   systemd configs, and RGOS proves display/touch/audio(`sc2730`)/Wi-Fi(`sprdwcn`)/
   power(`sc27xx`)/gamepad all work on it — so there is no vendor-driver backport
   to do. (The earlier "~4.14 vendor tree" note was wrong.)
-- **In progress:** rebuilding on the **latest mainline (7.2.9)** — forward-porting
+- **DONE:** rebuilt on the **latest mainline 7.2.9** (`Linux 7.2.9-sprd-ums512`, Image+DTB) — forward-ported
   the rg405m/sprd delta from 7.1-rc1 — per the user's "latest mainline" direction.
 - **Config gap-check (from the recovered stock V1.15 `.config`,
   [ubuntu-build/stock-boot-analysis.md](ubuntu-build/stock-boot-analysis.md)):**
