@@ -58,3 +58,13 @@ Android. See FIRST-BOOT-AND-GPU-CHECK.md for the GPU gate.
 Wi-Fi (`sprdwcn`) + audio (VBC/sc2730) aren't in mainline 7.2.9 yet — add in a
 later kernel pass. Display rotate-270 is via the extlinux cmdline; Lomiri's own
 rotation + gamepad→nav mapping are tuned on first boot.
+
+## Build gotchas (all resolved — recipe + go.sh already account for these)
+1. Ubuntu Base URL needs the **point release** (`24.04.5`), not bare `24.04` (404).
+2. `common-base.yaml`'s `userdel _apt` uses `script:` (a file) → skip via `skip_remove_apt_user: "true"` (Halium-only workaround anyway).
+3. fakemachine default VM OOM'd → `--memory=6G --scratchsize=20G`.
+4. `--disable-fakemachine` is NOT viable (recipe hardcodes `/scratch`); and fakemachine needs the host kernel readable (`sudo chmod +r /boot/vmlinuz-*`) to run without sudo.
+5. Legacy `enable-mesa.sh` breaks on 24.04 glvnd → dropped; install `libegl-mesa0 libgl1-mesa-dri libglx-mesa0 mesa-vulkan-drivers` via `additional_package` instead.
+6. `try-depmod-installed.sh` picks the host `uname -r` → replaced with explicit `depmod 7.2.9-sprd-ums512`.
+
+**Result: `rg405m-ut-24.04.5-rootfs.tar.gz` (~1.53 GB) — native UT 24.04 with Lomiri/Mir, Panfrost (`panfrost_dri.so` + glvnd), and the 7.2.9 modules. Verified.**

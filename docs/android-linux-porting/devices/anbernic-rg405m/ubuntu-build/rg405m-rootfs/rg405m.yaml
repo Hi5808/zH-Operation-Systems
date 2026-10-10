@@ -38,12 +38,13 @@ actions:
     variables:
       architecture: {{ $architecture }}
       variant: {{ $variant }}
+      # Ensure Mesa + Panfrost userspace is present (GL + Vulkan). On 24.04 libglvnd
+      # auto-selects the Mesa EGL vendor via egl_vendor.d — no alternatives needed,
+      # so we do NOT run the legacy enable-mesa.sh (it breaks on glvnd layouts).
+      additional_package: "libegl-mesa0 libgl1-mesa-dri libglx-mesa0 mesa-vulkan-drivers"
 
-  # 3) GPU: Mesa (Panfrost) as the EGL provider — no Mali blob
-  - action: run
-    chroot: true
-    description: Set EGL libs to Mesa (Panfrost)
-    script: scripts/enable-mesa.sh
+  # 3) GPU: Mesa/Panfrost is installed above; libglvnd handles EGL vendor
+  #    selection on 24.04 (no mesa-egl alternatives step).
 
   # 4) Our mainline 7.2.9 kernel MODULES (149 .ko). Image/dtb go on FAT at assembly.
   - action: overlay
@@ -52,7 +53,8 @@ actions:
     destination: /
   - action: run
     chroot: true
-    script: scripts/try-depmod-installed.sh
+    description: depmod our 7.2.9 kernel (explicit; auto-detect picks host uname)
+    command: depmod 7.2.9-sprd-ums512
 
   # 5) RG405M device overlay (rotate-270 handled via extlinux cmdline; gamepad tuned on-device)
   - action: overlay
