@@ -1,5 +1,5 @@
 {{- $architecture := or .architecture "arm64" -}}
-{{- $ubuntu_base_version := or .ubuntu_base_version "24.04" -}}
+{{- $ubuntu_base_version := or .ubuntu_base_version "24.04.5" -}}
 {{- $ut_aptly_archive := or .ut_aptly_archive "24.04-1.x" -}}
 {{- $variant := or .variant "mainline" -}}
 
