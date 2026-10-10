@@ -1,37 +1,47 @@
 {{- $architecture := or .architecture "arm64" -}}
-{{- $debug := or .debug "off" -}}
+{{- $ubuntu_base_version := or .ubuntu_base_version "24.04" -}}
+{{- $ut_aptly_archive := or .ut_aptly_archive "24.04-1.x" -}}
+{{- $variant := or .variant "mainline" -}}
 
-# Native Ubuntu Touch (Lomiri) rootfs for the Anbernic RG405M.
-# No Halium / libhybris / Android container. GPU = Mesa Panfrost (gbm-kms).
-# Kernel = our mainline 7.2.9-sprd-ums512 (installed as a .deb for modules).
-# Output: a rootfs tarball; the Image/dtb/extlinux go on the FAT boot partition
-# at SD-assembly time (see UBUNTU-TOUCH-BUILD.md), since this device boots
-# SPL -> U-Boot -> extlinux, not flash-kernel.
+# Native Ubuntu Touch (Lomiri) rootfs for the Anbernic RG405M — FROM SCRATCH.
+# No Halium / libhybris / Android container. Built like UBports' modern bases:
+# Ubuntu Base + repo.ubports.com + the NATIVE "mainline" UT variant
+# (ubuntu-touch-core-mainline / ubuntu-touch-mainline / session-wayland), on our
+# mainline 7.2.9-sprd-ums512 kernel, GPU via Mesa Panfrost (gbm-kms).
+#
+# Build 24.04:  sudo debos rg405m.yaml
+# Build 26.04:  sudo debos -t ubuntu_base_version:26.04 -t ut_aptly_archive:26.04-1.x rg405m.yaml
+# (16.04 is a separate legacy path — system-image rootfs — not this recipe.)
+#
+# Kernel Image + dtb are NOT installed here; they go on the FAT boot partition at
+# SD-assembly time (SPL -> U-Boot -> extlinux). Only the =m modules go in the rootfs.
 
 architecture: {{ $architecture }}
 actions:
-  # 1) Native UT base rootfs (Lomiri + Mir + systemd). Pulls the generic UT
-  #    rootfs from UBports CI and applies mainline mods. NOTE: confirm the CI
-  #    base-rootfs URL is live (job names drift) before running.
+  # 1) Ubuntu Base + UBports repo (from scratch; no debootstrap needed)
   - action: recipe
-    description: Setup core native UT rootfs
-    recipe: mainline-rootfs-core.yaml
+    description: Ubuntu Base + UBports repo ({{ $ubuntu_base_version }})
+    recipe: ubuntu-touch/common-base.yaml
     variables:
       architecture: {{ $architecture }}
-      debug: {{ $debug }}
-      imagesuffix: "-edge-rg405m"
+      ubuntu_base_version: {{ $ubuntu_base_version }}
+      ut_aptly_archive: {{ $ut_aptly_archive }}
 
-  # 2) GPU: make Mesa (Panfrost) the EGL provider — NOT the Mali blob.
+  # 2) Install the NATIVE Ubuntu Touch session (variant=mainline => no Halium)
+  - action: recipe
+    description: Install Ubuntu Touch ({{ $variant }} / native)
+    recipe: ubuntu-touch/ubuntu-touch-common.yaml
+    variables:
+      architecture: {{ $architecture }}
+      variant: {{ $variant }}
+
+  # 3) GPU: Mesa (Panfrost) as the EGL provider — no Mali blob
   - action: run
     chroot: true
     description: Set EGL libs to Mesa (Panfrost)
     script: scripts/enable-mesa.sh
 
-  # 3) Our mainline 7.2.9 kernel MODULES (=m drivers). The Image+dtb are NOT
-  #    installed here — they go on the FAT boot partition at SD-assembly time,
-  #    because the device boots SPL -> U-Boot -> extlinux from FAT. Only the
-  #    loadable modules need to live in the rootfs.
-  #    rg405m/modules/ holds lib/modules/7.2.9-sprd-ums512/  (from modules_install)
+  # 4) Our mainline 7.2.9 kernel MODULES (149 .ko). Image/dtb go on FAT at assembly.
   - action: overlay
     description: Install 7.2.9 kernel modules
     source: rg405m/modules
@@ -40,18 +50,17 @@ actions:
     chroot: true
     script: scripts/try-depmod-installed.sh
 
-  # 4) Device overlay: display rotate-270, gamepad, misc tweaks.
+  # 5) RG405M device overlay (rotate-270 handled via extlinux cmdline; gamepad tuned on-device)
   - action: overlay
     description: RG405M device files
     source: rg405m/overlay
     destination: /
 
-  # 5) Firmware (DEFERRED for first boot): Wi-Fi/BT/GNSS sprd firmware +
-  #    RF/audio config go here once sprdwcn/VBC are built into the kernel.
-  #    (hashes/paths in the device proprietary-files.txt)
+  # 6) Firmware (DEFERRED for first boot): sprd Wi-Fi/BT/GNSS once sprdwcn/VBC are
+  #    built into the kernel (hashes/paths in the device proprietary-files.txt).
 
-  # 6) Pack the rootfs for SD assembly (p3 ext4).
+  # 7) Pack the native UT rootfs for SD assembly (p3 ext4)
   - action: pack
     description: Pack native UT rootfs
-    file: rg405m-ut-rootfs.tar.gz
+    file: rg405m-ut-{{ $ubuntu_base_version }}-rootfs.tar.gz
     compression: gz
