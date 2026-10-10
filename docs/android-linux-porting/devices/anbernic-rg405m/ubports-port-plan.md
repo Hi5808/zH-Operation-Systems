@@ -65,27 +65,22 @@ the SPL" step.) Watch for the `preboot=role` USB-gadget-wait gotcha (patch to
 
 ---
 
-## Phase 1 — Kernel: pick the mainline tree (Panfrost build already done) (0–2 wks)
+## Phase 1 — Kernel: one proven mainline-7.1+sprd tree, already built (~0 wks)
 
-**Two candidate kernels — pick the mainline one for the native-GPU goal:**
+**One kernel, already built and proven.** The Ubuntu build *and* the RGOS Yocto
+build run the **same tree**: `linux-7-1-sprd` = **mainline Linux 7.1.0-rc1 + sprd/
+ums512 patches** (`Linux version 7.1.0-rc1-sprd-ums512`). There is no separate
+"vendor ~4.14" kernel — that earlier framing was wrong.
 
-| Tree | Pros | Cons |
-|---|---|---|
-| **mainline 7.1 `rg-rotate` (the "Ubuntu build" base)** | **already built** with `DRM_PANFROST=y`, `DRM_SPRD`, the `arm,mali-bifrost` GPU DT node, and all systemd configs — Panfrost works here | sprd Wi-Fi (`sprdwcn`) + sc2730 audio are vendor-only and may not be mainlined — verify/port |
-| RGOS vendor `linux-unisoc-t618` | audio/Wi-Fi/power proven (vendor drivers + ~40 patches) | too old for Panfrost (uses `mali_kbase`) |
-
-**Chosen base = the mainline 7.1 tree** (native GPU needs a modern kernel). Status
-and remaining work:
-
-- [x] **GPU + userspace config — DONE:** `CONFIG_DRM_PANFROST=y` (built-in),
-      `DRM_SPRD`, GEM_SHMEM/SCHED/IOMMU, and all systemd configs (`SYSVIPC`,
-      `DEVTMPFS`, `FHANDLE`, `TMPFS_XATTR`, `AUTOFS_FS`) are set; `Image` (Sep 11)
-      + `ums512-rg405m.dtb` built; GPU DT node `arm,mali-bifrost` so Panfrost binds.
-- [ ] **Driver-coverage gate (on-device, §Phase 2/first-boot):** confirm Wi-Fi
-      (`sprdwcn`) and audio (`sc2730` ASoC) actually work on mainline 7.1. If a
-      subsystem is missing, **port the vendor driver from the RGOS tree into the
-      7.1 tree** — this is the real remaining kernel work, not Panfrost.
-- [ ] Deploy the Sep-11 Panfrost `Image`+`dtb` onto the test card
+- [x] **Kernel DONE:** `CONFIG_DRM_PANFROST=y` (built-in) + `DRM_SPRD` + GPU DT
+      node `arm,mali-bifrost` (Panfrost binds) + all systemd configs; `Image`
+      built. **All device drivers present and proven on this tree by RGOS**
+      (display, touch, audio `sc2730`, Wi-Fi/BT `sprdwcn`, power `sc27xx`, gamepad)
+      — so there is **no vendor-driver backport to do**; Wi-Fi/audio already work
+      on 7.1.
+- [ ] Only remaining kernel step: pin the tree to a clean tag/commit (it currently
+      builds `-rc1` "dirty"/`+`) for a reproducible UT build.
+- [ ] Deploy the current Panfrost `Image`+`dtb` onto the test card
       ([ubuntu-build/FIRST-BOOT-AND-GPU-CHECK.md](ubuntu-build/FIRST-BOOT-AND-GPU-CHECK.md) §1b).
 
 Config notes (reference — mostly already satisfied on the 7.1 tree):

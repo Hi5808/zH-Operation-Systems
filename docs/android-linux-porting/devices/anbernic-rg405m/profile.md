@@ -164,14 +164,15 @@ and runs, not that it's mainlined.
 - The eMMC ADMA bug (§3 table, §8) is the single most important kernel
   issue on this SoC — read RGOS `docs/EMMC-ADMA-ERROR.md` before trusting
   eMMC writes.
-- **Two kernels in play.** RGOS uses the downstream vendor tree (audio/Wi-Fi/
-  power as vendor drivers). The **Ubuntu Touch port instead uses the mainline
-  `rg-rotate` 7.1 tree**, which is **already built** with `DRM_PANFROST=y`, the
-  `arm,mali-bifrost` GPU DT node, `DRM_SPRD`, and all systemd configs — the
-  native-GPU base. Open question for that tree: whether the sprd **Wi-Fi
-  (`sprdwcn`) + audio (`sc2730`)** vendor drivers are present/working or must be
-  backported from RGOS — resolved by the first-boot smoke test
-  ([ubuntu-build/FIRST-BOOT-AND-GPU-CHECK.md](ubuntu-build/FIRST-BOOT-AND-GPU-CHECK.md)).
+- **One kernel, shared.** Both the Ubuntu build and the RGOS Yocto build run the
+  **same `linux-7-1-sprd` tree = mainline Linux 7.1.0-rc1 + sprd/ums512 patches**
+  (`Linux version 7.1.0-rc1-sprd-ums512`; upstream `github.com/beebono/linux-mainline-sprd`).
+  It has `DRM_PANFROST=y` + the `arm,mali-bifrost` GPU node + `DRM_SPRD` + all
+  systemd configs, and RGOS proves display/touch/audio(`sc2730`)/Wi-Fi(`sprdwcn`)/
+  power(`sc27xx`)/gamepad all work on it — so there is no vendor-driver backport
+  to do. (The earlier "~4.14 vendor tree" note was wrong.)
+- **In progress:** rebuilding on the **latest mainline (7.2.9)** — forward-porting
+  the rg405m/sprd delta from 7.1-rc1 — per the user's "latest mainline" direction.
 - **Config gap-check (from the recovered stock V1.15 `.config`,
   [ubuntu-build/stock-boot-analysis.md](ubuntu-build/stock-boot-analysis.md)):**
   the stock kernel is already Halium-ready (`ANDROID_BINDER_IPC`/`BINDERFS`,

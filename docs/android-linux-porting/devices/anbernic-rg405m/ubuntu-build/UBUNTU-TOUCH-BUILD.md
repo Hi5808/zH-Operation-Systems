@@ -17,6 +17,23 @@ on the **`gbm-kms`** platform and Mesa — no Android container, no libhybris, n
 - **Boot:** eMMC SPL already loads U-Boot from the SD `uboot` partition; SD layout
   per [FLASH.md](FLASH.md) (GPT `uboot` + FAT boot + ext4 root).
 
+## Build matrix (in progress)
+
+Target: native (no-Halium) Ubuntu Touch on the **latest mainline kernel**, across
+**all three** UT bases.
+
+| Axis | Choice |
+|---|---|
+| Kernel | **mainline 7.2.9** (latest stable; forward-port the rg405m/sprd delta from the 7.1-rc1 tree). Source staged on kino: `~/rg405m/kernel-mainline/linux-7.2.9.tar.xz`. One kernel, shared by all bases. |
+| UT base 16.04 | native rootfs via `rootfs-builder-debos` (the upstream-supported native base) |
+| UT base 24.04 | native rootfs — **custom** (upstream ships 24.04 arm64 only as Halium) |
+| UT base 26.04 | native rootfs — **custom** (ditto) |
+
+Status: 7.2.9 source downloaded. Next: forward-port the sprd/rg405m delta →
+cross-build `Image`+dtbs on kino → then the three debos rootfs builds (need sudo).
+24.04/26.04-native are experimental (no trodden upstream path); 16.04 is the
+proven native base and comes first.
+
 ## How the native rootfs is obtained (resolved)
 
 There is **no prebuilt generic native arm64 rootfs to download**: on
