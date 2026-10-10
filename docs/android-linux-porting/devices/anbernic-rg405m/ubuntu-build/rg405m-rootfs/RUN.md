@@ -10,8 +10,33 @@ staged in `rg405m/modules/`, and the `Image`+`dtb` are in
 cd ~/rg405m/rootfs-builder-debos
 sudo debos rg405m.yaml      # -> rg405m-ut-rootfs.tar.gz (native Lomiri rootfs)
 ```
-If it errors fetching the base rootfs, the CI job URL in `mainline-rootfs-core.yaml`
-has drifted — update it to the current UBports xenial arm64 rootfs artifact and re-run.
+### ⚠️ Base-rootfs blocker (confirmed 2026-10-10) and options
+
+`rootfs-builder-debos`'s `mainline-rootfs-core.yaml` downloads the base rootfs from
+`ci.ubports.com/job/xenial-…-rootfs-arm64` — that **Jenkins job is dead (404)**;
+16.04/xenial is EOL and even upstream `main` still points at it. So `sudo ./go.sh`
+fails immediately at "Download latest ubuntu touch rootfs from CI".
+
+**Live alternative found:** the native UT rootfs is still served by the
+system-image OTA server, e.g. (16.04/arm64/mainline, devel, v1133):
+`https://system-image.ubports.com/pool/ubports-0c802f412bf028e1664fe39e54ea58fe6d180131161773bda89efdadecc79ad0.tar.xz`
+(357–379 MB). **But** it unpacks under a **`system/` prefix** (system-image
+read-only-rootfs format), not as a plain rootfs — so it needs the recipe's
+download+unpack replaced with a host extract that strips `system/`
+(`tar -xJ --strip-components=1 -C $ROOTDIR`), plus handling of the UBports
+system-image overlay model. Non-trivial, and 16.04 is a dead-end base anyway.
+
+**Two real paths (pick one):**
+1. **Adapt to the system-image tarball** — rewrite the core recipe's fetch/unpack
+   to the live URL above with `--strip-components=1`; iterate on the overlay model.
+   Gets a 16.04 native base soonest.
+2. **Build the rootfs from scratch** (debootstrap + the UBports Lomiri/Mir apt
+   repos) — more work, but base-version-agnostic and the only sane route to the
+   **24.04/26.04** bases (which have no native prebuilt at all). The right
+   long-term path for "all 3".
+
+The mainline **7.2.9 kernel is built and independent of this** — it drops onto
+whichever rootfs we produce.
 
 ## 2. Assemble the SD (reuse the proven SPL-compatible layout)
 Start from the existing Ubuntu SD image (gives the `uboot` partition the eMMC SPL
