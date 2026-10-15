@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/android-linux-porting/assets/banner.svg" alt="Porting Mainline Linux to Any Android Device" width="100%">
+<img src="docs/android-linux-porting/assets/banner.svg" alt="Porting Mainline Linux to Any Device" width="100%">
 
 ### Operating-systems engineering notes &amp; guides
 
