@@ -30,7 +30,7 @@
   </g>
 
   <text class="t title" x="48" y="96" font-size="40" fill="#f0f3fb">Porting Mainline Linux</text>
-  <text class="t title" x="48" y="140" font-size="40" fill="#cdd6f4">to <tspan fill="#7c9bff">Any</tspan> Android Device</text>
+  <text class="t title" x="48" y="140" font-size="40" fill="#cdd6f4">to <tspan fill="#7c9bff">Any</tspan> Device</text>
 
   <text class="t" x="48" y="180" font-size="18" fill="#8b93a7">Dump &#183; reverse engineer &#183; rebuild the kernel &#183; boot a real Linux userspace</text>
 
